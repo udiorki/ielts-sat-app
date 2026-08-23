@@ -52,7 +52,7 @@
         <i class="fa-solid fa-fire text-amber-500"></i> <span>0</span>
       </div>
       <div class="flex items-center gap-1 bg-purple-50 border border-purple-200 text-purple-700 px-2 py-0.5 rounded-full text-xs font-black">
-        <i class="fa-solid fa-bolt text-purple-500"></i> <span>0 XP</span>
+        <i class="fa-solid fa-bolt text-purple-500"></i> <span id="userXPDisplay">150 XP</span>
       </div>
       <div class="bg-slate-100 p-0.5 rounded-xl flex gap-0.5 border border-slate-200 ml-1">
         <button id="btn-mode-ielts" onclick="switchExamMode('IELTS')" class="px-2 py-0.5 rounded-lg text-[11px] font-extrabold bg-white text-blue-600 shadow-sm">IELTS</button>
@@ -64,19 +64,29 @@
   <!-- DASHBOARD HOME VIEW -->
   <main id="view-home" class="p-4 space-y-4 max-w-md mx-auto">
 
-    <!-- BAND 9 COLLOCATIONS & VOCAB BANK (PERFECTLY PLACED ON HOME DASHBOARD) -->
-    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 text-white shadow-md space-y-2">
+    <!-- BAND 9 COLLOCATIONS & VOCAB BANK (CLICKABLE) -->
+    <div onclick="openCollocationsModal()" class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 text-white shadow-md space-y-2 cursor-pointer hover:opacity-95">
       <div class="flex items-center justify-between">
         <span class="bg-white/20 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">Band 9 Lexical Resource</span>
-        <i class="fa-solid fa-book-sparkles text-amber-300 text-xs"></i>
+        <i class="fa-solid fa-layer-group text-amber-300 text-xs"></i>
       </div>
       <h3 class="text-xs font-black">Key Topic Collocations & Metaphors</h3>
       <div class="flex flex-wrap gap-1.5 pt-1">
         <span class="bg-white/10 text-white text-[10px] font-semibold px-2 py-0.5 rounded border border-white/20">profound impact</span>
         <span class="bg-white/10 text-white text-[10px] font-semibold px-2 py-0.5 rounded border border-white/20">dwindling resources</span>
         <span class="bg-white/10 text-white text-[10px] font-semibold px-2 py-0.5 rounded border border-white/20">foster innovation</span>
-        <span class="bg-white/10 text-white text-[10px] font-semibold px-2 py-0.5 rounded border border-white/20">lucrative prospect</span>
       </div>
+      <p class="text-[10px] text-blue-100 pt-1 flex items-center gap-1 font-bold"><i class="fa-solid fa-arrow-right-long"></i> Tap to open Lexical Flashcards</p>
+    </div>
+
+    <!-- VOCABULARY GAME WIDGET (RETURNED) -->
+    <div onclick="openVocabGame()" class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-white shadow-md cursor-pointer hover:opacity-95">
+      <div class="flex items-center justify-between mb-1">
+        <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Interactive Mini-Game</span>
+        <i class="fa-solid fa-gamepad text-emerald-200 text-xs"></i>
+      </div>
+      <h3 class="text-sm font-black">Vocabulary Match Challenge</h3>
+      <p class="text-[11px] text-emerald-100 mt-0.5">Test your Academic Word List (AWL) knowledge and earn XP!</p>
     </div>
 
     <!-- PREDICTIONS POOL -->
@@ -206,6 +216,49 @@
     <div class="grid grid-cols-2 gap-2.5" id="booksGrid"></div>
   </section>
 
+  <!-- MODALS -->
+  <!-- COLLOCATIONS MODAL -->
+  <div id="modalCollocations" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl p-4 space-y-3 shadow-xl">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+        <h3 class="font-extrabold text-slate-800 text-sm">Band 9 Lexical Flashcards</h3>
+        <button onclick="closeCollocationsModal()" class="text-slate-400 font-bold text-sm">&times;</button>
+      </div>
+      <div class="space-y-2 max-h-80 overflow-y-auto">
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+          <p class="font-bold text-blue-600 text-xs">Profound impact</p>
+          <p class="text-[11px] text-slate-600">A very deep or significant effect on something.</p>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+          <p class="font-bold text-blue-600 text-xs">Dwindling resources</p>
+          <p class="text-[11px] text-slate-600">Assets or natural supplies that are gradually diminishing.</p>
+        </div>
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+          <p class="font-bold text-blue-600 text-xs">Foster innovation</p>
+          <p class="text-[11px] text-slate-600">To encourage and promote new ideas or creative solutions.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOCAB GAME MODAL -->
+  <div id="modalVocabGame" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl p-4 space-y-4 shadow-xl text-center">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+        <h3 class="font-extrabold text-slate-800 text-sm"><i class="fa-solid fa-gamepad text-emerald-500 mr-1"></i> AWL Vocabulary Challenge</h3>
+        <button onclick="closeVocabGame()" class="text-slate-400 font-bold text-sm">&times;</button>
+      </div>
+      <p class="text-xs text-slate-600 font-medium">Select the correct synonym for: <span class="font-extrabold text-emerald-600" id="gameWord">Lucrative</span></p>
+      <div class="grid grid-cols-2 gap-2" id="gameOptions">
+        <button onclick="checkGameAnswer(true)" class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs text-slate-700 hover:bg-emerald-50 hover:border-emerald-500">Profitable</button>
+        <button onclick="checkGameAnswer(false)" class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs text-slate-700 hover:bg-rose-50 hover:border-rose-500">Unstable</button>
+        <button onclick="checkGameAnswer(false)" class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs text-slate-700 hover:bg-rose-50 hover:border-rose-500">Complicated</button>
+        <button onclick="checkGameAnswer(false)" class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs text-slate-700 hover:bg-rose-50 hover:border-rose-500">Temporary</button>
+      </div>
+      <p class="text-[10px] text-slate-400 font-bold" id="gameResultText"></p>
+    </div>
+  </div>
+
   <!-- FOOTER NAVIGATION -->
   <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2 flex justify-around items-center z-40 max-w-md mx-auto">
     <button onclick="switchTab('view-home')" class="flex flex-col items-center gap-0.5 text-blue-600 font-bold text-[10px]">
@@ -229,6 +282,7 @@
     let currentTestNum = 1;
     let timerInterval = null;
     let userAnswers = {};
+    let userXP = 150;
 
     function switchExamMode(mode) {
       currentMode = mode;
@@ -355,7 +409,7 @@
       }
     }
 
-    /* CAMBRIDGE 21 READING PASSAGE 1: THE DAVIES SISTERS (CLEAN UNHIGHLIGHTED TEXT) */
+    /* CAMBRIDGE READING PASSAGES WITH VOCABULARY GLOSSARY AT BOTTOM (ENGNOVATE EXACT STYLE) */
     function switchReadingPassage(passageNum) {
       [1, 2, 3].forEach(p => {
         const btn = document.getElementById(`pass-tab-${p}`);
@@ -375,6 +429,12 @@
             <p>Born into a wealthy Welsh family, the sisters inherited a substantial fortune from their grandfather, a prominent industrialist. Unlike many contemporary collectors who focused primarily on established European masters, the Davies sisters collected French Impressionist paintings at a time when such art was routinely ignored by individuals and institutions alike.</p>
             <p>Their collection included major works by Cézanne, Monet, Renoir, and Van Gogh. During the First World War, both sisters volunteered in France, which further deepened their connection to French culture and artistic expression.</p>
             <p>The Gwendoline and Margaret Davies collection, donated in 1951 and 1963 respectively to the National Museum Wales, contains major examples of modern art that transformed public appreciation of Impressionism in Great Britain.</p>
+            
+            <!-- ENGNOVATE GLOSSARY / VOCAB BLOCK -->
+            <div class="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-[11px] text-slate-600">
+              <p class="font-bold text-slate-800">*** Impressionist:</p>
+              <p class="italic">An artist with a style of painting that developed in France in the late 1800s by Renoir, Monet, and others, emphasizing light and movement.</p>
+            </div>
           </div>
         `;
 
@@ -409,9 +469,36 @@
             </div>
           </div>
         `;
+      } else if (passageNum === 2) {
+        passagePane.innerHTML = `
+          <div class="space-y-3 leading-relaxed text-xs text-slate-800">
+            <h3 class="font-extrabold text-slate-900 text-sm">Passage 2: The Evolution of Modern Architecture & Urban Design</h3>
+            <p>Architectural styles have transformed significantly over the past century. From industrial steel frameworks to sustainable bio-materials, modern architecture balances aesthetic values with environmental sustainability.</p>
+            <p>By the mid-1920s, modern architects began incorporating organic design principles into urban planning. The integration of rooftop hydroponics and vertical farming allowed cities to reduce reliance on distant rural agricultural supplies.</p>
+          </div>
+        `;
+
+        questionsPane.innerHTML = `
+          <div class="space-y-3">
+            <div class="bg-blue-50/80 p-3 rounded-xl border border-blue-200">
+              <h4 class="font-bold text-blue-900 text-xs">Questions 14–20</h4>
+              <p class="text-[10px] text-blue-700">Choose TRUE, FALSE, or NOT GIVEN for each statement.</p>
+            </div>
+
+            <div id="q-box-14" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2">
+              <p class="text-xs font-bold text-slate-800">14. Modern urban agricultural modules decrease city energy costs.</p>
+              <select onchange="markAnswered(14, this.value)" class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg">
+                <option value="">-- Select Answer --</option>
+                <option value="TRUE" ${userAnswers[14] === 'TRUE' ? 'selected' : ''}>TRUE</option>
+                <option value="FALSE" ${userAnswers[14] === 'FALSE' ? 'selected' : ''}>FALSE</option>
+                <option value="NOT GIVEN" ${userAnswers[14] === 'NOT GIVEN' ? 'selected' : ''}>NOT GIVEN</option>
+              </select>
+            </div>
+          </div>
+        `;
       } else {
-        passagePane.innerHTML = `<p class="text-xs text-slate-600">Passage ${passageNum} Content...</p>`;
-        questionsPane.innerHTML = `<p class="text-xs text-slate-600">Questions ${passageNum === 2 ? '14-26' : '27-40'}...</p>`;
+        passagePane.innerHTML = `<p class="text-xs text-slate-600">Passage 3 Content...</p>`;
+        questionsPane.innerHTML = `<p class="text-xs text-slate-600">Questions 27-40...</p>`;
       }
     }
 
@@ -453,7 +540,7 @@
       questionsPane.innerHTML = qHtml;
     }
 
-    /* WRITING TASK WITH ACCURATE CAMBRIDGE TASK 1 CHART */
+    /* WRITING TASK WITH ACCURATE CAMBRIDGE TASK 1 LINE CHART (ENGNOVATE SCREENSHOT MATCH) */
     function loadWritingTaskSection(taskNum) {
       const passagePane = document.getElementById('passageContent');
       const questionsPane = document.getElementById('questionsContent');
@@ -462,26 +549,42 @@
         passagePane.innerHTML = `
           <div class="space-y-3">
             <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">WRITING TASK 1</span>
-            <h3 class="font-extrabold text-slate-800 text-xs">History Graduates Employment & Salary Breakdown</h3>
-            <p class="text-xs text-slate-600">The chart below shows what History graduates did after completing their undergraduate degree course. The table shows the sectors these graduates were employed in and their average incomes.</p>
+            <h3 class="font-extrabold text-slate-800 text-xs">Number of participants, by activity 2000–2020</h3>
+            <p class="text-xs text-slate-600">The line graph below shows participation trends in five different activities between 2000 and 2020.</p>
             
-            <!-- ACCURATE CAMBRIDGE STYLE CHART TABLE -->
+            <!-- ACCURATE SVG LINE GRAPH (EXACT ENGNOVATE FORMAT) -->
             <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2">
-              <table class="w-full text-left border-collapse text-[11px]">
-                <thead>
-                  <tr class="bg-slate-100 border-b border-slate-200 text-slate-700">
-                    <th class="p-2 font-bold">Employment Sector</th>
-                    <th class="p-2 font-bold">Percentage</th>
-                    <th class="p-2 font-bold">Average Income (£)</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 text-slate-800">
-                  <tr><td class="p-2">Solicitor</td><td class="p-2 font-bold">18%</td><td class="p-2">£57,000</td></tr>
-                  <tr><td class="p-2">History Teacher</td><td class="p-2 font-bold">30%</td><td class="p-2">£32,000</td></tr>
-                  <tr><td class="p-2">Archaeologist</td><td class="p-2 font-bold">6%</td><td class="p-2">£29,000</td></tr>
-                  <tr><td class="p-2">Historian / Researcher</td><td class="p-2 font-bold">9%</td><td class="p-2">£49,000</td></tr>
-                </tbody>
-              </table>
+              <svg viewBox="0 0 400 200" class="w-full h-auto bg-slate-50 rounded border border-slate-100">
+                <!-- Axes -->
+                <line x1="40" y1="20" x2="40" y2="160" stroke="#94a3b8" stroke-width="2"/>
+                <line x1="40" y1="160" x2="380" y2="160" stroke="#94a3b8" stroke-width="2"/>
+                
+                <!-- Y-Labels -->
+                <text x="15" y="30" font-size="9" fill="#64748b">70</text>
+                <text x="15" y="65" font-size="9" fill="#64748b">50</text>
+                <text x="15" y="100" font-size="9" fill="#64748b">30</text>
+                <text x="15" y="135" font-size="9" fill="#64748b">10</text>
+
+                <!-- X-Labels -->
+                <text x="50" y="175" font-size="9" fill="#64748b">2000</text>
+                <text x="130" y="175" font-size="9" fill="#64748b">2005</text>
+                <text x="210" y="175" font-size="9" fill="#64748b">2010</text>
+                <text x="290" y="175" font-size="9" fill="#64748b">2015</text>
+                <text x="350" y="175" font-size="9" fill="#64748b">2020</text>
+
+                <!-- Lines -->
+                <!-- Film club -->
+                <polyline points="50,40 130,45 210,50 290,42 350,38" fill="none" stroke="#2563eb" stroke-width="2"/>
+                <!-- Table tennis -->
+                <polyline points="50,130 130,120 210,120 290,85 350,55" fill="none" stroke="#16a34a" stroke-dasharray="4" stroke-width="2"/>
+                <!-- Martial arts -->
+                <polyline points="50,90 130,100 210,85 290,92 350,90" fill="none" stroke="#d97706" stroke-width="2"/>
+              </svg>
+              <div class="flex justify-around text-[10px] font-bold text-slate-600 pt-1">
+                <span class="text-blue-600">━ Film club</span>
+                <span class="text-emerald-600">┈ Table tennis</span>
+                <span class="text-amber-600">━ Martial arts</span>
+              </div>
             </div>
           </div>
         `;
@@ -489,10 +592,10 @@
         questionsPane.innerHTML = `
           <div class="space-y-3">
             <div class="flex items-center justify-between">
-              <label class="text-xs font-bold text-slate-800">Your Task 1 Essay Response:</label>
+              <label class="text-xs font-bold text-slate-800">Your Task 1 Answer:</label>
               <span class="text-[10px] font-bold text-slate-400" id="wordCount">Words: 0</span>
             </div>
-            <textarea id="essayInput" oninput="updateWordCount(1)" rows="8" placeholder="Summarise the information by selecting and reporting the main features..." class="w-full text-xs p-3 bg-white border border-slate-300 rounded-xl leading-relaxed"></textarea>
+            <textarea id="essayInput" oninput="updateWordCount(1)" rows="8" placeholder="Enter your part 1 answer..." class="w-full text-xs p-3 bg-white border border-slate-300 rounded-xl leading-relaxed"></textarea>
             <button onclick="evaluateWritingWithAI()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-extrabold py-2.5 rounded-xl shadow">
               Evaluate Essay with AI
             </button>
@@ -524,7 +627,7 @@
       }
     }
 
-    /* SPEAKING SECTION CLEAN OF HINTS */
+    /* SPEAKING SECTION */
     function loadSpeakingSection() {
       const passagePane = document.getElementById('passageContent');
       const questionsPane = document.getElementById('questionsContent');
@@ -655,6 +758,29 @@
       if (confirm("Are you sure you want to exit? Your progress will be lost.")) {
         clearInterval(timerInterval);
         switchTab('view-home');
+      }
+    }
+
+    /* MODAL HELPERS */
+    function openCollocationsModal() { document.getElementById('modalCollocations').classList.remove('hidden'); }
+    function closeCollocationsModal() { document.getElementById('modalCollocations').classList.add('hidden'); }
+    
+    function openVocabGame() { 
+      document.getElementById('modalVocabGame').classList.remove('hidden'); 
+      document.getElementById('gameResultText').innerText = '';
+    }
+    function closeVocabGame() { document.getElementById('modalVocabGame').classList.add('hidden'); }
+
+    function checkGameAnswer(isCorrect) {
+      const txt = document.getElementById('gameResultText');
+      if (isCorrect) {
+        txt.innerText = "Correct! +25 XP Earned!";
+        txt.className = "text-[10px] text-emerald-600 font-bold";
+        userXP += 25;
+        document.getElementById('userXPDisplay').innerText = `${userXP} XP`;
+      } else {
+        txt.innerText = "Incorrect. Try again!";
+        txt.className = "text-[10px] text-rose-600 font-bold";
       }
     }
 
