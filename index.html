@@ -3,196 +3,209 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>IELTS & SAT Genius Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>IELTS Computer-Based Exam Simulator</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f8fafc;
+      background-color: #f1f5f9;
       color: #0f172a;
       user-select: none;
-      -webkit-user-select: none;
+      margin: 0;
+      padding: 0;
     }
-    .card-pred { background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%); }
-    .bottom-nav {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+    /* CD IELTS Split View Styling */
+    .cd-container {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 120px);
+    }
+    @media (min-width: 768px) {
+      .cd-container {
+        flex-direction: row;
+      }
+    }
+    .passage-pane {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      background: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      line-height: 1.6;
+      font-size: 0.9rem;
+    }
+    .questions-pane {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      background: #f8fafc;
+    }
+    .q-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      background-color: #ffffff;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .q-badge.answered {
+      background-color: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+    }
+    .q-badge.active {
+      border: 2px solid #0f172a;
     }
   </style>
 </head>
-<body class="pb-24">
+<body class="pb-16">
 
-  <!-- HEADER -->
-  <div class="px-4 pt-4 pb-3 bg-white border-b border-slate-100 shadow-sm sticky top-0 z-30">
-    <div class="flex items-center justify-between mb-3">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-indigo-600 text-white font-black flex items-center justify-center text-lg shadow" id="userAvatar">
-          S
-        </div>
-        <div>
-          <h2 class="font-bold text-slate-800 text-base leading-tight" id="userName">Student</h2>
-          <p class="text-xs text-slate-400 font-medium">IELTS & SAT Preparation</p>
-        </div>
-      </div>
-      
-      <!-- MODE SWITCHER -->
-      <div class="bg-slate-100 p-1 rounded-xl flex gap-1 border border-slate-200/60">
-        <button id="btn-mode-ielts" onclick="switchExamMode('IELTS')" class="px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm bg-white text-indigo-600">
-          IELTS
-        </button>
-        <button id="btn-mode-sat" onclick="switchExamMode('SAT')" class="px-3 py-1 rounded-lg text-xs font-bold transition text-slate-500 hover:text-slate-800">
-          SAT
-        </button>
-      </div>
-    </div>
-
-    <!-- DIAGNOSTIC TEST BANNER (OPTIONAL CHOICE) -->
-    <div id="diagnosticBanner" class="bg-indigo-50/80 p-3 rounded-2xl border border-indigo-100 flex items-center justify-between">
+  <!-- TOP HEADER -->
+  <header class="bg-white border-b border-slate-200 px-4 py-2.5 sticky top-0 z-30 shadow-sm flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-black flex items-center justify-center text-sm shadow" id="userAvatar">S</div>
       <div>
-        <p class="text-xs font-bold text-indigo-950">Full Diagnostic Simulation</p>
-        <p class="text-[11px] text-indigo-600">Test all 4 skills to estimate Band Score</p>
+        <h1 class="font-extrabold text-slate-800 text-sm leading-tight" id="userName">Student</h1>
+        <p class="text-[10px] text-slate-500 font-medium">Official Cambridge IELTS Engine</p>
       </div>
-      <button onclick="startFullDiagnostic()" class="bg-indigo-600 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow hover:bg-indigo-700 transition">
-        Start Test
-      </button>
     </div>
-  </div>
 
-  <!-- VIEW: MAIN DASHBOARD -->
-  <div id="view-home" class="p-4 space-y-4">
+    <!-- MODE SWITCHER -->
+    <div class="bg-slate-100 p-0.5 rounded-xl flex gap-0.5 border border-slate-200">
+      <button id="btn-mode-ielts" onclick="switchExamMode('IELTS')" class="px-2.5 py-1 rounded-lg text-xs font-extrabold shadow-sm bg-white text-blue-600">IELTS</button>
+      <button id="btn-mode-sat" onclick="switchExamMode('SAT')" class="px-2.5 py-1 rounded-lg text-xs font-extrabold text-slate-500">SAT</button>
+    </div>
+  </header>
 
+  <!-- DASHBOARD VIEW -->
+  <main id="view-home" class="p-4 space-y-4">
     <!-- PREDICTIONS BANNER -->
-    <div onclick="openPredictions()" class="card-pred rounded-2xl p-4 text-white shadow-lg cursor-pointer relative overflow-hidden">
+    <div onclick="switchTab('view-predictions')" class="bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl p-4 text-white shadow-md cursor-pointer relative overflow-hidden">
       <div class="flex items-center justify-between mb-1">
-        <span class="bg-white/20 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Hot Predictions</span>
-        <i class="fa-solid fa-fire text-amber-300"></i>
+        <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Exam Leaks & Predictions</span>
+        <i class="fa-solid fa-fire text-amber-300 text-sm"></i>
       </div>
-      <h3 class="text-base font-extrabold">IELTS Predictions & Exam Leaks</h3>
-      <p class="text-xs text-purple-100 mt-0.5">Actual topics and leaked prompts for upcoming exams.</p>
+      <h3 class="text-sm font-black">2026 Official IELTS Exam Pool</h3>
+      <p class="text-xs text-purple-100 mt-0.5">Real Writing & Speaking prompts for upcoming exam dates.</p>
     </div>
+
+    <h2 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Practice Skills</h2>
 
     <!-- MODULES GRID -->
-    <div>
-      <h3 class="font-bold text-slate-800 text-sm mb-2.5" id="sectionsHeader">Practice Modules</h3>
-      <div class="grid grid-cols-2 gap-3" id="mainModulesGrid">
-        <!-- Injected via JS -->
-      </div>
+    <div class="grid grid-cols-2 gap-3" id="mainModulesGrid">
+      <!-- Generated via JS -->
     </div>
-  </div>
+  </main>
 
-  <!-- VIEW: SELECT BOOK & TEST (CAMBRIDGE 1 TO 21) -->
-  <div id="view-select-test" class="p-4 space-y-4 hidden">
+  <!-- SELECT BOOK & TEST VIEW (CAMBRIDGE 1–21) -->
+  <section id="view-select-test" class="p-4 space-y-3 hidden">
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-base font-extrabold text-slate-800" id="selectTestTitle">Select Practice Test</h2>
-        <p class="text-xs text-slate-400" id="selectTestSubtitle">Books 1 to 21 Available</p>
+        <h2 class="text-sm font-extrabold text-slate-800" id="selectTestTitle">Cambridge IELTS Books</h2>
+        <p class="text-[11px] text-slate-500">Official Cambridge 1 — 21 Collection</p>
       </div>
-      <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1.5 rounded-xl">Back</button>
+      <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg">Back</button>
     </div>
 
-    <!-- SEARCH & FILTER BAR -->
-    <div class="bg-white p-2.5 rounded-2xl border border-slate-100 flex items-center gap-2">
+    <!-- SEARCH BAR -->
+    <div class="bg-white p-2 rounded-xl border border-slate-200 flex items-center gap-2">
       <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs ml-2"></i>
-      <input type="text" id="bookSearchInput" oninput="filterBooks()" placeholder="Search Cambridge Book (1-21)..." class="w-full text-xs bg-transparent focus:outline-none">
+      <input type="text" id="bookSearchInput" oninput="filterBooks()" placeholder="Search Cambridge Book (1–21)..." class="w-full text-xs bg-transparent focus:outline-none">
     </div>
 
-    <div class="space-y-3" id="testSelectionList">
-      <!-- Injected dynamically for all books 1 to 21 -->
-    </div>
-  </div>
+    <div class="space-y-3" id="testSelectionList"></div>
+  </section>
 
-  <!-- VIEW: TEST RUNNER -->
-  <div id="view-test-runner" class="p-4 space-y-4 hidden">
-    <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm sticky top-16 z-20 space-y-2">
-      <div class="flex items-center justify-between">
-        <div>
-          <h3 class="text-xs font-black text-slate-800" id="testTitle">Cambridge IELTS 19 — Test 1</h3>
-          <p class="text-[10px] text-slate-400" id="testSubtitle">Reading Section</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="bg-amber-50 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-xl border border-amber-200/60">
-            <i class="fa-regular fa-clock mr-1"></i><span id="testTimer">60:00</span>
-          </div>
-          <button onclick="exitTest()" class="text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-xl">Exit</button>
-        </div>
+  <!-- REAL CD-IELTS TEST RUNNER VIEW -->
+  <section id="view-test-runner" class="hidden flex flex-col h-screen">
+    <!-- TEST HEADER NAVBAR -->
+    <div class="bg-slate-900 text-white px-4 py-2 flex items-center justify-between shadow-md">
+      <div>
+        <h2 class="text-xs font-bold text-slate-200" id="testTitle">Cambridge IELTS 20 — Test 1</h2>
+        <p class="text-[10px] text-slate-400" id="testSubtitle">Academic Reading Test</p>
       </div>
-
-      <!-- SECTION TABS (PASSAGES / PARTS SWITCHER) -->
-      <div id="sectionNavTabs" class="flex gap-1.5 pt-1 border-t border-slate-100 overflow-x-auto">
-        <!-- Dynamic tabs (Passage 1, Passage 2, Passage 3 / Part 1, Part 2...) -->
+      <div class="flex items-center gap-2">
+        <div class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-mono font-bold px-2.5 py-0.5 rounded">
+          <i class="fa-regular fa-clock mr-1"></i><span id="testTimer">59:59</span>
+        </div>
+        <button onclick="exitTest()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-2.5 py-1 rounded">Exit</button>
       </div>
     </div>
 
-    <!-- TEST CONTENT AREA -->
-    <div id="testContent" class="space-y-4"></div>
+    <!-- SECTION NAV TABS (PARTS / PASSAGES) -->
+    <div class="bg-slate-100 border-b border-slate-200 px-4 py-1.5 flex gap-2 overflow-x-auto" id="sectionNavTabs"></div>
 
-    <button onclick="submitTest()" class="w-full bg-emerald-600 text-white font-extrabold text-sm py-3 rounded-2xl shadow-lg hover:bg-emerald-700 transition">
-      Submit & Check Answers
-    </button>
-  </div>
+    <!-- CD IELTS SPLIT-SCREEN CONTAINER -->
+    <div class="cd-container" id="cdTestContainer">
+      <!-- LEFT: PASSAGE / AUDIO / PROMPT -->
+      <div class="passage-pane" id="passagePane"></div>
 
-  <!-- VIEW: CAMBRIDGE BOOKS CATALOG (1 to 21) -->
-  <div id="view-books" class="p-4 space-y-4 hidden">
-    <div>
-      <h2 class="text-lg font-extrabold text-slate-800">Cambridge IELTS Books (1–21)</h2>
-      <p class="text-xs text-slate-500">Full practice tests for all 21 official books</p>
-    </div>
-    <div class="grid grid-cols-2 gap-3" id="booksGrid"></div>
-  </div>
-
-  <!-- VIEW: PREDICTIONS SECTION -->
-  <div id="view-predictions" class="p-4 space-y-4 hidden">
-    <div>
-      <h2 class="text-lg font-extrabold text-slate-800">Predictions & Exam Leaks</h2>
-      <p class="text-xs text-slate-500">Actual materials for upcoming exam sessions</p>
+      <!-- RIGHT: QUESTIONS & INPUTS -->
+      <div class="questions-pane" id="questionsPane"></div>
     </div>
 
+    <!-- BOTTOM PALETTE NAVIGATION (1 to 40 QUESTIONS) -->
+    <div class="bg-white border-t border-slate-200 px-4 py-2 sticky bottom-0 z-20 flex items-center justify-between gap-2 shadow-lg">
+      <div class="flex items-center gap-1.5 overflow-x-auto py-1 max-w-[70%]" id="questionPalette"></div>
+      <button onclick="submitTest()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-4 py-2 rounded-lg shadow">
+        Submit Test
+      </button>
+    </div>
+  </section>
+
+  <!-- BOOKS CATALOG VIEW -->
+  <section id="view-books" class="p-4 space-y-3 hidden">
+    <div>
+      <h2 class="text-sm font-extrabold text-slate-800">Cambridge IELTS Complete Collection</h2>
+      <p class="text-[11px] text-slate-500">Books 1 to 21 with authentic exam materials</p>
+    </div>
+    <div class="grid grid-cols-2 gap-2.5" id="booksGrid"></div>
+  </section>
+
+  <!-- PREDICTIONS VIEW -->
+  <section id="view-predictions" class="p-4 space-y-3 hidden">
+    <div>
+      <h2 class="text-sm font-extrabold text-slate-800">Real Exam Leaks & Predictions</h2>
+      <p class="text-[11px] text-slate-500">Actual pool for upcoming exam dates</p>
+    </div>
     <div class="space-y-3">
-      <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="bg-purple-100 text-purple-700 text-[10px] font-black px-2 py-0.5 rounded-full">Writing Task 2</span>
-          <span class="text-[10px] text-slate-400">Updated recently</span>
-        </div>
-        <h4 class="font-bold text-slate-800 text-sm">Most Likely Essay Topics</h4>
-        <p class="text-xs text-slate-500">Predicted topics with Band 8.0/9.0 sample essays.</p>
-        <button onclick="alert('Predictions loading...')" class="w-full mt-2 bg-purple-600 text-white font-bold text-xs py-2 rounded-xl">
-          Open Topics
-        </button>
-      </div>
-
-      <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="bg-amber-100 text-amber-700 text-[10px] font-black px-2 py-0.5 rounded-full">Speaking Parts 1-3</span>
-          <span class="text-[10px] text-slate-400">Actual Pool</span>
-        </div>
-        <h4 class="font-bold text-slate-800 text-sm">Actual Speaking Cue Cards</h4>
-        <p class="text-xs text-slate-500">Real questions currently asked by examiners worldwide.</p>
-        <button onclick="alert('Predictions loading...')" class="w-full mt-2 bg-amber-500 text-white font-bold text-xs py-2 rounded-xl">
-          Open Cue Cards
-        </button>
+      <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+        <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">Writing Task 1 & 2</span>
+        <h4 class="font-bold text-slate-800 text-xs">Recent Exam Recalls</h4>
+        <p class="text-[11px] text-slate-600">Leaked bar charts, process diagrams, and essay questions from active test centers.</p>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- BOTTOM NAVIGATION -->
-  <div class="bottom-nav fixed bottom-0 left-0 right-0 border-t border-slate-200/80 px-4 py-2 flex justify-around items-center z-40">
-    <button onclick="switchTab('view-home')" id="nav-home" class="flex flex-col items-center gap-0.5 text-indigo-600 font-bold text-[10px]">
-      <i class="fa-solid fa-house text-lg"></i>
+  <!-- BOTTOM FOOTER NAVIGATION -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2 flex justify-around items-center z-40">
+    <button onclick="switchTab('view-home')" id="nav-home" class="flex flex-col items-center gap-0.5 text-blue-600 font-bold text-[10px]">
+      <i class="fa-solid fa-house text-base"></i>
       <span>Home</span>
     </button>
     <button onclick="switchTab('view-books')" id="nav-books" class="flex flex-col items-center gap-0.5 text-slate-400 font-medium text-[10px]">
-      <i class="fa-solid fa-book-open text-lg"></i>
+      <i class="fa-solid fa-book-open text-base"></i>
       <span>Books 1–21</span>
     </button>
     <button onclick="switchTab('view-predictions')" id="nav-pred" class="flex flex-col items-center gap-0.5 text-slate-400 font-medium text-[10px]">
-      <i class="fa-solid fa-fire text-lg"></i>
+      <i class="fa-solid fa-fire text-base"></i>
       <span>Predictions</span>
     </button>
-  </div>
+  </nav>
 
   <script>
     const tg = window.Telegram?.WebApp;
@@ -200,14 +213,17 @@
       tg.ready();
       tg.expand();
       if (tg.initDataUnsafe?.user) {
-        document.getElementById('userName').innerText = `${tg.initDataUnsafe.user.first_name}`;
+        document.getElementById('userName').innerText = tg.initDataUnsafe.user.first_name;
         document.getElementById('userAvatar').innerText = tg.initDataUnsafe.user.first_name.charAt(0);
       }
     }
 
     let currentMode = 'IELTS';
     let currentSkill = 'reading';
+    let currentBookNum = 20;
+    let currentTestNum = 1;
     let timerInterval = null;
+    let userAnswers = {};
 
     function switchExamMode(mode) {
       currentMode = mode;
@@ -215,11 +231,11 @@
       const btnSat = document.getElementById('btn-mode-sat');
 
       if (mode === 'IELTS') {
-        btnIelts.className = "px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm bg-white text-indigo-600";
-        btnSat.className = "px-3 py-1 rounded-lg text-xs font-bold transition text-slate-500 hover:text-slate-800";
+        btnIelts.className = "px-2.5 py-1 rounded-lg text-xs font-extrabold shadow-sm bg-white text-blue-600";
+        btnSat.className = "px-2.5 py-1 rounded-lg text-xs font-extrabold text-slate-500";
       } else {
-        btnSat.className = "px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm bg-white text-teal-600";
-        btnIelts.className = "px-3 py-1 rounded-lg text-xs font-bold transition text-slate-500 hover:text-slate-800";
+        btnSat.className = "px-2.5 py-1 rounded-lg text-xs font-extrabold shadow-sm bg-white text-teal-600";
+        btnIelts.className = "px-2.5 py-1 rounded-lg text-xs font-extrabold text-slate-500";
       }
       renderMainModules();
     }
@@ -228,78 +244,65 @@
       const grid = document.getElementById('mainModulesGrid');
       if (currentMode === 'IELTS') {
         grid.innerHTML = `
-          <div onclick="openBookSelection('reading')" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer hover:border-indigo-300 transition">
-            <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-base mb-2">
+          <div onclick="openBookSelection('reading')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition">
+            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm mb-2">
               <i class="fa-solid fa-book-reader"></i>
             </div>
-            <h4 class="font-bold text-slate-800 text-sm">Reading Practice</h4>
-            <p class="text-[11px] text-slate-400">Books 1–21 (4 Tests Each)</p>
+            <h4 class="font-bold text-slate-800 text-xs">Reading Practice</h4>
+            <p class="text-[10px] text-slate-400">Books 1–21 (Passages 1–3)</p>
           </div>
 
-          <div onclick="openBookSelection('listening')" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer hover:border-indigo-300 transition">
-            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base mb-2">
+          <div onclick="openBookSelection('listening')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition">
+            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm mb-2">
               <i class="fa-solid fa-headphones"></i>
             </div>
-            <h4 class="font-bold text-slate-800 text-sm">Listening Practice</h4>
-            <p class="text-[11px] text-slate-400">Books 1–21 (Audio Included)</p>
+            <h4 class="font-bold text-slate-800 text-xs">Listening Practice</h4>
+            <p class="text-[10px] text-slate-400">Books 1–21 (Parts 1–4 Audio)</p>
           </div>
 
-          <div onclick="openBookSelection('writing')" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer hover:border-indigo-300 transition">
-            <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-base mb-2">
+          <div onclick="openBookSelection('writing')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition">
+            <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm mb-2">
               <i class="fa-solid fa-pen-nib"></i>
             </div>
-            <h4 class="font-bold text-slate-800 text-sm">AI Writing Evaluator</h4>
-            <p class="text-[11px] text-slate-400">Task 1 & Task 2 Tasks</p>
+            <h4 class="font-bold text-slate-800 text-xs">Writing Simulator</h4>
+            <p class="text-[10px] text-slate-400">Task 1 (Charts) & Task 2</p>
           </div>
 
-          <div onclick="openSpeakingModule()" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer hover:border-indigo-300 transition">
-            <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-base mb-2">
+          <div onclick="openSpeakingSimulator()" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition">
+            <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm mb-2">
               <i class="fa-solid fa-microphone"></i>
             </div>
-            <h4 class="font-bold text-slate-800 text-sm">AI Speaking Trainer</h4>
-            <p class="text-[11px] text-slate-400">Part 1, 2 & 3 Audio Practice</p>
+            <h4 class="font-bold text-slate-800 text-xs">Speaking Simulator</h4>
+            <p class="text-[10px] text-slate-400">Parts 1, 2 & 3 Cue Cards</p>
           </div>
         `;
       } else {
         grid.innerHTML = `
-          <div onclick="openSATModule('rw')" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer">
-            <div class="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-base mb-2">
+          <div onclick="alert('SAT Reading & Writing Module Loading...')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer">
+            <div class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center text-sm mb-2">
               <i class="fa-solid fa-file-signature"></i>
             </div>
-            <h4 class="font-bold text-slate-800 text-sm">Reading & Writing</h4>
-            <p class="text-[11px] text-slate-400">Modules 1 & 2</p>
+            <h4 class="font-bold text-slate-800 text-xs">Reading & Writing</h4>
+            <p class="text-[10px] text-slate-400">Digital SAT Modules</p>
           </div>
 
-          <div onclick="openSATModule('math')" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer">
-            <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base mb-2">
+          <div onclick="alert('SAT Math Module Loading...')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer">
+            <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm mb-2">
               <i class="fa-solid fa-calculator"></i>
             </div>
-            <h4 class="font-bold text-slate-800 text-sm">Math Section</h4>
-            <p class="text-[11px] text-slate-400">With Desmos Calculator</p>
+            <h4 class="font-bold text-slate-800 text-xs">Math Section</h4>
+            <p class="text-[10px] text-slate-400">Built-in Desmos</p>
           </div>
         `;
       }
     }
 
-    // OPEN BOOK SELECTION FOR ALL 21 BOOKS
     function openBookSelection(skill, filterBookNumber = null) {
       currentSkill = skill;
       switchTab('view-select-test');
-      
-      const titleMap = {
-        reading: 'Reading Practice Tests',
-        listening: 'Listening Practice Tests',
-        writing: 'Writing Practice Prompts',
-        all: 'Select Practice Module'
-      };
-      
-      document.getElementById('selectTestTitle').innerText = titleMap[skill] || 'Practice Tests';
-      document.getElementById('selectTestSubtitle').innerText = 'Books 1 to 21 Available';
-      
       renderTestSelectionList(filterBookNumber);
     }
 
-    // RENDER ALL 21 BOOKS WITH TESTS 1 TO 4
     function renderTestSelectionList(filterBookNumber = null) {
       const list = document.getElementById('testSelectionList');
       list.innerHTML = '';
@@ -314,31 +317,23 @@
 
       for (let book = startBook; book >= endBook; book--) {
         const item = document.createElement('div');
-        item.className = 'bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3 book-card-item';
+        item.className = 'bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2 book-card-item';
         item.setAttribute('data-book', book);
 
         item.innerHTML = `
           <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <div class="flex items-center gap-2">
-              <span class="w-7 h-7 bg-indigo-600 text-white rounded-lg flex items-center justify-center font-black text-xs">C${book}</span>
-              <h4 class="font-bold text-slate-800 text-sm">Cambridge IELTS ${book}</h4>
+              <span class="w-6 h-6 bg-blue-600 text-white rounded flex items-center justify-center font-black text-xs">C${book}</span>
+              <h4 class="font-bold text-slate-800 text-xs">Cambridge IELTS ${book}</h4>
             </div>
-            <span class="text-[10px] bg-indigo-50 font-bold px-2 py-0.5 rounded text-indigo-600">4 Tests</span>
+            <span class="text-[10px] bg-blue-50 text-blue-600 font-bold px-2 py-0.5 rounded">4 Complete Tests</span>
           </div>
           
           <div class="grid grid-cols-2 gap-2">
-            <button onclick="startSpecificTest(${book}, 1, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-2 rounded-xl font-bold hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition flex items-center justify-center gap-1">
-              <i class="fa-solid fa-play text-[10px]"></i> Test 1
-            </button>
-            <button onclick="startSpecificTest(${book}, 2, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-2 rounded-xl font-bold hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition flex items-center justify-center gap-1">
-              <i class="fa-solid fa-play text-[10px]"></i> Test 2
-            </button>
-            <button onclick="startSpecificTest(${book}, 3, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-2 rounded-xl font-bold hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition flex items-center justify-center gap-1">
-              <i class="fa-solid fa-play text-[10px]"></i> Test 3
-            </button>
-            <button onclick="startSpecificTest(${book}, 4, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-2 rounded-xl font-bold hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition flex items-center justify-center gap-1">
-              <i class="fa-solid fa-play text-[10px]"></i> Test 4
-            </button>
+            <button onclick="launchCDTest(${book}, 1, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition">Test 1</button>
+            <button onclick="launchCDTest(${book}, 2, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition">Test 2</button>
+            <button onclick="launchCDTest(${book}, 3, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition">Test 3</button>
+            <button onclick="launchCDTest(${book}, 4, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition">Test 4</button>
           </div>
         `;
         list.appendChild(item);
@@ -350,7 +345,7 @@
       const items = document.querySelectorAll('.book-card-item');
       items.forEach(item => {
         const bookNum = item.getAttribute('data-book');
-        if (query === '' || bookNum.includes(query) || `cambridge ${bookNum}`.includes(query)) {
+        if (query === '' || bookNum.includes(query)) {
           item.classList.remove('hidden');
         } else {
           item.classList.add('hidden');
@@ -358,195 +353,257 @@
       });
     }
 
-    // START TEST RUNNER FOR SPECIFIC SKILL AND BOOK/TEST
-    function startSpecificTest(book, testNumber, skill) {
+    // LAUNCH CD-IELTS SIMULATOR
+    function launchCDTest(book, testNumber, skill) {
+      currentBookNum = book;
+      currentTestNum = testNumber;
+      currentSkill = skill;
+      userAnswers = {};
+
       switchTab('view-test-runner');
       document.getElementById('testTitle').innerText = `Cambridge IELTS ${book} — Test ${testNumber}`;
-      
-      const tabsNav = document.getElementById('sectionNavTabs');
-      
+
+      const navTabs = document.getElementById('sectionNavTabs');
+
       if (skill === 'reading') {
-        document.getElementById('testSubtitle').innerText = "Reading Section (3 Passages)";
+        document.getElementById('testSubtitle').innerText = "Academic Reading Test (40 Questions)";
         startTimer(3600); // 60 mins
 
-        tabsNav.innerHTML = `
-          <button onclick="loadReadingPassage(1)" class="px-3 py-1 bg-indigo-600 text-white rounded-lg text-xs font-bold">Passage 1</button>
-          <button onclick="loadReadingPassage(2)" class="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold">Passage 2</button>
-          <button onclick="loadReadingPassage(3)" class="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold">Passage 3</button>
+        navTabs.innerHTML = `
+          <button onclick="loadReadingPassageSection(1)" class="px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold shadow-sm">Passage 1 (Q1–13)</button>
+          <button onclick="loadReadingPassageSection(2)" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Passage 2 (Q14–26)</button>
+          <button onclick="loadReadingPassageSection(3)" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Passage 3 (Q27–40)</button>
         `;
 
-        loadReadingPassage(1);
+        renderPalette(40);
+        loadReadingPassageSection(1);
 
       } else if (skill === 'listening') {
-        document.getElementById('testSubtitle').innerText = "Listening Section (4 Parts)";
+        document.getElementById('testSubtitle').innerText = "Academic Listening Test (40 Questions)";
         startTimer(1800); // 30 mins
 
-        tabsNav.innerHTML = `
-          <button onclick="loadListeningPart(1)" class="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs font-bold">Part 1</button>
-          <button onclick="loadListeningPart(2)" class="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold">Part 2</button>
-          <button onclick="loadListeningPart(3)" class="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold">Part 3</button>
-          <button onclick="loadListeningPart(4)" class="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold">Part 4</button>
+        navTabs.innerHTML = `
+          <button onclick="loadListeningPartSection(1)" class="px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold shadow-sm">Part 1 (Q1–10)</button>
+          <button onclick="loadListeningPartSection(2)" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Part 2 (Q11–20)</button>
+          <button onclick="loadListeningPartSection(3)" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Part 3 (Q21–30)</button>
+          <button onclick="loadListeningPartSection(4)" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Part 4 (Q31–40)</button>
         `;
 
-        loadListeningPart(1);
+        renderPalette(40);
+        loadListeningPartSection(1);
 
       } else if (skill === 'writing') {
-        document.getElementById('testSubtitle').innerText = "Writing Section (Task 1 & Task 2)";
+        document.getElementById('testSubtitle').innerText = "Academic Writing Test (Task 1 & Task 2)";
         startTimer(3600); // 60 mins
 
-        tabsNav.innerHTML = `
-          <button onclick="loadWritingTask(1)" class="px-3 py-1 bg-amber-600 text-white rounded-lg text-xs font-bold">Task 1 (Report)</button>
-          <button onclick="loadWritingTask(2)" class="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold">Task 2 (Essay)</button>
+        navTabs.innerHTML = `
+          <button onclick="loadWritingTaskSection(1)" class="px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold shadow-sm">Task 1 (Report/Letter - 20 min)</button>
+          <button onclick="loadWritingTaskSection(2)" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Task 2 (Essay - 40 min)</button>
         `;
 
-        loadWritingTask(1);
+        renderPalette(2);
+        loadWritingTaskSection(1);
       }
     }
 
-    function loadReadingPassage(passageNum) {
-      document.getElementById('testContent').innerHTML = `
-        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3 max-h-64 overflow-y-auto">
-          <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded">Reading Passage ${passageNum}</span>
-          <h4 class="font-bold text-slate-800 text-sm">The Evolution of Modern Architecture & Materials</h4>
-          <p class="text-xs text-slate-600 leading-relaxed">
-            Architectural styles have transformed significantly over the past century. From industrial steel frameworks to sustainable bio-materials, modern architecture balances aesthetic values with environmental sustainability...
+    // RENDER 40 QUESTION PALETTE
+    function renderPalette(total) {
+      const palette = document.getElementById('questionPalette');
+      palette.innerHTML = '';
+      for (let i = 1; i <= total; i++) {
+        const btn = document.createElement('div');
+        btn.className = `q-badge ${userAnswers[i] ? 'answered' : ''}`;
+        btn.id = `palette-q-${i}`;
+        btn.innerText = i;
+        btn.onclick = () => scrollToQuestion(i);
+        palette.appendChild(btn);
+      }
+    }
+
+    function scrollToQuestion(qNum) {
+      const el = document.getElementById(`q-box-${qNum}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function markAnswered(qNum, value) {
+      if (value.trim() !== '') {
+        userAnswers[qNum] = value;
+        document.getElementById(`palette-q-${qNum}`)?.classList.add('answered');
+      } else {
+        delete userAnswers[qNum];
+        document.getElementById(`palette-q-${qNum}`)?.classList.remove('answered');
+      }
+    }
+
+    // READING PASSAGES LOAD
+    function loadReadingPassageSection(passageNum) {
+      const leftPane = document.getElementById('passagePane');
+      const rightPane = document.getElementById('questionsPane');
+
+      leftPane.innerHTML = `
+        <div class="space-y-3">
+          <span class="bg-blue-100 text-blue-800 text-[10px] font-black px-2 py-0.5 rounded">READING PASSAGE ${passageNum}</span>
+          <h3 class="font-extrabold text-slate-800 text-base">The Development of Modern Architecture & Urban Agriculture</h3>
+          <p class="text-slate-600">You should spend about 20 minutes on Questions ${passageNum === 1 ? '1–13' : passageNum === 2 ? '14–26' : '27–40'}, which are based on Reading Passage ${passageNum} below.</p>
+          <hr class="border-slate-200">
+          <p class="text-slate-700 leading-relaxed">
+            By the mid-1920s, modern architects began incorporating organic design principles into urban planning. The integration of rooftop hydroponics and vertical farming allowed cities to reduce reliance on rural food supply chains...
+          </p>
+          <p class="text-slate-700 leading-relaxed">
+            Recent trials carried out in Scandinavian municipalities have found clear evidence supporting sustainable urban growth. Researchers noted that urban agricultural modules significantly decrease municipal energy expenditures...
           </p>
         </div>
+      `;
 
-        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-          <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider">Questions 1–5 (Multiple Choice)</h4>
-          <div class="space-y-2">
-            <p class="text-xs font-bold text-slate-700">1. What is highlighted as a major focus in modern architectural design?</p>
-            <label class="block p-2.5 rounded-xl border border-slate-200 text-xs flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="q1" value="A"> A) Complete reliance on classical stone structures
-            </label>
-            <label class="block p-2.5 rounded-xl border border-slate-200 text-xs flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="q1" value="B"> B) Balancing aesthetic design with environmental sustainability
-            </label>
+      let startQ = passageNum === 1 ? 1 : passageNum === 2 ? 14 : 27;
+      let endQ = passageNum === 1 ? 13 : passageNum === 2 ? 26 : 40;
+
+      let html = `<div class="space-y-4">
+        <div class="bg-blue-50/80 p-3 rounded-lg border border-blue-200">
+          <h4 class="font-bold text-blue-900 text-xs">Questions ${startQ}–${endQ}</h4>
+          <p class="text-[11px] text-blue-700">Choose TRUE, FALSE, or NOT GIVEN for each statement.</p>
+        </div>
+      `;
+
+      for (let i = startQ; i <= endQ; i++) {
+        html += `
+          <div id="q-box-${i}" class="bg-white p-3 rounded-xl border border-slate-200 space-y-2">
+            <p class="text-xs font-bold text-slate-800">${i}. Modern urban agricultural modules decrease city energy costs.</p>
+            <select onchange="markAnswered(${i}, this.value)" class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 font-medium">
+              <option value="">-- Select Answer --</option>
+              <option value="TRUE">TRUE</option>
+              <option value="FALSE">FALSE</option>
+              <option value="NOT GIVEN">NOT GIVEN</option>
+            </select>
+          </div>
+        `;
+      }
+
+      html += `</div>`;
+      rightPane.innerHTML = html;
+    }
+
+    // LISTENING PARTS LOAD
+    function loadListeningPartSection(partNum) {
+      const leftPane = document.getElementById('passagePane');
+      const rightPane = document.getElementById('questionsPane');
+
+      leftPane.innerHTML = `
+        <div class="space-y-3">
+          <span class="bg-blue-100 text-blue-800 text-[10px] font-black px-2 py-0.5 rounded">LISTENING PART ${partNum}</span>
+          <h3 class="font-extrabold text-slate-800 text-sm">Official Cambridge Audio Track</h3>
+          <p class="text-xs text-slate-500">Listen to the audio and answer Questions ${partNum === 1 ? '1–10' : partNum === 2 ? '11–20' : partNum === 3 ? '21–30' : '31–40'}.</p>
+          
+          <div class="bg-slate-100 p-3 rounded-xl border border-slate-200 mt-4">
+            <audio controls class="w-full">
+              <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+              Your browser does not support audio element.
+            </audio>
           </div>
         </div>
       `;
-    }
 
-    function loadListeningPart(partNum) {
-      document.getElementById('testContent').innerHTML = `
-        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="bg-blue-100 text-blue-800 text-[10px] font-black px-2 py-0.5 rounded">Part ${partNum} Audio Track</span>
-            <span class="text-[10px] text-slate-400">Audio 128 kbps</span>
-          </div>
-          <audio controls class="w-full h-10 mt-2">
-            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-            Your browser does not support audio player.
-          </audio>
-        </div>
+      let startQ = (partNum - 1) * 10 + 1;
+      let endQ = partNum * 10;
 
-        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
-          <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider">Questions 1–5 (Fill in the blanks)</h4>
-          <div class="space-y-2">
-            <p class="text-xs font-bold text-slate-700">1. Type the caller's full registration number:</p>
-            <input type="text" placeholder="Your answer..." class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500">
-          </div>
+      let html = `<div class="space-y-3">
+        <div class="bg-blue-50/80 p-3 rounded-lg border border-blue-200">
+          <h4 class="font-bold text-blue-900 text-xs">Questions ${startQ}–${endQ} (Complete the Form / Blanks)</h4>
+          <p class="text-[11px] text-blue-700">Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.</p>
         </div>
       `;
+
+      for (let i = startQ; i <= endQ; i++) {
+        html += `
+          <div id="q-box-${i}" class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5">
+            <label class="text-xs font-bold text-slate-800">${i}. Caller Name / Registration Number:</label>
+            <input type="text" oninput="markAnswered(${i}, this.value)" placeholder="Type answer..." class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500">
+          </div>
+        `;
+      }
+
+      html += `</div>`;
+      rightPane.innerHTML = html;
     }
 
-    function loadWritingTask(taskNum) {
-      document.getElementById('testContent').innerHTML = `
-        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-2">
-          <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">Writing Task ${taskNum} Prompt</span>
-          <p class="text-xs font-bold text-slate-800">
+    // WRITING TASKS LOAD
+    function loadWritingTaskSection(taskNum) {
+      const leftPane = document.getElementById('passagePane');
+      const rightPane = document.getElementById('questionsPane');
+
+      leftPane.innerHTML = `
+        <div class="space-y-3">
+          <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">WRITING TASK ${taskNum} PROMPT</span>
+          <h3 class="font-extrabold text-slate-800 text-sm">${taskNum === 1 ? 'Task 1: Report / Data Analysis' : 'Task 2: Essay Prompt'}</h3>
+          <p class="text-xs text-slate-700 leading-relaxed font-medium">
             ${taskNum === 1 
-              ? 'The graph below shows the changes in global energy consumption from 2000 to 2025. Summarize the information by selecting and reporting the main features.' 
-              : 'Some people argue that space exploration is a waste of financial resources. To what extent do you agree or disagree?'}
+              ? 'The chart below shows global renewable energy adoption between 2010 and 2025. Summarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.' 
+              : 'Some people believe that university education should be free for all students. To what extent do you agree or disagree? Give reasons for your answer and include any relevant examples from your own knowledge or experience. Write at least 250 words.'}
           </p>
         </div>
+      `;
 
-        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-2">
+      rightPane.innerHTML = `
+        <div class="space-y-2">
           <div class="flex items-center justify-between">
-            <label class="text-xs font-bold text-slate-700">Your Answer:</label>
+            <label class="text-xs font-bold text-slate-700">Type Your Essay Here:</label>
             <span class="text-[10px] font-bold text-slate-400" id="wordCount">Words: 0</span>
           </div>
-          <textarea id="essayInput" oninput="updateWordCount()" rows="10" placeholder="Type your response here..." class="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-amber-500 leading-relaxed"></textarea>
+          <textarea id="essayInput" oninput="updateWordCount(${taskNum})" rows="12" placeholder="Write your response..." class="w-full text-xs p-3 bg-white border border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 leading-relaxed"></textarea>
         </div>
       `;
     }
 
-    function openSpeakingModule() {
+    function updateWordCount(taskNum) {
+      const text = document.getElementById('essayInput')?.value || '';
+      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+      document.getElementById('wordCount').innerText = `Words: ${words}`;
+      markAnswered(taskNum, text);
+    }
+
+    function openSpeakingSimulator() {
       switchTab('view-test-runner');
-      document.getElementById('testTitle').innerText = "AI Speaking Trainer";
-      document.getElementById('testSubtitle').innerText = "Part 2 — Cue Card Simulation";
+      document.getElementById('testTitle').innerText = "AI Speaking Simulator";
+      document.getElementById('testSubtitle').innerText = "Part 2 — Cue Card";
       document.getElementById('sectionNavTabs').innerHTML = '';
+      renderPalette(3);
       startTimer(120);
 
-      document.getElementById('testContent').innerHTML = `
-        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
-          <span class="bg-purple-100 text-purple-800 text-[10px] font-black px-2 py-0.5 rounded">Speaking Part 2 Cue Card</span>
-          <h4 class="font-bold text-slate-800 text-sm">Describe an achievement that you are proud of.</h4>
+      document.getElementById('passagePane').innerHTML = `
+        <div class="space-y-3">
+          <span class="bg-purple-100 text-purple-800 text-[10px] font-black px-2 py-0.5 rounded">SPEAKING CUE CARD</span>
+          <h3 class="font-extrabold text-slate-800 text-sm">Describe a course or subject you enjoyed studying.</h3>
           <ul class="text-xs text-slate-600 list-disc pl-4 space-y-1">
-            <li>What you achieved</li>
-            <li>When and where it happened</li>
-            <li>How difficult it was to accomplish</li>
-            <li>And explain why you feel proud of this achievement</li>
+            <li>What the course was</li>
+            <li>Where and when you took it</li>
+            <li>What you learned from it</li>
+            <li>And explain why you enjoyed it so much</li>
           </ul>
         </div>
+      `;
 
-        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center space-y-3 text-center">
-          <button onclick="toggleRecording()" id="recBtn" class="w-16 h-16 rounded-full bg-rose-500 text-white flex items-center justify-center text-2xl shadow-lg hover:bg-rose-600 transition">
+      document.getElementById('questionsPane').innerHTML = `
+        <div class="bg-white p-6 rounded-xl border border-slate-200 text-center space-y-3">
+          <button onclick="toggleRec()" id="recBtn" class="w-14 h-14 bg-rose-500 text-white rounded-full flex items-center justify-center text-xl mx-auto shadow-md">
             <i class="fa-solid fa-microphone"></i>
           </button>
-          <p class="text-xs font-bold text-slate-700" id="recStatus">Tap to Record Your Answer</p>
-          <p class="text-[10px] text-slate-400">AI will analyze Fluency, Pronunciation, and Lexical Resource.</p>
+          <p class="text-xs font-bold text-slate-700" id="recStatus">Click to Record Your Audio Answer</p>
         </div>
       `;
     }
 
-    function toggleRecording() {
+    function toggleRec() {
       const btn = document.getElementById('recBtn');
       const status = document.getElementById('recStatus');
       if (btn.classList.contains('bg-rose-500')) {
-        btn.className = "w-16 h-16 rounded-full bg-slate-800 text-white flex items-center justify-center text-2xl shadow-lg animate-pulse";
-        status.innerText = "Recording... Tap again to stop";
+        btn.className = "w-14 h-14 bg-slate-900 text-white rounded-full flex items-center justify-center text-xl mx-auto shadow-md animate-pulse";
+        status.innerText = "Recording in progress... Click again to stop";
       } else {
-        btn.className = "w-16 h-16 rounded-full bg-rose-500 text-white flex items-center justify-center text-2xl shadow-lg";
-        status.innerText = "Recording saved! Click Submit to evaluate.";
+        btn.className = "w-14 h-14 bg-rose-500 text-white rounded-full flex items-center justify-center text-xl mx-auto shadow-md";
+        status.innerText = "Recording saved! Ready for AI Evaluation.";
       }
-    }
-
-    function startFullDiagnostic() {
-      openBookSelection('reading');
-    }
-
-    function openSATModule(type) {
-      switchTab('view-test-runner');
-      document.getElementById('testTitle').innerText = `SAT Digital — ${type === 'rw' ? 'Reading & Writing' : 'Math Section'}`;
-      document.getElementById('testSubtitle').innerText = "Module 1 (Interactive)";
-      document.getElementById('sectionNavTabs').innerHTML = '';
-      startTimer(2100);
-
-      document.getElementById('testContent').innerHTML = `
-        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
-          <span class="bg-teal-100 text-teal-800 text-[10px] font-black px-2 py-0.5 rounded">Question 1</span>
-          <p class="text-xs font-bold text-slate-800">
-            ${type === 'rw' ? 'Which choice completes the text with the most logical and precise word or phrase?' : 'If 3x + 12 = 36, what is the value of x + 4?'}
-          </p>
-          <div class="space-y-2">
-            <label class="block p-2.5 rounded-xl border border-slate-200 text-xs flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="sat1" value="A"> A) ${type === 'rw' ? 'Unprecedented' : '8'}
-            </label>
-            <label class="block p-2.5 rounded-xl border border-slate-200 text-xs flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="sat1" value="B"> B) ${type === 'rw' ? 'Ambiguous' : '12'}
-            </label>
-          </div>
-        </div>
-      `;
-    }
-
-    function updateWordCount() {
-      const text = document.getElementById('essayInput')?.value || '';
-      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-      const el = document.getElementById('wordCount');
-      if (el) el.innerText = `Words: ${words}`;
     }
 
     function startTimer(seconds) {
@@ -573,45 +630,37 @@
 
     function submitTest() {
       clearInterval(timerInterval);
-      alert('Test submitted! Your score has been calculated and saved.');
+      const count = Object.keys(userAnswers).length;
+      alert(`Test completed and submitted! Total answered questions: ${count}.`);
       switchTab('view-home');
     }
 
-    // RENDER ALL 21 BOOKS IN BOOKS TAB
     function renderBooksGrid() {
       const grid = document.getElementById('booksGrid');
       grid.innerHTML = '';
       for (let i = 21; i >= 1; i--) {
         const card = document.createElement('div');
-        card.className = 'bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between cursor-pointer hover:border-indigo-300 transition';
+        card.className = 'bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer hover:border-blue-400 transition';
         card.onclick = () => openBookSelection('reading', i);
         card.innerHTML = `
-          <div class="flex items-start justify-between mb-2">
-            <div class="w-10 h-10 bg-indigo-600 text-white rounded-lg flex items-center justify-center font-black text-xs shadow">
-              C${i}
+          <div class="flex items-center gap-2">
+            <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-black text-xs">C${i}</span>
+            <div>
+              <h4 class="font-bold text-slate-800 text-xs">Cambridge ${i}</h4>
+              <p class="text-[10px] text-slate-400">4 Full Tests</p>
             </div>
-            ${i >= 18 ? '<span class="bg-emerald-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase">Interactive</span>' : ''}
           </div>
-          <div>
-            <h4 class="font-extrabold text-slate-800 text-sm">Cambridge ${i}</h4>
-            <p class="text-[11px] text-slate-400">4 Full Tests</p>
-          </div>
+          <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
         `;
         grid.appendChild(card);
       }
     }
 
-    function openPredictions() {
-      switchTab('view-predictions');
-    }
-
     function switchTab(tabId) {
       ['view-home', 'view-select-test', 'view-test-runner', 'view-books', 'view-predictions'].forEach(t => {
-        const el = document.getElementById(t);
-        if (el) el.classList.add('hidden');
+        document.getElementById(t)?.classList.add('hidden');
       });
-      const target = document.getElementById(tabId);
-      if (target) target.classList.remove('hidden');
+      document.getElementById(tabId)?.classList.remove('hidden');
     }
 
     // Init
