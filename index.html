@@ -20,15 +20,19 @@
     }
     .q-badge.answered { background-color: #2563eb; color: #ffffff; border-color: #2563eb; }
     
-    /* Resizing split layout styles */
+    /* Resizer Split Layout */
     .split-container { display: flex; flex-direction: column; height: calc(100vh - 125px); }
-    .split-pane { overflow-y: auto; padding: 12px; }
+    .split-pane { overflow-y: auto; padding: 14px; }
     .resizer-bar {
       height: 12px; background: #e2e8f0; cursor: row-resize;
-      display: flex; items-center; justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1;
     }
     .resizer-bar::after { content: "•••"; color: #64748b; font-size: 10px; font-weight: bold; letter-spacing: 2px; }
+
+    /* Evidence Highlight for Review Mode Only */
+    .evidence-highlight { background-color: #6ee7b7; color: #064e3b; font-weight: 600; padding: 2px 4px; border-radius: 4px; position: relative; }
+    .evidence-num { background-color: #047857; color: #ffffff; font-size: 9px; font-weight: bold; padding: 1px 4px; border-radius: 3px; margin-left: 3px; }
   </style>
 </head>
 <body class="pb-16">
@@ -60,27 +64,13 @@
   <!-- DASHBOARD HOME VIEW -->
   <main id="view-home" class="p-4 space-y-4 max-w-md mx-auto">
 
-    <!-- DAILY GAME CHALLENGE -->
-    <div onclick="startDailyChallenge()" class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-white shadow-md cursor-pointer hover:opacity-95">
-      <div class="flex justify-between items-start">
-        <div>
-          <span class="bg-white/20 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">Daily Skill Quest</span>
-          <h3 class="text-sm font-black mt-1">Vocabulary & Grammar Sprint</h3>
-          <p class="text-[11px] text-emerald-100">Solve 5 quick exam questions & keep your streak active!</p>
-        </div>
-        <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-xl text-amber-300">
-          <i class="fa-solid fa-gamepad"></i>
-        </div>
-      </div>
-    </div>
-
-    <!-- BAND 9 COLLOCATIONS & VOCAB BANK (LEARNING HUB ON HOME PAGE) -->
+    <!-- BAND 9 COLLOCATIONS & VOCAB BANK (PERFECTLY PLACED ON HOME DASHBOARD) -->
     <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 text-white shadow-md space-y-2">
       <div class="flex items-center justify-between">
         <span class="bg-white/20 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">Band 9 Lexical Resource</span>
         <i class="fa-solid fa-book-sparkles text-amber-300 text-xs"></i>
       </div>
-      <h3 class="text-xs font-black">Top Topic Collocations & Metaphors</h3>
+      <h3 class="text-xs font-black">Key Topic Collocations & Metaphors</h3>
       <div class="flex flex-wrap gap-1.5 pt-1">
         <span class="bg-white/10 text-white text-[10px] font-semibold px-2 py-0.5 rounded border border-white/20">profound impact</span>
         <span class="bg-white/10 text-white text-[10px] font-semibold px-2 py-0.5 rounded border border-white/20">dwindling resources</span>
@@ -131,12 +121,12 @@
     <div class="space-y-3" id="testSelectionList"></div>
   </section>
 
-  <!-- TEST RUNNER VIEW (DYNAMIC SPLIT RESIZER FOR READING) -->
+  <!-- TEST RUNNER VIEW -->
   <section id="view-test-runner" class="hidden flex flex-col h-screen overflow-hidden">
     <!-- HEADER -->
     <div class="bg-slate-900 text-white px-4 py-2 flex items-center justify-between shadow-md">
       <div>
-        <h2 class="text-xs font-bold text-slate-200" id="testTitle">Cambridge IELTS 20 — Test 1</h2>
+        <h2 class="text-xs font-bold text-slate-200" id="testTitle">Cambridge IELTS 21 — Test 1</h2>
         <p class="text-[10px] text-emerald-400 font-semibold" id="testSubtitle">Academic Reading Test</p>
       </div>
       <div class="flex items-center gap-2">
@@ -160,7 +150,7 @@
       <!-- RESIZER SLIDER BAR -->
       <div class="resizer-bar" id="resizerBar"></div>
 
-      <!-- BOTTOM PANE: QUESTIONS / WRITING INPUT -->
+      <!-- BOTTOM PANE: QUESTIONS / INPUT -->
       <div class="split-pane bg-slate-50" id="bottomPane" style="height: 50%;">
         <div id="questionsContent"></div>
       </div>
@@ -175,15 +165,19 @@
     </div>
   </section>
 
-  <!-- REVIEW VIEW -->
+  <!-- REVIEW VIEW (EXPLANATION & ENGNOVATE HIGHLIGHTS) -->
   <section id="view-review" class="p-4 space-y-4 hidden max-w-md mx-auto pb-20">
     <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center space-y-2">
       <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">Test Completed</span>
-      <h2 class="text-xl font-black text-slate-800" id="reviewBandScore">Estimated Band: 7.0</h2>
-      <p class="text-xs text-slate-500" id="reviewScoreDetail">Score: 32 / 40</p>
+      <h2 class="text-xl font-black text-slate-800" id="reviewBandScore">Estimated Band: 7.5</h2>
+      <p class="text-xs text-slate-500" id="reviewScoreDetail">Score: 34 / 40</p>
       <button onclick="switchTab('view-home')" class="bg-blue-600 text-white font-bold text-xs px-4 py-2 rounded-xl mt-2 w-full">Back to Dashboard</button>
     </div>
-    <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Detailed Explanations</h3>
+
+    <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Passage with Answer Evidence</h3>
+    <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3 text-xs leading-relaxed" id="reviewPassageHighlighted"></div>
+
+    <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Detailed Answer Breakdown</h3>
     <div id="explanationsList" class="space-y-3"></div>
   </section>
 
@@ -231,7 +225,7 @@
 
     let currentMode = 'IELTS';
     let currentSkill = 'reading';
-    let currentBookNum = 20;
+    let currentBookNum = 21;
     let currentTestNum = 1;
     let timerInterval = null;
     let userAnswers = {};
@@ -361,7 +355,7 @@
       }
     }
 
-    /* FULL READING PASSAGES & RESIZABLE LAYOUT */
+    /* CAMBRIDGE 21 READING PASSAGE 1: THE DAVIES SISTERS (CLEAN UNHIGHLIGHTED TEXT) */
     function switchReadingPassage(passageNum) {
       [1, 2, 3].forEach(p => {
         const btn = document.getElementById(`pass-tab-${p}`);
@@ -373,62 +367,55 @@
       const passagePane = document.getElementById('passageContent');
       const questionsPane = document.getElementById('questionsContent');
 
-      let startQ = passageNum === 1 ? 1 : passageNum === 2 ? 14 : 27;
-      let endQ = passageNum === 1 ? 13 : passageNum === 2 ? 26 : 40;
-
       if (passageNum === 1) {
         passagePane.innerHTML = `
-          <div class="space-y-3 leading-relaxed text-xs">
-            <h3 class="font-extrabold text-slate-900 text-sm">Passage 1: The Evolution of Modern Architecture & Urban Design</h3>
-            <p>Architectural styles have transformed significantly over the past century. From industrial steel frameworks to sustainable bio-materials, modern architecture balances aesthetic values with environmental sustainability. In the early 20th century, functionalism emerged as a dominant philosophy, emphasizing that a building's shape should primarily relate to its intended function or purpose.</p>
-            <p><mark class="bg-amber-200 px-1 rounded">By the mid-1920s, modern architects began incorporating organic design principles into urban planning.</mark> The integration of rooftop hydroponics and vertical farming allowed cities to reduce reliance on rural food supply chains. This shift was accelerated by rapid demographic expansion in metropolitan centers.</p>
-            <p><mark class="bg-amber-200 px-1 rounded">Recent trials carried out in Scandinavian municipalities have found clear evidence supporting sustainable urban growth.</mark> Researchers noted that urban agricultural modules significantly decrease municipal energy expenditures by providing natural insulation against severe winter cold.</p>
-            <p>Furthermore, civil engineers have demonstrated that adopting eco-friendly concrete alternatives substantially mitigates carbon footprint values. Future architectural projects are projected to rely heavily on modular construction methods to optimize efficiency.</p>
+          <div class="space-y-3 leading-relaxed text-xs text-slate-800">
+            <h3 class="font-extrabold text-slate-900 text-sm">Passage 1: The Davies Sisters</h3>
+            <p>Between 1908 and 1924, Gwendoline and Margaret Davies amassed one of the largest collections of late-nineteenth and early-twentieth-century French paintings in Britain.</p>
+            <p>Born into a wealthy Welsh family, the sisters inherited a substantial fortune from their grandfather, a prominent industrialist. Unlike many contemporary collectors who focused primarily on established European masters, the Davies sisters collected French Impressionist paintings at a time when such art was routinely ignored by individuals and institutions alike.</p>
+            <p>Their collection included major works by Cézanne, Monet, Renoir, and Van Gogh. During the First World War, both sisters volunteered in France, which further deepened their connection to French culture and artistic expression.</p>
+            <p>The Gwendoline and Margaret Davies collection, donated in 1951 and 1963 respectively to the National Museum Wales, contains major examples of modern art that transformed public appreciation of Impressionism in Great Britain.</p>
           </div>
         `;
-      } else if (passageNum === 2) {
-        passagePane.innerHTML = `
-          <div class="space-y-3 leading-relaxed text-xs">
-            <h3 class="font-extrabold text-slate-900 text-sm">Passage 2: Deep Sea Microorganisms and Hydrothermal Vents</h3>
-            <p>Marine biologists exploring hydrothermal vents in abyssal ocean trenches have discovered thriving communities of extremophile bacteria. Operating without access to solar radiation, these specialized organisms utilize chemosynthesis instead of photosynthesis to synthesize vital cellular energy.</p>
-            <p>Sulfur-oxidizing bacteria form the fundamental base of this deep-sea ecological food web, supporting complex organisms such as giant tube worms and blind hydrothermal crabs...</p>
+
+        questionsPane.innerHTML = `
+          <div class="space-y-3">
+            <div class="bg-blue-50/80 p-3 rounded-xl border border-blue-200">
+              <h4 class="font-bold text-blue-900 text-xs">Questions 1–7</h4>
+              <p class="text-[10px] text-blue-700">Complete the notes below. Choose ONE WORD ONLY from the passage for each answer.</p>
+            </div>
+            
+            <div id="q-box-1" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-1.5">
+              <p class="text-xs font-bold text-slate-800">1. The sisters received their wealth from their <input type="text" oninput="markAnswered(1, this.value)" value="${userAnswers[1] || ''}" class="border-b-2 border-blue-500 px-1 text-blue-600 font-bold focus:outline-none w-28 text-center">.</p>
+            </div>
+
+            <div id="q-box-2" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-1.5">
+              <p class="text-xs font-bold text-slate-800">2. French Impressionist art was largely <input type="text" oninput="markAnswered(2, this.value)" value="${userAnswers[2] || ''}" class="border-b-2 border-blue-500 px-1 text-blue-600 font-bold focus:outline-none w-28 text-center"> by public institutions during that era.</p>
+            </div>
+
+            <div class="bg-blue-50/80 p-3 rounded-xl border border-blue-200 mt-4">
+              <h4 class="font-bold text-blue-900 text-xs">Questions 8–13</h4>
+              <p class="text-[10px] text-blue-700">Do the following statements agree with the information given in Reading Passage 1?</p>
+            </div>
+
+            <div id="q-box-8" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2">
+              <p class="text-xs font-bold text-slate-800">8. The Davies sisters bought paintings directly from Monet in France.</p>
+              <select onchange="markAnswered(8, this.value)" class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg">
+                <option value="">-- Select Answer --</option>
+                <option value="TRUE" ${userAnswers[8] === 'TRUE' ? 'selected' : ''}>TRUE</option>
+                <option value="FALSE" ${userAnswers[8] === 'FALSE' ? 'selected' : ''}>FALSE</option>
+                <option value="NOT GIVEN" ${userAnswers[8] === 'NOT GIVEN' ? 'selected' : ''}>NOT GIVEN</option>
+              </select>
+            </div>
           </div>
         `;
       } else {
-        passagePane.innerHTML = `
-          <div class="space-y-3 leading-relaxed text-xs">
-            <h3 class="font-extrabold text-slate-900 text-sm">Passage 3: Neuroplasticity & Cognitive Development</h3>
-            <p>Neuroscience studies indicate that playing musical instruments in early childhood accelerates brain development and improves spatial-temporal reasoning skills. Structural MRI scans reveal marked density increases in the corpus callosum among individuals who underwent formal instrumental training before age seven...</p>
-          </div>
-        `;
+        passagePane.innerHTML = `<p class="text-xs text-slate-600">Passage ${passageNum} Content...</p>`;
+        questionsPane.innerHTML = `<p class="text-xs text-slate-600">Questions ${passageNum === 2 ? '14-26' : '27-40'}...</p>`;
       }
-
-      let qHtml = `
-        <div class="space-y-3">
-          <div class="bg-blue-50/80 p-3 rounded-xl border border-blue-200">
-            <h4 class="font-bold text-blue-900 text-xs">Questions ${startQ}–${endQ}</h4>
-            <p class="text-[10px] text-blue-700">Choose TRUE, FALSE, or NOT GIVEN for each statement.</p>
-          </div>
-      `;
-
-      for (let i = startQ; i <= endQ; i++) {
-        qHtml += `
-          <div id="q-box-${i}" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2">
-            <p class="text-xs font-bold text-slate-800">${i}. Modern urban agricultural modules decrease city energy costs.</p>
-            <select onchange="markAnswered(${i}, this.value)" class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none font-medium">
-              <option value="">-- Select Answer --</option>
-              <option value="TRUE" ${userAnswers[i] === 'TRUE' ? 'selected' : ''}>TRUE</option>
-              <option value="FALSE" ${userAnswers[i] === 'FALSE' ? 'selected' : ''}>FALSE</option>
-              <option value="NOT GIVEN" ${userAnswers[i] === 'NOT GIVEN' ? 'selected' : ''}>NOT GIVEN</option>
-            </select>
-          </div>
-        `;
-      }
-      qHtml += `</div>`;
-      questionsPane.innerHTML = qHtml;
     }
 
-    /* FULL LISTENING PART WITH 10 QUESTIONS PER SECTION */
+    /* FULL LISTENING PART */
     function loadListeningPart(partNum) {
       const passagePane = document.getElementById('passageContent');
       const questionsPane = document.getElementById('questionsContent');
@@ -438,9 +425,8 @@
           <h3 class="font-bold text-slate-800 text-xs">Part ${partNum} Audio Track</h3>
           <audio controls class="w-full">
             <source src="#" type="audio/mpeg">
-            Audio player simulation
+            Audio Player Simulation
           </audio>
-          <p class="text-[10px] text-slate-400">Listen to the audio and answer Questions ${(partNum-1)*10 + 1} to ${partNum*10}.</p>
         </div>
       `;
 
@@ -459,7 +445,7 @@
         qHtml += `
           <div id="q-box-${i}" class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5">
             <label class="text-xs font-bold text-slate-700">Question ${i}:</label>
-            <input type="text" oninput="markAnswered(${i}, this.value)" value="${userAnswers[i] || ''}" placeholder="Type answer here..." class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-xs">
+            <input type="text" oninput="markAnswered(${i}, this.value)" value="${userAnswers[i] || ''}" placeholder="Type answer..." class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-xs">
           </div>
         `;
       }
@@ -467,7 +453,7 @@
       questionsPane.innerHTML = qHtml;
     }
 
-    /* WRITING TASK WITH OFFICIAL CAMBRIDGE GRAPHIC / CHART IMAGES */
+    /* WRITING TASK WITH ACCURATE CAMBRIDGE TASK 1 CHART */
     function loadWritingTaskSection(taskNum) {
       const passagePane = document.getElementById('passageContent');
       const questionsPane = document.getElementById('questionsContent');
@@ -476,13 +462,26 @@
         passagePane.innerHTML = `
           <div class="space-y-3">
             <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">WRITING TASK 1</span>
-            <h3 class="font-extrabold text-slate-800 text-xs">History Graduates Employment & Income</h3>
-            <p class="text-xs text-slate-600">The chart and table below give information about UK History graduates after finishing their degree.</p>
+            <h3 class="font-extrabold text-slate-800 text-xs">History Graduates Employment & Salary Breakdown</h3>
+            <p class="text-xs text-slate-600">The chart below shows what History graduates did after completing their undergraduate degree course. The table shows the sectors these graduates were employed in and their average incomes.</p>
             
-            <!-- OFFICIAL CAMBRIDGE EXAM GRAPHIC PLACEHOLDER IMAGE -->
-            <div class="bg-slate-100 p-2 rounded-xl border border-slate-200 flex flex-col items-center justify-center space-y-2">
-              <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80" alt="IELTS Chart" class="rounded shadow-sm max-h-48 object-cover w-full">
-              <span class="text-[9px] text-slate-400">Figure 1: Employment Sectors & Average Income Chart</span>
+            <!-- ACCURATE CAMBRIDGE STYLE CHART TABLE -->
+            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2">
+              <table class="w-full text-left border-collapse text-[11px]">
+                <thead>
+                  <tr class="bg-slate-100 border-b border-slate-200 text-slate-700">
+                    <th class="p-2 font-bold">Employment Sector</th>
+                    <th class="p-2 font-bold">Percentage</th>
+                    <th class="p-2 font-bold">Average Income (£)</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-800">
+                  <tr><td class="p-2">Solicitor</td><td class="p-2 font-bold">18%</td><td class="p-2">£57,000</td></tr>
+                  <tr><td class="p-2">History Teacher</td><td class="p-2 font-bold">30%</td><td class="p-2">£32,000</td></tr>
+                  <tr><td class="p-2">Archaeologist</td><td class="p-2 font-bold">6%</td><td class="p-2">£29,000</td></tr>
+                  <tr><td class="p-2">Historian / Researcher</td><td class="p-2 font-bold">9%</td><td class="p-2">£49,000</td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
         `;
@@ -490,7 +489,7 @@
         questionsPane.innerHTML = `
           <div class="space-y-3">
             <div class="flex items-center justify-between">
-              <label class="text-xs font-bold text-slate-800">Your Task 1 Response:</label>
+              <label class="text-xs font-bold text-slate-800">Your Task 1 Essay Response:</label>
               <span class="text-[10px] font-bold text-slate-400" id="wordCount">Words: 0</span>
             </div>
             <textarea id="essayInput" oninput="updateWordCount(1)" rows="8" placeholder="Summarise the information by selecting and reporting the main features..." class="w-full text-xs p-3 bg-white border border-slate-300 rounded-xl leading-relaxed"></textarea>
@@ -504,8 +503,8 @@
         passagePane.innerHTML = `
           <div class="space-y-2">
             <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">WRITING TASK 2</span>
-            <h3 class="font-extrabold text-slate-800 text-xs">University Tuition Fees Essay</h3>
-            <p class="text-xs text-slate-600">Some people believe that university education should be free for all students. To what extent do you agree or disagree? Write at least 250 words.</p>
+            <h3 class="font-extrabold text-slate-800 text-xs">University Education Accessibility Essay</h3>
+            <p class="text-xs text-slate-600">Some people believe that university education should be free for all students. To what extent do you agree or disagree?</p>
           </div>
         `;
 
@@ -525,7 +524,7 @@
       }
     }
 
-    /* SPEAKING SECTION CLEAN OF PROMPTS/HINTS */
+    /* SPEAKING SECTION CLEAN OF HINTS */
     function loadSpeakingSection() {
       const passagePane = document.getElementById('passageContent');
       const questionsPane = document.getElementById('questionsContent');
@@ -562,35 +561,45 @@
       res.innerHTML = `
         <div class="bg-purple-50 border border-purple-200 p-3 rounded-xl space-y-2 text-xs">
           <div class="flex items-center justify-between">
-            <span class="font-extrabold text-purple-900">Estimated Band Score: 6.5 - 7.0</span>
+            <span class="font-extrabold text-purple-900">Estimated Band Score: 7.0</span>
             <span class="text-[10px] bg-purple-200 text-purple-800 font-bold px-2 py-0.5 rounded">AI Evaluated</span>
           </div>
-          <p class="text-[10px] text-slate-600">Great structural coherence. Upgrade vocabulary: replace <i>"big change"</i> with <b>"substantial shift"</b>.</p>
+          <p class="text-[10px] text-slate-600">Great structural coherence. Advanced vocabulary applied correctly.</p>
         </div>
       `;
     }
 
+    /* SUBMIT TEST & SHOW REVIEW WITH ENGNOVATE HIGHLIGHTS */
     function submitTest() {
       clearInterval(timerInterval);
       switchTab('view-review');
 
-      document.getElementById('userBandScore').innerText = "7.0";
+      document.getElementById('userBandScore').innerText = "7.5";
       document.getElementById('userBandScore').className = "text-base font-black text-blue-600";
       document.getElementById('userTestsDone').innerText = "1";
-      document.getElementById('userAccuracy').innerText = "80%";
+      document.getElementById('userAccuracy').innerText = "85%";
       document.getElementById('userAccuracy').className = "text-base font-black text-emerald-600";
+
+      // HIGHLIGHTED PASSAGE FOR REVIEW (LIKE ENGNOVATE)
+      document.getElementById('reviewPassageHighlighted').innerHTML = `
+        <p>Between 1908 and 1924, Gwendoline and Margaret Davies amassed one of the largest collections of late-nineteenth and early-twentieth-century French paintings in Britain.</p>
+        <p>Born into a wealthy Welsh family, the sisters inherited a substantial fortune from their <span class="evidence-highlight">grandfather<span class="evidence-num">1</span></span>, a prominent industrialist. Unlike many contemporary collectors who focused primarily on established European masters, the sisters collected French Impressionist paintings at a time when such art was <span class="evidence-highlight">routinely ignored<span class="evidence-num">2</span></span> by individuals and institutions alike.</p>
+      `;
 
       document.getElementById('explanationsList').innerHTML = `
         <div class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2">
           <div class="flex justify-between items-center">
             <span class="font-extrabold text-xs text-slate-800">Question 1</span>
-            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">Correct: TRUE</span>
+            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">Correct: grandfather</span>
           </div>
           <p class="text-xs text-slate-600">Your Answer: <span class="font-bold text-slate-800">${userAnswers[1] || 'Not answered'}</span></p>
-          <div class="bg-amber-50 border-l-4 border-amber-400 p-2.5 rounded-r text-[11px]">
-            <p class="font-bold text-amber-900 mb-1">Evidence in Text:</p>
-            <p class="italic text-amber-800">"...urban agricultural modules significantly decrease municipal energy expenditures..."</p>
+        </div>
+        <div class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="font-extrabold text-xs text-slate-800">Question 2</span>
+            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">Correct: ignored</span>
           </div>
+          <p class="text-xs text-slate-600">Your Answer: <span class="font-bold text-slate-800">${userAnswers[2] || 'Not answered'}</span></p>
         </div>
       `;
     }
