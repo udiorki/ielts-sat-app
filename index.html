@@ -1,304 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IELTS & SAT Prep Platform</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        * { box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; background: #f4f6f8; height: 100vh; display: flex; flex-direction: column; color: #1c1c1e; }
-        
-        .screen { display: none; flex-direction: column; height: 100vh; overflow-y: auto; padding: 16px; }
-        .screen.active { display: flex; }
+innerText = ${score} / 40;
+      
+      let band = 5.0;
+      if (score >= 39) band = 9.0;
+      else if (score >= 37) band = 8.5;
+      else if (score >= 35) band = 8.0;
+      else if (score >= 32) band = 7.5;
+      else if (score >= 30) band = 7.0;
+      else if (score >= 26) band = 6.5;
+      else if (score >= 23) band = 6.0;
+      else if (score >= 18) band = 5.5;
 
-        /* HEADER & NAV */
-        .screen-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-        .back-btn { background: #e5e5ea; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; }
-        .screen-title { font-size: 18px; font-weight: bold; }
+      document.getElementById('calculatedBand').innerText = band.toFixed(1);
+    }
 
-        /* CARD LISTS */
-        .hero-card { background: #fff; border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 16px; }
-        .hero-title { font-size: 20px; font-weight: bold; margin-bottom: 4px; }
-        .hero-sub { font-size: 13px; color: #8e8e93; }
+    // Navigation Switcher
+    function switchTab(tabId) {
+      const tabs = ['view-home', 'view-books', 'view-answers', 'view-calc'];
+      tabs.forEach(t => {
+        document.getElementById(t).classList.add('hidden');
+      });
+      document.getElementById(tabId).classList.remove('hidden');
 
-        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-        .menu-card { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); cursor: pointer; transition: transform 0.1s; }
-        .menu-card:active { transform: scale(0.98); }
-        .card-icon { font-size: 24px; margin-bottom: 8px; }
-        .card-title { font-size: 14px; font-weight: bold; }
-        .card-desc { font-size: 11px; color: #8e8e93; margin-top: 2px; }
+      // Update Nav Bar visual state
+      const navs = ['nav-home', 'nav-books', 'nav-answers', 'nav-calc'];
+      navs.forEach(n => {
+        const el = document.getElementById(n);
+        el.className = 'flex flex-col items-center gap-0.5 text-slate-400 font-medium text-[10px]';
+      });
 
-        .list-card { background: #fff; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); cursor: pointer; }
-        .list-card:active { background: #f2f2f7; }
-        .list-info { display: flex; flex-direction: column; gap: 2px; }
-        .list-title { font-size: 15px; font-weight: 600; }
-        .list-badge { font-size: 11px; color: #007aff; background: #e5f1ff; padding: 2px 8px; border-radius: 4px; width: fit-content; }
+      const activeNavMap = {
+        'view-home': 'nav-home',
+        'view-books': 'nav-books',
+        'view-answers': 'nav-answers',
+        'view-calc': 'nav-calc'
+      };
+      
+      document.getElementById(activeNavMap[tabId]).className = 'flex flex-col items-center gap-0.5 text-indigo-600 font-bold text-[10px]';
+    }
 
-        /* PRACTICE SPLIT VIEW SCREEN */
-        #screen-practice { padding: 0; overflow: hidden; }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: #fff; border-bottom: 1px solid #e0e0e0; }
-        .timer { font-weight: bold; font-family: monospace; font-size: 15px; background: #eee; padding: 4px 8px; border-radius: 6px; }
-
-        .workspace { display: flex; flex: 1; overflow: hidden; }
-        .passage-panel { flex: 1; padding: 16px; overflow-y: auto; background: #fff; border-right: 2px solid #e0e0e0; font-size: 14px; line-height: 1.6; }
-        .questions-panel { flex: 1; padding: 16px; overflow-y: auto; background: #fafafa; }
-
-        .q-card { background: #fff; padding: 12px; border-radius: 10px; margin-bottom: 12px; border: 1px solid #e5e5e5; }
-        .options { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
-        .opt-btn { display: flex; align-items: center; gap: 8px; padding: 8px; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; background: #fff; font-size: 13px; }
-
-        .bottom-nav { background: #fff; border-top: 1px solid #e0e0e0; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; }
-        .parts-tabs { display: flex; gap: 6px; }
-        .part-tab { flex: 1; text-align: center; padding: 6px; background: #f0f0f0; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
-        .part-tab.active { background: #007aff; color: white; }
-        
-        .q-numbers { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 4px; }
-        .q-num { min-width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
-        .q-num.answered { background: #34c759; color: white; border-color: #34c759; }
-
-        .submit-btn { background: #34c759; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; }
-    </style>
-</head>
-<body>
-
-    <!-- 1. DASHBOARD SCREEN -->
-    <div id="screen-dashboard" class="screen active">
-        <div class="hero-card">
-            <div class="hero-title">IELTS & SAT Prep</div>
-            <div class="hero-sub">Your personal test prep assistant</div>
-        </div>
-
-        <div class="grid-container">
-            <div class="menu-card" onclick="navigateTo('screen-modules')">
-                <div class="card-icon">📖</div>
-                <div class="card-title">Cambridge Materials</div>
-                <div class="card-desc">Authentic tests & tasks</div>
-            </div>
-            <div class="menu-card" onclick="navigateTo('screen-books')">
-                <div class="card-icon">✍️</div>
-                <div class="card-title">Full Tests</div>
-                <div class="card-desc">Timed simulations</div>
-            </div>
-            <div class="menu-card" onclick="alert('Analytics in progress')">
-                <div class="card-icon">📊</div>
-                <div class="card-title">Analytics</div>
-                <div class="card-desc">Score predictions</div>
-            </div>
-            <div class="menu-card" onclick="alert('Tips coming soon')">
-                <div class="card-icon">💡</div>
-                <div class="card-title">Expert Tips</div>
-                <div class="card-desc">Strategies & hacks</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. MODULE SELECTION (Reading / Writing / Listening / Speaking) -->
-    <div id="screen-modules" class="screen">
-        <div class="screen-header">
-            <button class="back-btn" onclick="navigateTo('screen-dashboard')">⬅️ Back</button>
-            <div class="screen-title">Select Section</div>
-        </div>
-
-        <div class="list-card" onclick="navigateTo('screen-books')">
-            <div class="list-info">
-                <div class="list-title">📚 Reading Practice</div>
-                <span class="list-badge">Academic & General</span>
-            </div>
-            <span>➡️</span>
-        </div>
-        <div class="list-card" onclick="alert('Writing section coming next!')">
-            <div class="list-info">
-                <div class="list-title">✍️ Writing Evaluator (AI)</div>
-                <span class="list-badge">Task 1 & Task 2</span>
-            </div>
-            <span>➡️</span>
-        </div>
-        <div class="list-card" onclick="alert('Listening coming soon!')">
-            <div class="list-info">
-                <div class="list-title">🎧 Listening Practice</div>
-                <span class="list-badge">Audio + Transcripts</span>
-            </div>
-            <span>➡️</span>
-        </div>
-    </div>
-
-    <!-- 3. CAMBRIDGE BOOKS SELECTION -->
-    <div id="screen-books" class="screen">
-        <div class="screen-header">
-            <button class="back-btn" onclick="navigateTo('screen-modules')">⬅️ Back</button>
-            <div class="screen-title">Cambridge IELTS Books</div>
-        </div>
-
-        <div class="list-card" onclick="selectBook('Cambridge 18')">
-            <div class="list-info">
-                <div class="list-title">Cambridge IELTS 18</div>
-                <span class="list-badge">4 Full Practice Tests</span>
-            </div>
-            <span>➡️</span>
-        </div>
-        <div class="list-card" onclick="selectBook('Cambridge 17')">
-            <div class="list-info">
-                <div class="list-title">Cambridge IELTS 17</div>
-                <span class="list-badge">4 Full Practice Tests</span>
-            </div>
-            <span>➡️</span>
-        </div>
-        <div class="list-card" onclick="selectBook('Cambridge 16')">
-            <div class="list-info">
-                <div class="list-title">Cambridge IELTS 16</div>
-                <span class="list-badge">4 Full Practice Tests</span>
-            </div>
-            <span>➡️</span>
-        </div>
-    </div>
-
-    <!-- 4. TESTS SELECTION (Test 1, Test 2, Test 3, Test 4) -->
-    <div id="screen-tests" class="screen">
-        <div class="screen-header">
-            <button class="back-btn" onclick="navigateTo('screen-books')">⬅️ Back</button>
-            <div class="screen-title" id="selected-book-title">Cambridge 18</div>
-        </div>
-
-        <div class="list-card" onclick="startTest('Test 1')">
-            <div class="list-info">
-                <div class="list-title">Practice Test 1</div>
-                <span class="list-badge">Reading • 3 Passages (40 Questions)</span>
-            </div>
-            <span>🚀 Start</span>
-        </div>
-        <div class="list-card" onclick="startTest('Test 2')">
-            <div class="list-info">
-                <div class="list-title">Practice Test 2</div>
-                <span class="list-badge">Reading • 3 Passages (40 Questions)</span>
-            </div>
-            <span>🚀 Start</span>
-        </div>
-        <div class="list-card" onclick="startTest('Test 3')">
-            <div class="list-info">
-                <div class="list-title">Practice Test 3</div>
-                <span class="list-badge">Reading • 3 Passages (40 Questions)</span>
-            </div>
-            <span>🚀 Start</span>
-        </div>
-        <div class="list-card" onclick="startTest('Test 4')">
-            <div class="list-info">
-                <div class="list-title">Practice Test 4</div>
-                <span class="list-badge">Reading • 3 Passages (40 Questions)</span>
-            </div>
-            <span>🚀 Start</span>
-        </div>
-    </div>
-
-    <!-- 5. PRACTICE TEST (SPLIT SCREEN VIEW) -->
-    <div id="screen-practice" class="screen">
-        <div class="top-bar">
-            <button class="back-btn" onclick="navigateTo('screen-tests')">⬅️ Exit Test</button>
-            <span style="font-size: 13px; font-weight: bold;" id="test-header-title">Part 1</span>
-            <div class="timer">01:00:00</div>
-        </div>
-
-        <div class="workspace">
-            <div class="passage-panel" id="passage-content">
-                <!-- Passage content inserted dynamically -->
-            </div>
-
-            <div class="questions-panel" id="questions-content">
-                <!-- Question content inserted dynamically -->
-            </div>
-        </div>
-
-        <div class="bottom-nav">
-            <div class="q-numbers" id="q-numbers-bar">
-                <!-- Question buttons 1-13 generated dynamically -->
-            </div>
-            <div class="parts-tabs">
-                <div class="part-tab active" id="tab-part1" onclick="loadPart(1)">Part 1 (1-13)</div>
-                <div class="part-tab" id="tab-part2" onclick="loadPart(2)">Part 2 (14-26)</div>
-                <div class="part-tab" id="tab-part3" onclick="loadPart(3)">Part 3 (27-40)</div>
-            </div>
-            <button class="submit-btn" onclick="alert('Test submitted successfully!')">Submit Full Test 🚀</button>
-        </div>
-    </div>
-
-    <script>
-        Telegram.WebApp.ready();
-        Telegram.WebApp.expand();
-
-        let currentBook = "Cambridge 18";
-        let currentPart = 1;
-
-        // Dynamic Mock Test Data for Parts 1, 2, 3
-        const testPassages = {
-            1: {
-                title: "Part 1: Georgia O'Keeffe",
-                passage: "<h3>Georgia O'Keeffe</h3><p>For seven decades, Georgia O'Keeffe (1887-1986) was a major figure in American art. Remarkably, she remained independent from European trends, carving out her own unique style.</p><p>Her early work focused on dramatic, large-scale flowers and urban landscapes, which instantly captured public attention.</p>",
-                qStart: 1, qEnd: 13
-            },
-            2: {
-                title: "Part 2: The History of Glass",
-                passage: "<h3>The History of Glass</h3><p>From our earliest origins, man has made use of glass. Historians have discovered that a type of natural glass - obsidian - was used as early as the Stone Age.</p><p>The earliest known man-made glass is in Egypt dating back to 1500 BC.</p>",
-                qStart: 14, qEnd: 26
-            },
-            3: {
-                title: "Part 3: Artificial Intelligence in Medicine",
-                passage: "<h3>AI in Modern Medicine</h3><p>Artificial intelligence is transforming healthcare globally. Machine learning algorithms can now detect diseases from medical imagery faster and more accurately than human practitioners in many cases.</p>",
-                qStart: 27, qEnd: 40
-            }
-        };
-
-        function navigateTo(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-        }
-
-        function selectBook(bookName) {
-            currentBook = bookName;
-            document.getElementById('selected-book-title').innerText = bookName;
-            navigateTo('screen-tests');
-        }
-
-        function startTest(testName) {
-            document.getElementById('test-header-title').innerText = `${currentBook} - ${testName}`;
-            loadPart(1);
-            navigateTo('screen-practice');
-        }
-
-        function loadPart(partNum) {
-            currentPart = partNum;
-            const data = testPassages[partNum];
-
-            // Update Tabs UI
-            document.querySelectorAll('.part-tab').forEach(t => t.classList.remove('active'));
-            document.getElementById(`tab-part${partNum}`).classList.add('active');
-
-            // Render Passage
-            document.getElementById('passage-content').innerHTML = data.passage;
-
-            // Render Questions
-            let questionsHTML = '';
-            for (let i = data.qStart; i <= data.qEnd; i++) {
-                questionsHTML += `
-                    <div class="q-card">
-                        <b>Question ${i}</b>
-                        <p>Statement for question ${i} regarding passage text.</p>
-                        <div class="options">
-                            <label class="opt-btn"><input type="radio" name="q${i}" value="TRUE"> TRUE</label>
-                            <label class="opt-btn"><input type="radio" name="q${i}" value="FALSE"> FALSE</label>
-                            <label class="opt-btn"><input type="radio" name="q${i}" value="NOT GIVEN"> NOT GIVEN</label>
-                        </div>
-                    </div>
-                `;
-            }
-            document.getElementById('questions-content').innerHTML = questionsHTML;
-
-            // Render Q-Numbers Bar
-            let numsHTML = '';
-            for (let i = data.qStart; i <= data.qEnd; i++) {
-                numsHTML += `<div class="q-num">${i}</div>`;
-            }
-            document.getElementById('q-numbers-bar').innerHTML = numsHTML;
-        }
-    </script>
+    // Init App
+    renderBooksGrid();
+    updateAnswerView();
+  </script>
 </body>
 </html>
+```eof
+
+### Как применить изменения:
+1. Замените весь код в файле `index.html` в VS Code.
+2. Сохраните файл (`Ctrl + S` / `⌘ + S`) и отправьте его на GitHub / сервер.
+3. В файле `main.py` укажите новую версию ссылки:
+   
+```python
+   WEBAPP_URL = "https://ваша-ссылка-на-webapp/?v=5.0"
