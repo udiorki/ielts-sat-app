@@ -1,0 +1,16 @@
+# Secrets — never commit real keys
+.env
+*.env
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# SQLite cache generated at runtime
+backend/content_cache.db
+
+# OS / editor
+.DS_Store
+.vscode/
