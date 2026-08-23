@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,8 +16,6 @@
       user-select: none;
       -webkit-user-select: none;
     }
-    .card-ielts { background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); }
-    .card-sat { background: linear-gradient(135deg, #0d9488 0%, #059669 100%); }
     .card-pred { background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%); }
     .bottom-nav {
       background: rgba(255, 255, 255, 0.95);
@@ -28,7 +26,7 @@
 </head>
 <body class="pb-24">
 
-  <!-- HEADER & MODE SWITCHER -->
+  <!-- HEADER -->
   <div class="px-4 pt-4 pb-3 bg-white border-b border-slate-100 shadow-sm sticky top-0 z-30">
     <div class="flex items-center justify-between mb-3">
       <div class="flex items-center gap-3">
@@ -37,7 +35,7 @@
         </div>
         <div>
           <h2 class="font-bold text-slate-800 text-base leading-tight" id="userName">Student</h2>
-          <p class="text-xs text-slate-400 font-medium">IELTS & SAT Platform</p>
+          <p class="text-xs text-slate-400 font-medium">IELTS & SAT Preparation</p>
         </div>
       </div>
       
@@ -52,17 +50,15 @@
       </div>
     </div>
 
-    <!-- USER STATS / SCORE BOARD -->
-    <div id="userStatsCard" class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-xs font-bold text-slate-700">Уровень не определен</p>
-          <p class="text-[11px] text-slate-400">Пройдите Full Diagnostic Test (60 мин)</p>
-        </div>
-        <button onclick="startFullDiagnostic()" class="bg-indigo-600 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow hover:bg-indigo-700 transition">
-          Пройти Тест
-        </button>
+    <!-- DIAGNOSTIC TEST BANNER (OPTIONAL CHOICE) -->
+    <div id="diagnosticBanner" class="bg-indigo-50/80 p-3 rounded-2xl border border-indigo-100 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-bold text-indigo-950">Diagnostic Full Test</p>
+        <p class="text-[11px] text-indigo-600">Determine your overall Band Score (60 min)</p>
       </div>
+      <button onclick="startFullDiagnostic()" class="bg-indigo-600 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow hover:bg-indigo-700 transition">
+        Start
+      </button>
     </div>
   </div>
 
@@ -70,54 +66,67 @@
   <div id="view-home" class="p-4 space-y-4">
 
     <!-- PREDICTIONS BANNER -->
-    <div onclick="openModule('predictions')" class="card-pred rounded-2xl p-4 text-white shadow-lg cursor-pointer relative overflow-hidden">
+    <div onclick="openPredictions()" class="card-pred rounded-2xl p-4 text-white shadow-lg cursor-pointer relative overflow-hidden">
       <div class="flex items-center justify-between mb-1">
         <span class="bg-white/20 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Hot Predictions</span>
         <i class="fa-solid fa-fire text-amber-300"></i>
       </div>
       <h3 class="text-base font-extrabold">IELTS Predictions & Exam Leaks</h3>
-      <p class="text-xs text-purple-100 mt-0.5">Актуальные темы и задания для ближайших экзаменов.</p>
+      <p class="text-xs text-purple-100 mt-0.5">Actual topics and questions for upcoming exam dates.</p>
     </div>
 
-    <!-- MAIN EXAM MODULES GRID -->
+    <!-- MODULES GRID -->
     <div>
-      <h3 class="font-bold text-slate-800 text-sm mb-2.5" id="sectionsHeader">Разделы подготовки IELTS</h3>
+      <h3 class="font-bold text-slate-800 text-sm mb-2.5" id="sectionsHeader">Practice Modules</h3>
       <div class="grid grid-cols-2 gap-3" id="mainModulesGrid">
         <!-- Injected via JS -->
       </div>
     </div>
   </div>
 
-  <!-- VIEW: FULL DIAGNOSTIC & ONLINE TEST RUNNER -->
+  <!-- VIEW: SELECT BOOK & TEST (FOR READING & LISTENING) -->
+  <div id="view-select-test" class="p-4 space-y-4 hidden">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-base font-extrabold text-slate-800" id="selectTestTitle">Select Practice Test</h2>
+        <p class="text-xs text-slate-400">Choose a Cambridge book and section</p>
+      </div>
+      <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1.5 rounded-xl">Back</button>
+    </div>
+
+    <div class="space-y-3" id="testSelectionList">
+      <!-- Injected dynamically -->
+    </div>
+  </div>
+
+  <!-- VIEW: TEST RUNNER -->
   <div id="view-test-runner" class="p-4 space-y-4 hidden">
     <div class="flex items-center justify-between bg-white p-3 rounded-2xl border border-slate-100 shadow-sm sticky top-16 z-20">
       <div>
-        <h3 class="text-xs font-black text-slate-800" id="testTitle">Cambridge IELTS 18 — Test 1</h3>
-        <p class="text-[10px] text-slate-400" id="testSubtitle">Reading Section (Passage 1)</p>
+        <h3 class="text-xs font-black text-slate-800" id="testTitle">Cambridge IELTS 18</h3>
+        <p class="text-[10px] text-slate-400" id="testSubtitle">Reading Section — Passage 1</p>
       </div>
       <div class="flex items-center gap-2">
-        <div class="bg-amber-50 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-xl border border-amber-200/60" id="timerBox">
+        <div class="bg-amber-50 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-xl border border-amber-200/60">
           <i class="fa-regular fa-clock mr-1"></i><span id="testTimer">60:00</span>
         </div>
-        <button onclick="exitTest()" class="text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-xl">Выйти</button>
+        <button onclick="exitTest()" class="text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-xl">Exit</button>
       </div>
     </div>
 
-    <!-- TEST CONTAINER -->
-    <div id="testContent" class="space-y-4">
-      <!-- Injected dynamically: Reading Passages, Audio player for Listening, or Writing Editor -->
-    </div>
+    <!-- TEST CONTENT -->
+    <div id="testContent" class="space-y-4"></div>
 
     <button onclick="submitTest()" class="w-full bg-emerald-600 text-white font-extrabold text-sm py-3 rounded-2xl shadow-lg hover:bg-emerald-700 transition">
-      Завершить и Проверить Ответы
+      Submit & Check Answers
     </button>
   </div>
 
   <!-- VIEW: CAMBRIDGE BOOKS (1 to 21) -->
   <div id="view-books" class="p-4 space-y-4 hidden">
     <div>
-      <h2 class="text-lg font-extrabold text-slate-800">Каталог Cambridge IELTS</h2>
-      <p class="text-xs text-slate-500">Интерактивное решение с 1 по 21 книгу</p>
+      <h2 class="text-lg font-extrabold text-slate-800">Cambridge IELTS Books</h2>
+      <p class="text-xs text-slate-500">Interactive tests from Books 1 to 21</p>
     </div>
     <div class="grid grid-cols-2 gap-3" id="booksGrid"></div>
   </div>
@@ -126,31 +135,31 @@
   <div id="view-predictions" class="p-4 space-y-4 hidden">
     <div>
       <h2 class="text-lg font-extrabold text-slate-800">Predictions & Exam Leaks</h2>
-      <p class="text-xs text-slate-500">Эксклюзивные материалы к предстоящим сессиям</p>
+      <p class="text-xs text-slate-500">Materials for upcoming exam sessions</p>
     </div>
 
     <div class="space-y-3">
       <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-2">
         <div class="flex items-center justify-between">
           <span class="bg-purple-100 text-purple-700 text-[10px] font-black px-2 py-0.5 rounded-full">Writing Task 2</span>
-          <span class="text-[10px] text-slate-400">Обновлено вчера</span>
+          <span class="text-[10px] text-slate-400">Updated recently</span>
         </div>
-        <h4 class="font-bold text-slate-800 text-sm">Most Likely Essay Topics for This Month</h4>
-        <p class="text-xs text-slate-500">10 прогнозируемых тем с готовыми идеальными эссе (Band 8.0/9.0) и vocabulary подборками.</p>
-        <button onclick="alert('Раздел прогнозов загружается...')" class="w-full mt-2 bg-purple-600 text-white font-bold text-xs py-2 rounded-xl">
-          Открыть материалы
+        <h4 class="font-bold text-slate-800 text-sm">Most Likely Essay Topics</h4>
+        <p class="text-xs text-slate-500">Predicted topics with Band 8.0/9.0 sample essays.</p>
+        <button onclick="alert('Predictions loading...')" class="w-full mt-2 bg-purple-600 text-white font-bold text-xs py-2 rounded-xl">
+          Open Topics
         </button>
       </div>
 
       <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-2">
         <div class="flex items-center justify-between">
-          <span class="bg-amber-100 text-amber-700 text-[10px] font-black px-2 py-0.5 rounded-full">Speaking Part 1-3</span>
-          <span class="text-[10px] text-slate-400">Актуальный пул</span>
+          <span class="bg-amber-100 text-amber-700 text-[10px] font-black px-2 py-0.5 rounded-full">Speaking Parts 1-3</span>
+          <span class="text-[10px] text-slate-400">Actual Pool</span>
         </div>
         <h4 class="font-bold text-slate-800 text-sm">Actual Speaking Cue Cards</h4>
-        <p class="text-xs text-slate-500">Список реальных вопросов, которые сейчас задают экзаменаторы во всем мире.</p>
-        <button onclick="alert('Раздел прогнозов загружается...')" class="w-full mt-2 bg-amber-500 text-white font-bold text-xs py-2 rounded-xl">
-          Открыть карточки
+        <p class="text-xs text-slate-500">Real questions currently asked by examiners worldwide.</p>
+        <button onclick="alert('Predictions loading...')" class="w-full mt-2 bg-amber-500 text-white font-bold text-xs py-2 rounded-xl">
+          Open Cue Cards
         </button>
       </div>
     </div>
@@ -160,11 +169,11 @@
   <div class="bottom-nav fixed bottom-0 left-0 right-0 border-t border-slate-200/80 px-4 py-2 flex justify-around items-center z-40">
     <button onclick="switchTab('view-home')" id="nav-home" class="flex flex-col items-center gap-0.5 text-indigo-600 font-bold text-[10px]">
       <i class="fa-solid fa-house text-lg"></i>
-      <span>Главная</span>
+      <span>Home</span>
     </button>
     <button onclick="switchTab('view-books')" id="nav-books" class="flex flex-col items-center gap-0.5 text-slate-400 font-medium text-[10px]">
       <i class="fa-solid fa-book-open text-lg"></i>
-      <span>Книги 1–21</span>
+      <span>Books 1–21</span>
     </button>
     <button onclick="switchTab('view-predictions')" id="nav-pred" class="flex flex-col items-center gap-0.5 text-slate-400 font-medium text-[10px]">
       <i class="fa-solid fa-fire text-lg"></i>
@@ -190,18 +199,14 @@
       currentMode = mode;
       const btnIelts = document.getElementById('btn-mode-ielts');
       const btnSat = document.getElementById('btn-mode-sat');
-      const sectionsHeader = document.getElementById('sectionsHeader');
 
       if (mode === 'IELTS') {
         btnIelts.className = "px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm bg-white text-indigo-600";
         btnSat.className = "px-3 py-1 rounded-lg text-xs font-bold transition text-slate-500 hover:text-slate-800";
-        sectionsHeader.innerText = "Разделы подготовки IELTS";
       } else {
         btnSat.className = "px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm bg-white text-teal-600";
         btnIelts.className = "px-3 py-1 rounded-lg text-xs font-bold transition text-slate-500 hover:text-slate-800";
-        sectionsHeader.innerText = "Разделы подготовки SAT Digital";
       }
-
       renderMainModules();
     }
 
@@ -209,36 +214,36 @@
       const grid = document.getElementById('mainModulesGrid');
       if (currentMode === 'IELTS') {
         grid.innerHTML = `
-          <div onclick="openModule('reading')" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer hover:border-indigo-300 transition">
+          <div onclick="openBookSelection('reading')" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer hover:border-indigo-300 transition">
             <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-base mb-2">
               <i class="fa-solid fa-book-reader"></i>
             </div>
             <h4 class="font-bold text-slate-800 text-sm">Reading Practice</h4>
-            <p class="text-[11px] text-slate-400">3 Пассажа (60 мин)</p>
+            <p class="text-[11px] text-slate-400">Select Book & Passage</p>
           </div>
 
-          <div onclick="openModule('listening')" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer hover:border-indigo-300 transition">
+          <div onclick="openBookSelection('listening')" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer hover:border-indigo-300 transition">
             <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base mb-2">
               <i class="fa-solid fa-headphones"></i>
             </div>
             <h4 class="font-bold text-slate-800 text-sm">Listening Practice</h4>
-            <p class="text-[11px] text-slate-400">Аудио + 40 вопросов</p>
+            <p class="text-[11px] text-slate-400">Audio + 40 Questions</p>
           </div>
 
-          <div onclick="openModule('writing')" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer hover:border-indigo-300 transition">
+          <div onclick="openWritingModule()" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer hover:border-indigo-300 transition">
             <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-base mb-2">
               <i class="fa-solid fa-pen-nib"></i>
             </div>
             <h4 class="font-bold text-slate-800 text-sm">AI Writing Evaluator</h4>
-            <p class="text-[11px] text-slate-400">Task 1 & Task 2 с ИИ</p>
+            <p class="text-[11px] text-slate-400">Task 1 & Task 2 Evaluation</p>
           </div>
 
-          <div onclick="openModule('speaking')" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer hover:border-indigo-300 transition">
+          <div onclick="openSpeakingModule()" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer hover:border-indigo-300 transition">
             <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-base mb-2">
               <i class="fa-solid fa-microphone"></i>
             </div>
             <h4 class="font-bold text-slate-800 text-sm">AI Speaking Trainer</h4>
-            <p class="text-[11px] text-slate-400">Голосовой разбор ИИ</p>
+            <p class="text-[11px] text-slate-400">Part 1, 2 & 3 Audio Practice</p>
           </div>
         `;
       } else {
@@ -256,83 +261,166 @@
               <i class="fa-solid fa-calculator"></i>
             </div>
             <h4 class="font-bold text-slate-800 text-sm">Math Section</h4>
-            <p class="text-[11px] text-slate-400">С калькулятором</p>
+            <p class="text-[11px] text-slate-400">With Calculator</p>
           </div>
         `;
       }
     }
 
-    function startFullDiagnostic() {
-      switchTab('view-test-runner');
-      document.getElementById('testTitle').innerText = "IELTS Full Diagnostic Test";
-      document.getElementById('testSubtitle').innerText = "Раздел 1: Reading (Passage 1 из 3)";
+    // LIST OF TESTS SELECTION
+    function openBookSelection(skill) {
+      switchTab('view-select-test');
+      document.getElementById('selectTestTitle').innerText = skill === 'reading' ? 'Reading Practice Tests' : 'Listening Practice Tests';
       
-      startTimer(3600); // 60 минут
+      const list = document.getElementById('testSelectionList');
+      list.innerHTML = '';
 
-      const container = document.getElementById('testContent');
-      container.innerHTML = `
-        <!-- PASSAGE TEXT BOX -->
-        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3 max-h-60 overflow-y-auto">
-          <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded">Reading Passage 1</span>
-          <h4 class="font-bold text-slate-800 text-sm">The Impact of Microplastics on Marine Life</h4>
-          <p class="text-xs text-slate-600 leading-relaxed">
-            Recent studies in marine biology demonstrate that microplastics affect copepods by reducing their feeding rates and reproductive output. Microplastics, defined as plastic particles smaller than five millimeters, have become ubiquitous in aquatic environments worldwide...
+      for (let book = 19; book >= 15; book--) {
+        const item = document.createElement('div');
+        item.className = 'bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3';
+        item.innerHTML = `
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-slate-800 text-sm">Cambridge IELTS ${book}</h4>
+            <span class="text-[10px] bg-slate-100 font-bold px-2 py-0.5 rounded text-slate-600">4 Full Tests</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="startSpecificTest('Cambridge ${book}', 'Test 1', '${skill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-2 rounded-xl font-bold hover:bg-indigo-50 hover:text-indigo-600 transition">
+              Test 1
+            </button>
+            <button onclick="startSpecificTest('Cambridge ${book}', 'Test 2', '${skill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-2 rounded-xl font-bold hover:bg-indigo-50 hover:text-indigo-600 transition">
+              Test 2
+            </button>
+          </div>
+        `;
+        list.appendChild(item);
+      }
+    }
+
+    // START SPECIFIC READING OR LISTENING TEST
+    function startSpecificTest(book, test, skill) {
+      switchTab('view-test-runner');
+      document.getElementById('testTitle').innerText = `${book} — ${test}`;
+      
+      if (skill === 'reading') {
+        document.getElementById('testSubtitle').innerText = "Reading Section — Passage 1 of 3";
+        startTimer(3600); // 60 mins
+
+        document.getElementById('testContent').innerHTML = `
+          <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3 max-h-60 overflow-y-auto">
+            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded">Passage 1</span>
+            <h4 class="font-bold text-slate-800 text-sm">The Development of Urban Agriculture</h4>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Urban agriculture refers to the practice of cultivating, processing, and distributing food in or around urban areas. Vertical farming and rooftop hydroponics are increasingly recognized as viable solutions to food security challenges...
+            </p>
+          </div>
+
+          <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+            <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider">Questions 1–5 (Multiple Choice)</h4>
+            <div class="space-y-2">
+              <p class="text-xs font-bold text-slate-700">1. What is the primary focus of vertical farming?</p>
+              <label class="block p-2.5 rounded-xl border border-slate-200 text-xs flex items-center gap-2">
+                <input type="radio" name="q1" value="A"> A) Reducing urban population
+              </label>
+              <label class="block p-2.5 rounded-xl border border-slate-200 text-xs flex items-center gap-2">
+                <input type="radio" name="q1" value="B"> B) Optimizing food production in urban spaces
+              </label>
+            </div>
+          </div>
+        `;
+      } else {
+        document.getElementById('testSubtitle').innerText = "Listening Section — Part 1 of 4";
+        startTimer(1800); // 30 mins
+
+        document.getElementById('testContent').innerHTML = `
+          <!-- AUDIO PLAYER -->
+          <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
+            <span class="bg-blue-100 text-blue-800 text-[10px] font-black px-2 py-0.5 rounded">Part 1 Audio Track</span>
+            <audio controls class="w-full h-10 mt-2">
+              <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+
+          <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
+            <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider">Questions 1–5 (Complete the Form)</h4>
+            <div class="space-y-2">
+              <p class="text-xs font-bold text-slate-700">1. Customer Name: <span class="font-normal underline">John Smith</span></p>
+              <p class="text-xs font-bold text-slate-700">2. Contact Number:</p>
+              <input type="text" placeholder="Type answer here..." class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none">
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // WRITING MODULE
+    function openWritingModule() {
+      switchTab('view-test-runner');
+      document.getElementById('testTitle').innerText = "AI Writing Evaluator";
+      document.getElementById('testSubtitle').innerText = "Task 2 (Academic Essay)";
+      startTimer(2400); // 40 mins
+
+      document.getElementById('testContent').innerHTML = `
+        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-2">
+          <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">Writing Task 2 Prompt</span>
+          <p class="text-xs font-bold text-slate-800">
+            Some people believe that university education should be free for everyone. To what extent do you agree or disagree?
           </p>
         </div>
 
-        <!-- QUESTIONS BOX -->
-        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-          <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider">Questions 1–5 (Multiple Choice)</h4>
-          
-          <div class="space-y-2">
-            <p class="text-xs font-bold text-slate-700">1. According to the passage, microplastics affect copepods by:</p>
-            <label class="block p-2.5 rounded-xl border border-slate-200 text-xs flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="q1" value="A"> A) Increasing their body size
-            </label>
-            <label class="block p-2.5 rounded-xl border border-slate-200 text-xs flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="q1" value="B"> B) Lowering feeding rates and reproduction
-            </label>
-            <label class="block p-2.5 rounded-xl border border-slate-200 text-xs flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="q1" value="C"> C) Changing ocean salinity levels
-            </label>
+        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-slate-700">Your Essay:</label>
+            <span class="text-[10px] font-bold text-slate-400" id="wordCount">Words: 0</span>
           </div>
-
-          <div class="space-y-2 pt-2 border-t border-slate-100">
-            <p class="text-xs font-bold text-slate-700">2. What is the maximum size of microplastics mentioned?</p>
-            <input type="text" id="q2" placeholder="Введите ответ (напр. 5mm)..." class="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500">
-          </div>
+          <textarea id="essayInput" oninput="updateWordCount()" rows="10" placeholder="Write your essay here (minimum 250 words)..." class="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 leading-relaxed"></textarea>
         </div>
       `;
     }
 
-    function openModule(moduleType) {
-      if (moduleType === 'writing') {
-        switchTab('view-test-runner');
-        document.getElementById('testTitle').innerText = "AI Writing Evaluator";
-        document.getElementById('testSubtitle').innerText = "Task 2 (Academic Essay)";
-        startTimer(2400); // 40 минут
+    // SPEAKING MODULE
+    function openSpeakingModule() {
+      switchTab('view-test-runner');
+      document.getElementById('testTitle').innerText = "AI Speaking Trainer";
+      document.getElementById('testSubtitle').innerText = "Part 2 — Cue Card Simulation";
+      startTimer(90); // 1.5 min preparation
 
-        document.getElementById('testContent').innerHTML = `
-          <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-2">
-            <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">Writing Task 2 Topic</span>
-            <p class="text-xs font-bold text-slate-800">
-              Some people believe that artificial intelligence will replace human teachers in the future. To what extent do you agree or disagree?
-            </p>
-          </div>
+      document.getElementById('testContent').innerHTML = `
+        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
+          <span class="bg-purple-100 text-purple-800 text-[10px] font-black px-2 py-0.5 rounded">Speaking Part 2 Cue Card</span>
+          <h4 class="font-bold text-slate-800 text-sm">Describe a memorable trip you took with your family or friends.</h4>
+          <ul class="text-xs text-slate-600 list-disc pl-4 space-y-1">
+            <li>Where you went</li>
+            <li>Who you went with</li>
+            <li>What you did during the trip</li>
+            <li>And explain why this trip was memorable to you</li>
+          </ul>
+        </div>
 
-          <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-2">
-            <div class="flex items-center justify-between">
-              <label class="text-xs font-bold text-slate-700">Ваше Эссе:</label>
-              <span class="text-[10px] font-bold text-slate-400" id="wordCount">Слов: 0</span>
-            </div>
-            <textarea id="essayInput" oninput="updateWordCount()" rows="10" placeholder="Начните писать эссе здесь (минимум 250 слов)..." class="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 leading-relaxed"></textarea>
-          </div>
-        `;
-      } else if (moduleType === 'predictions') {
-        switchTab('view-predictions');
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center space-y-3 text-center">
+          <button onclick="toggleRecording()" id="recBtn" class="w-16 h-16 rounded-full bg-rose-500 text-white flex items-center justify-center text-2xl shadow-lg hover:bg-rose-600 transition">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          <p class="text-xs font-bold text-slate-700" id="recStatus">Tap to Record Your Answer</p>
+          <p class="text-[10px] text-slate-400">AI will analyze your Fluency, Grammar, and Pronunciation.</p>
+        </div>
+      `;
+    }
+
+    function toggleRecording() {
+      const btn = document.getElementById('recBtn');
+      const status = document.getElementById('recStatus');
+      if (btn.classList.contains('bg-rose-500')) {
+        btn.className = "w-16 h-16 rounded-full bg-slate-800 text-white flex items-center justify-center text-2xl shadow-lg animate-pulse";
+        status.innerText = "Recording... Tap again to stop";
       } else {
-        startFullDiagnostic();
+        btn.className = "w-16 h-16 rounded-full bg-rose-500 text-white flex items-center justify-center text-2xl shadow-lg";
+        status.innerText = "Recording saved! Click Submit to evaluate.";
       }
+    }
+
+    function startFullDiagnostic() {
+      openBookSelection('reading');
     }
 
     function openSATModule(type) {
@@ -343,11 +431,9 @@
 
       document.getElementById('testContent').innerHTML = `
         <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
-          <span class="bg-teal-100 text-teal-800 text-[10px] font-black px-2 py-0.5 rounded">SAT Digital Question 1</span>
+          <span class="bg-teal-100 text-teal-800 text-[10px] font-black px-2 py-0.5 rounded">Question 1</span>
           <p class="text-xs font-bold text-slate-800">
-            ${type === 'rw' 
-              ? 'Which choice completes the text with the most logical and precise word or phrase?' 
-              : 'If 3x + 12 = 36, what is the value of x + 4?'}
+            ${type === 'rw' ? 'Which choice completes the text with the most logical and precise word or phrase?' : 'If 3x + 12 = 36, what is the value of x + 4?'}
           </p>
           <div class="space-y-2">
             <label class="block p-2.5 rounded-xl border border-slate-200 text-xs flex items-center gap-2">
@@ -365,7 +451,7 @@
       const text = document.getElementById('essayInput')?.value || '';
       const words = text.trim() ? text.trim().split(/\s+/).length : 0;
       const el = document.getElementById('wordCount');
-      if (el) el.innerText = `Слов: ${words}`;
+      if (el) el.innerText = `Words: ${words}`;
     }
 
     function startTimer(seconds) {
@@ -375,10 +461,11 @@
         remain--;
         const m = Math.floor(remain / 60);
         const s = remain % 60;
-        document.getElementById('testTimer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        const timerEl = document.getElementById('testTimer');
+        if (timerEl) timerEl.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
         if (remain <= 0) {
           clearInterval(timerInterval);
-          alert('Время вышло! Автоматическая отправка результатов.');
+          alert('Time is up!');
           submitTest();
         }
       }, 1000);
@@ -391,7 +478,7 @@
 
     function submitTest() {
       clearInterval(timerInterval);
-      alert('Тест успешно проверен! Ваши результаты сохранены.');
+      alert('Test submitted! Your score has been saved.');
       switchTab('view-home');
     }
 
@@ -401,7 +488,7 @@
       for (let i = 21; i >= 1; i--) {
         const card = document.createElement('div');
         card.className = 'bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between cursor-pointer hover:border-indigo-300 transition';
-        card.onclick = () => startFullDiagnostic();
+        card.onclick = () => openBookSelection('reading');
         card.innerHTML = `
           <div class="flex items-start justify-between mb-2">
             <div class="w-10 h-10 bg-indigo-600 text-white rounded-lg flex items-center justify-center font-black text-xs shadow">
@@ -411,15 +498,19 @@
           </div>
           <div>
             <h4 class="font-extrabold text-slate-800 text-sm">Cambridge ${i}</h4>
-            <p class="text-[11px] text-slate-400">4 Полных Теста</p>
+            <p class="text-[11px] text-slate-400">4 Full Tests</p>
           </div>
         `;
         grid.appendChild(card);
       }
     }
 
+    function openPredictions() {
+      switchTab('view-predictions');
+    }
+
     function switchTab(tabId) {
-      ['view-home', 'view-test-runner', 'view-books', 'view-predictions'].forEach(t => {
+      ['view-home', 'view-select-test', 'view-test-runner', 'view-books', 'view-predictions'].forEach(t => {
         const el = document.getElementById(t);
         if (el) el.classList.add('hidden');
       });
