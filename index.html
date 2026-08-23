@@ -19,13 +19,16 @@
       font-size: 11px; font-weight: 700; background-color: #ffffff; color: #334155; cursor: pointer;
     }
     .q-badge.answered { background-color: #2563eb; color: #ffffff; border-color: #2563eb; }
-    .q-badge.active { border: 2px solid #0f172a; }
-
-    /* Custom resizable split pane styling */
-    .test-scroll-area {
-      height: calc(100vh - 120px);
-      overflow-y: auto;
+    
+    /* Resizing split layout styles */
+    .split-container { display: flex; flex-direction: column; height: calc(100vh - 125px); }
+    .split-pane { overflow-y: auto; padding: 12px; }
+    .resizer-bar {
+      height: 12px; background: #e2e8f0; cursor: row-resize;
+      display: flex; items-center; justify-content: center;
+      border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1;
     }
+    .resizer-bar::after { content: "•••"; color: #64748b; font-size: 10px; font-weight: bold; letter-spacing: 2px; }
   </style>
 </head>
 <body class="pb-16">
@@ -40,7 +43,6 @@
       </div>
     </div>
 
-    <!-- STREAK & XP -->
     <div class="flex items-center gap-2">
       <div class="flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-700 px-2 py-0.5 rounded-full text-xs font-black">
         <i class="fa-solid fa-fire text-amber-500"></i> <span>0</span>
@@ -58,8 +60,8 @@
   <!-- DASHBOARD HOME VIEW -->
   <main id="view-home" class="p-4 space-y-4 max-w-md mx-auto">
 
-    <!-- DAILY GAME CHALLENGE BANNER -->
-    <div onclick="startDailyChallenge()" class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-white shadow-md relative overflow-hidden cursor-pointer hover:opacity-95">
+    <!-- DAILY GAME CHALLENGE -->
+    <div onclick="startDailyChallenge()" class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-white shadow-md cursor-pointer hover:opacity-95">
       <div class="flex justify-between items-start">
         <div>
           <span class="bg-white/20 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">Daily Skill Quest</span>
@@ -72,17 +74,32 @@
       </div>
     </div>
 
+    <!-- BAND 9 COLLOCATIONS & VOCAB BANK (LEARNING HUB ON HOME PAGE) -->
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 text-white shadow-md space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="bg-white/20 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">Band 9 Lexical Resource</span>
+        <i class="fa-solid fa-book-sparkles text-amber-300 text-xs"></i>
+      </div>
+      <h3 class="text-xs font-black">Top Topic Collocations & Metaphors</h3>
+      <div class="flex flex-wrap gap-1.5 pt-1">
+        <span class="bg-white/10 text-white text-[10px] font-semibold px-2 py-0.5 rounded border border-white/20">profound impact</span>
+        <span class="bg-white/10 text-white text-[10px] font-semibold px-2 py-0.5 rounded border border-white/20">dwindling resources</span>
+        <span class="bg-white/10 text-white text-[10px] font-semibold px-2 py-0.5 rounded border border-white/20">foster innovation</span>
+        <span class="bg-white/10 text-white text-[10px] font-semibold px-2 py-0.5 rounded border border-white/20">lucrative prospect</span>
+      </div>
+    </div>
+
     <!-- PREDICTIONS POOL -->
-    <div onclick="switchTab('view-predictions')" class="bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl p-4 text-white shadow-md cursor-pointer relative overflow-hidden">
+    <div onclick="switchTab('view-predictions')" class="bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl p-4 text-white shadow-md cursor-pointer">
       <div class="flex items-center justify-between mb-1">
-        <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Exam Leaks & Predictions</span>
+        <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Exam Predictions</span>
         <i class="fa-solid fa-fire text-amber-300 text-xs"></i>
       </div>
       <h3 class="text-sm font-black">2026 Official Cambridge Exam Pool</h3>
       <p class="text-[11px] text-purple-100 mt-0.5">Real Writing & Speaking prompts for upcoming test dates.</p>
     </div>
 
-    <!-- STATS SUMMARY FOR NEW USERS -->
+    <!-- USER STATS -->
     <div class="grid grid-cols-3 gap-2">
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Estimated Band</p>
@@ -98,13 +115,7 @@
       </div>
     </div>
 
-    <div class="bg-blue-50 border border-blue-200 p-2.5 rounded-xl text-center">
-      <p class="text-[11px] text-blue-800 font-medium"><i class="fa-solid fa-circle-info mr-1"></i> Pass your first practice test to calculate your official Band Score estimate.</p>
-    </div>
-
     <h2 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Practice Modules</h2>
-
-    <!-- MODULES GRID -->
     <div class="grid grid-cols-2 gap-3" id="mainModulesGrid"></div>
   </main>
 
@@ -117,13 +128,12 @@
       </div>
       <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg">Back</button>
     </div>
-
     <div class="space-y-3" id="testSelectionList"></div>
   </section>
 
-  <!-- TEST RUNNER VIEW (UNIFIED SCROLLING LAYOUT) -->
-  <section id="view-test-runner" class="hidden flex flex-col h-screen">
-    <!-- TEST HEADER -->
+  <!-- TEST RUNNER VIEW (DYNAMIC SPLIT RESIZER FOR READING) -->
+  <section id="view-test-runner" class="hidden flex flex-col h-screen overflow-hidden">
+    <!-- HEADER -->
     <div class="bg-slate-900 text-white px-4 py-2 flex items-center justify-between shadow-md">
       <div>
         <h2 class="text-xs font-bold text-slate-200" id="testTitle">Cambridge IELTS 20 — Test 1</h2>
@@ -137,13 +147,26 @@
       </div>
     </div>
 
-    <!-- PASSAGE / PART TABS -->
+    <!-- SECTION NAV TABS -->
     <div class="bg-slate-100 border-b border-slate-200 px-4 py-1.5 flex gap-2 overflow-x-auto" id="sectionNavTabs"></div>
 
-    <!-- MAIN SINGLE CONTENT AREA (TEXT & QUESTIONS TOGETHER) -->
-    <div class="test-scroll-area p-4 space-y-6" id="unifiedTestContainer"></div>
+    <!-- SPLIT VIEW AREA -->
+    <div class="split-container" id="splitMainLayout">
+      <!-- TOP PANE: PASSAGE / TASK IMAGE -->
+      <div class="split-pane bg-white" id="topPane" style="height: 50%;">
+        <div id="passageContent"></div>
+      </div>
 
-    <!-- BOTTOM PALETTE & SUBMIT -->
+      <!-- RESIZER SLIDER BAR -->
+      <div class="resizer-bar" id="resizerBar"></div>
+
+      <!-- BOTTOM PANE: QUESTIONS / WRITING INPUT -->
+      <div class="split-pane bg-slate-50" id="bottomPane" style="height: 50%;">
+        <div id="questionsContent"></div>
+      </div>
+    </div>
+
+    <!-- BOTTOM PALETTE -->
     <div class="bg-white border-t border-slate-200 px-4 py-2 sticky bottom-0 z-20 flex items-center justify-between gap-2 shadow-lg">
       <div class="flex items-center gap-1 overflow-x-auto py-1 max-w-[65%]" id="questionPalette"></div>
       <button onclick="submitTest()" class="bg-emerald-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-lg shadow whitespace-nowrap">
@@ -152,7 +175,7 @@
     </div>
   </section>
 
-  <!-- REVIEW & INGENIOUS EXPLANATIONS -->
+  <!-- REVIEW VIEW -->
   <section id="view-review" class="p-4 space-y-4 hidden max-w-md mx-auto pb-20">
     <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center space-y-2">
       <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">Test Completed</span>
@@ -160,8 +183,7 @@
       <p class="text-xs text-slate-500" id="reviewScoreDetail">Score: 32 / 40</p>
       <button onclick="switchTab('view-home')" class="bg-blue-600 text-white font-bold text-xs px-4 py-2 rounded-xl mt-2 w-full">Back to Dashboard</button>
     </div>
-
-    <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Answer Keys & Detailed InGenious Explanations</h3>
+    <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Detailed Explanations</h3>
     <div id="explanationsList" class="space-y-3"></div>
   </section>
 
@@ -169,59 +191,48 @@
   <section id="view-predictions" class="p-4 space-y-3 hidden max-w-md mx-auto">
     <div class="flex justify-between items-center">
       <div>
-        <h2 class="text-sm font-extrabold text-slate-800">Real Exam Leaks & Predictions</h2>
-        <p class="text-[11px] text-slate-500">Actual pool for upcoming exam dates</p>
+        <h2 class="text-sm font-extrabold text-slate-800">Real Exam Predictions</h2>
+        <p class="text-[11px] text-slate-500">Upcoming exam prompts pool</p>
       </div>
       <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg">Back</button>
     </div>
-    <div class="space-y-3">
-      <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2">
-        <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">Writing Task 1 & 2</span>
-        <h4 class="font-bold text-slate-800 text-xs">Recent Exam Recalls</h4>
-        <p class="text-[11px] text-slate-600">Leaked pie charts, maps, and essay prompts from active test centers.</p>
-      </div>
+    <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+      <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">Writing Task 1 & 2</span>
+      <h4 class="font-bold text-slate-800 text-xs">Leaked Cambridge Recalls</h4>
+      <p class="text-[11px] text-slate-600">Charts, process diagrams, and essay questions collected from current test centers.</p>
     </div>
   </section>
 
-  <!-- BOOKS CATALOG VIEW -->
+  <!-- BOOKS CATALOG -->
   <section id="view-books" class="p-4 space-y-3 hidden max-w-md mx-auto">
     <div>
       <h2 class="text-sm font-extrabold text-slate-800">Cambridge IELTS Complete Collection</h2>
-      <p class="text-[11px] text-slate-500">Books 1 to 21 with authentic exam materials</p>
+      <p class="text-[11px] text-slate-500">Books 1 to 21</p>
     </div>
     <div class="grid grid-cols-2 gap-2.5" id="booksGrid"></div>
   </section>
 
   <!-- FOOTER NAVIGATION -->
   <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2 flex justify-around items-center z-40 max-w-md mx-auto">
-    <button onclick="switchTab('view-home')" id="nav-home" class="flex flex-col items-center gap-0.5 text-blue-600 font-bold text-[10px]">
+    <button onclick="switchTab('view-home')" class="flex flex-col items-center gap-0.5 text-blue-600 font-bold text-[10px]">
       <i class="fa-solid fa-house text-base"></i><span>Home</span>
     </button>
-    <button onclick="switchTab('view-books')" id="nav-books" class="flex flex-col items-center gap-0.5 text-slate-400 font-medium text-[10px]">
+    <button onclick="switchTab('view-books')" class="flex flex-col items-center gap-0.5 text-slate-400 font-medium text-[10px]">
       <i class="fa-solid fa-book-open text-base"></i><span>Books 1–21</span>
     </button>
-    <button onclick="switchTab('view-predictions')" id="nav-pred" class="flex flex-col items-center gap-0.5 text-slate-400 font-medium text-[10px]">
+    <button onclick="switchTab('view-predictions')" class="flex flex-col items-center gap-0.5 text-slate-400 font-medium text-[10px]">
       <i class="fa-solid fa-fire text-base"></i><span>Predictions</span>
     </button>
   </nav>
 
   <script>
     const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.ready();
-      tg.expand();
-      tg.enableClosingConfirmation();
-      if (tg.initDataUnsafe?.user) {
-        document.getElementById('userName').innerText = tg.initDataUnsafe.user.first_name;
-        document.getElementById('userAvatar').innerText = tg.initDataUnsafe.user.first_name.charAt(0);
-      }
-    }
+    if (tg) { tg.ready(); tg.expand(); }
 
     let currentMode = 'IELTS';
     let currentSkill = 'reading';
     let currentBookNum = 20;
     let currentTestNum = 1;
-    let currentPassage = 1;
     let timerInterval = null;
     let userAnswers = {};
 
@@ -238,37 +249,28 @@
 
     function renderMainModules() {
       const grid = document.getElementById('mainModulesGrid');
-      if (currentMode === 'IELTS') {
-        grid.innerHTML = `
-          <div onclick="openBookSelection('reading')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition">
-            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-book-reader"></i></div>
-            <h4 class="font-bold text-slate-800 text-xs">Reading Practice</h4>
-            <p class="text-[10px] text-slate-400">Books 1–21 (Passages 1-3)</p>
-          </div>
-          <div onclick="openBookSelection('listening')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition">
-            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-headphones"></i></div>
-            <h4 class="font-bold text-slate-800 text-xs">Listening Practice</h4>
-            <p class="text-[10px] text-slate-400">Books 1–21 (Parts 1-4)</p>
-          </div>
-          <div onclick="openBookSelection('writing')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition">
-            <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-pen-nib"></i></div>
-            <h4 class="font-bold text-slate-800 text-xs">Writing Simulator</h4>
-            <p class="text-[10px] text-slate-400">Charts, Maps & Essays</p>
-          </div>
-          <div onclick="openBookSelection('speaking')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition">
-            <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-microphone"></i></div>
-            <h4 class="font-bold text-slate-800 text-xs">Speaking AI</h4>
-            <p class="text-[10px] text-slate-400">Collocations & Vocabulary</p>
-          </div>
-        `;
-      } else {
-        grid.innerHTML = `
-          <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-            <h4 class="font-bold text-slate-800 text-xs">Digital SAT Suite</h4>
-            <p class="text-[10px] text-slate-400">Reading, Writing & Math</p>
-          </div>
-        `;
-      }
+      grid.innerHTML = `
+        <div onclick="openBookSelection('reading')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-book-reader"></i></div>
+          <h4 class="font-bold text-slate-800 text-xs">Reading Practice</h4>
+          <p class="text-[10px] text-slate-400">Books 1–21 (Passages 1-3)</p>
+        </div>
+        <div onclick="openBookSelection('listening')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-headphones"></i></div>
+          <h4 class="font-bold text-slate-800 text-xs">Listening Practice</h4>
+          <p class="text-[10px] text-slate-400">Books 1–21 (Parts 1-4)</p>
+        </div>
+        <div onclick="openBookSelection('writing')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400">
+          <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-pen-nib"></i></div>
+          <h4 class="font-bold text-slate-800 text-xs">Writing Simulator</h4>
+          <p class="text-[10px] text-slate-400">Charts, Maps & Essays</p>
+        </div>
+        <div onclick="openBookSelection('speaking')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400">
+          <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-microphone"></i></div>
+          <h4 class="font-bold text-slate-800 text-xs">Speaking AI</h4>
+          <p class="text-[10px] text-slate-400">Parts 1, 2 & 3</p>
+        </div>
+      `;
     }
 
     function openBookSelection(skill, filterBookNumber = null) {
@@ -295,10 +297,10 @@
             <span class="text-[10px] bg-blue-50 text-blue-600 font-bold px-2 py-0.5 rounded uppercase">${currentSkill}</span>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <button onclick="launchCDTest(${book}, 1, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition">Test 1</button>
-            <button onclick="launchCDTest(${book}, 2, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition">Test 2</button>
-            <button onclick="launchCDTest(${book}, 3, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition">Test 3</button>
-            <button onclick="launchCDTest(${book}, 4, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition">Test 4</button>
+            <button onclick="launchCDTest(${book}, 1, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white">Test 1</button>
+            <button onclick="launchCDTest(${book}, 2, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white">Test 2</button>
+            <button onclick="launchCDTest(${book}, 3, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white">Test 3</button>
+            <button onclick="launchCDTest(${book}, 4, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white">Test 4</button>
           </div>
         `;
         list.appendChild(item);
@@ -330,18 +332,18 @@
         document.getElementById('testSubtitle').innerText = "Academic Listening Test (40 Questions)";
         startTimer(2400);
         navTabs.innerHTML = `
-          <button class="px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold">Part 1</button>
-          <button class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Part 2</button>
-          <button class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Part 3</button>
-          <button class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Part 4</button>
+          <button onclick="loadListeningPart(1)" id="l-tab-1" class="px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold">Part 1 (Q1–10)</button>
+          <button onclick="loadListeningPart(2)" id="l-tab-2" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Part 2 (Q11–20)</button>
+          <button onclick="loadListeningPart(3)" id="l-tab-3" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Part 3 (Q21–30)</button>
+          <button onclick="loadListeningPart(4)" id="l-tab-4" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Part 4 (Q31–40)</button>
         `;
         renderPalette(40);
-        loadListeningSection();
+        loadListeningPart(1);
       } else if (skill === 'writing') {
         document.getElementById('testSubtitle').innerText = "Academic Writing Test";
         startTimer(3600);
         navTabs.innerHTML = `
-          <button onclick="loadWritingTaskSection(1)" id="w-tab-1" class="px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold">Task 1 (Chart & Data)</button>
+          <button onclick="loadWritingTaskSection(1)" id="w-tab-1" class="px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold">Task 1 (Chart & Image)</button>
           <button onclick="loadWritingTaskSection(2)" id="w-tab-2" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Task 2 (Essay)</button>
         `;
         renderPalette(2);
@@ -359,9 +361,8 @@
       }
     }
 
-    /* UNIFIED READING VIEW: TEXT ON TOP, QUESTIONS DIRECTLY BELOW */
+    /* FULL READING PASSAGES & RESIZABLE LAYOUT */
     function switchReadingPassage(passageNum) {
-      currentPassage = passageNum;
       [1, 2, 3].forEach(p => {
         const btn = document.getElementById(`pass-tab-${p}`);
         if (btn) btn.className = p === passageNum 
@@ -369,37 +370,40 @@
           : "px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold";
       });
 
-      const container = document.getElementById('unifiedTestContainer');
+      const passagePane = document.getElementById('passageContent');
+      const questionsPane = document.getElementById('questionsContent');
+
       let startQ = passageNum === 1 ? 1 : passageNum === 2 ? 14 : 27;
       let endQ = passageNum === 1 ? 13 : passageNum === 2 ? 26 : 40;
 
-      let passageText = "";
       if (passageNum === 1) {
-        passageText = `
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3 leading-relaxed text-xs">
+        passagePane.innerHTML = `
+          <div class="space-y-3 leading-relaxed text-xs">
             <h3 class="font-extrabold text-slate-900 text-sm">Passage 1: The Evolution of Modern Architecture & Urban Design</h3>
-            <p>Architectural styles have transformed significantly over the past century. From industrial steel frameworks to sustainable bio-materials, modern architecture balances aesthetic values with environmental sustainability...</p>
-            <p><mark class="bg-amber-200 px-1 rounded">By the mid-1920s, modern architects began incorporating organic design principles into urban planning.</mark> The integration of rooftop hydroponics and vertical farming allowed cities to reduce reliance on rural food supply chains.</p>
-            <p><mark class="bg-amber-200 px-1 rounded">Recent trials carried out in Scandinavian municipalities have found clear evidence supporting sustainable urban growth.</mark> Researchers noted that urban agricultural modules significantly decrease municipal energy expenditures.</p>
+            <p>Architectural styles have transformed significantly over the past century. From industrial steel frameworks to sustainable bio-materials, modern architecture balances aesthetic values with environmental sustainability. In the early 20th century, functionalism emerged as a dominant philosophy, emphasizing that a building's shape should primarily relate to its intended function or purpose.</p>
+            <p><mark class="bg-amber-200 px-1 rounded">By the mid-1920s, modern architects began incorporating organic design principles into urban planning.</mark> The integration of rooftop hydroponics and vertical farming allowed cities to reduce reliance on rural food supply chains. This shift was accelerated by rapid demographic expansion in metropolitan centers.</p>
+            <p><mark class="bg-amber-200 px-1 rounded">Recent trials carried out in Scandinavian municipalities have found clear evidence supporting sustainable urban growth.</mark> Researchers noted that urban agricultural modules significantly decrease municipal energy expenditures by providing natural insulation against severe winter cold.</p>
+            <p>Furthermore, civil engineers have demonstrated that adopting eco-friendly concrete alternatives substantially mitigates carbon footprint values. Future architectural projects are projected to rely heavily on modular construction methods to optimize efficiency.</p>
           </div>
         `;
       } else if (passageNum === 2) {
-        passageText = `
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3 leading-relaxed text-xs">
-            <h3 class="font-extrabold text-slate-900 text-sm">Passage 2: Deep Sea Microorganisms and Extremophiles</h3>
-            <p>Marine biologists exploring hydrothermal vents have discovered extremophile bacteria that survive without sunlight. These organisms utilize chemosynthesis instead of photosynthesis...</p>
+        passagePane.innerHTML = `
+          <div class="space-y-3 leading-relaxed text-xs">
+            <h3 class="font-extrabold text-slate-900 text-sm">Passage 2: Deep Sea Microorganisms and Hydrothermal Vents</h3>
+            <p>Marine biologists exploring hydrothermal vents in abyssal ocean trenches have discovered thriving communities of extremophile bacteria. Operating without access to solar radiation, these specialized organisms utilize chemosynthesis instead of photosynthesis to synthesize vital cellular energy.</p>
+            <p>Sulfur-oxidizing bacteria form the fundamental base of this deep-sea ecological food web, supporting complex organisms such as giant tube worms and blind hydrothermal crabs...</p>
           </div>
         `;
       } else {
-        passageText = `
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3 leading-relaxed text-xs">
-            <h3 class="font-extrabold text-slate-900 text-sm">Passage 3: Cognitive Benefits of Early Music Education</h3>
-            <p>Neuroscience studies indicate that playing musical instruments in early childhood accelerates brain development and improves spatial-temporal skills...</p>
+        passagePane.innerHTML = `
+          <div class="space-y-3 leading-relaxed text-xs">
+            <h3 class="font-extrabold text-slate-900 text-sm">Passage 3: Neuroplasticity & Cognitive Development</h3>
+            <p>Neuroscience studies indicate that playing musical instruments in early childhood accelerates brain development and improves spatial-temporal reasoning skills. Structural MRI scans reveal marked density increases in the corpus callosum among individuals who underwent formal instrumental training before age seven...</p>
           </div>
         `;
       }
 
-      let questionsHtml = `
+      let qHtml = `
         <div class="space-y-3">
           <div class="bg-blue-50/80 p-3 rounded-xl border border-blue-200">
             <h4 class="font-bold text-blue-900 text-xs">Questions ${startQ}–${endQ}</h4>
@@ -408,10 +412,10 @@
       `;
 
       for (let i = startQ; i <= endQ; i++) {
-        questionsHtml += `
+        qHtml += `
           <div id="q-box-${i}" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2">
             <p class="text-xs font-bold text-slate-800">${i}. Modern urban agricultural modules decrease city energy costs.</p>
-            <select onchange="markAnswered(${i}, this.value)" class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 font-medium">
+            <select onchange="markAnswered(${i}, this.value)" class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none font-medium">
               <option value="">-- Select Answer --</option>
               <option value="TRUE" ${userAnswers[i] === 'TRUE' ? 'selected' : ''}>TRUE</option>
               <option value="FALSE" ${userAnswers[i] === 'FALSE' ? 'selected' : ''}>FALSE</option>
@@ -420,125 +424,127 @@
           </div>
         `;
       }
-      questionsHtml += `</div>`;
-
-      container.innerHTML = passageText + questionsHtml;
+      qHtml += `</div>`;
+      questionsPane.innerHTML = qHtml;
     }
 
-    function loadListeningSection() {
-      const container = document.getElementById('unifiedTestContainer');
-      container.innerHTML = `
-        <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
-          <h3 class="font-bold text-slate-800 text-xs">Part 1 Audio Track</h3>
+    /* FULL LISTENING PART WITH 10 QUESTIONS PER SECTION */
+    function loadListeningPart(partNum) {
+      const passagePane = document.getElementById('passageContent');
+      const questionsPane = document.getElementById('questionsContent');
+
+      passagePane.innerHTML = `
+        <div class="space-y-2">
+          <h3 class="font-bold text-slate-800 text-xs">Part ${partNum} Audio Track</h3>
           <audio controls class="w-full">
             <source src="#" type="audio/mpeg">
-            Your browser does not support audio player.
+            Audio player simulation
           </audio>
-          <div class="p-3 bg-slate-50 rounded-lg text-xs space-y-2">
-            <p class="font-bold text-slate-700">Questions 1–10: Complete the notes below.</p>
-            <p class="text-slate-600">Write ONE WORD AND/OR A NUMBER for each answer.</p>
-            <input type="text" oninput="markAnswered(1, this.value)" placeholder="1. Customer Name..." class="w-full p-2 bg-white border border-slate-300 rounded text-xs">
-          </div>
+          <p class="text-[10px] text-slate-400">Listen to the audio and answer Questions ${(partNum-1)*10 + 1} to ${partNum*10}.</p>
         </div>
       `;
+
+      let startQ = (partNum - 1) * 10 + 1;
+      let endQ = partNum * 10;
+
+      let qHtml = `
+        <div class="space-y-3">
+          <div class="bg-blue-50/80 p-3 rounded-xl border border-blue-200">
+            <h4 class="font-bold text-blue-900 text-xs">Questions ${startQ}–${endQ}: Complete the notes below</h4>
+            <p class="text-[10px] text-blue-700">Write ONE WORD AND/OR A NUMBER for each answer.</p>
+          </div>
+      `;
+
+      for (let i = startQ; i <= endQ; i++) {
+        qHtml += `
+          <div id="q-box-${i}" class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5">
+            <label class="text-xs font-bold text-slate-700">Question ${i}:</label>
+            <input type="text" oninput="markAnswered(${i}, this.value)" value="${userAnswers[i] || ''}" placeholder="Type answer here..." class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-xs">
+          </div>
+        `;
+      }
+      qHtml += `</div>`;
+      questionsPane.innerHTML = qHtml;
     }
 
+    /* WRITING TASK WITH OFFICIAL CAMBRIDGE GRAPHIC / CHART IMAGES */
     function loadWritingTaskSection(taskNum) {
-      const container = document.getElementById('unifiedTestContainer');
-      
-      const btn1 = document.getElementById('w-tab-1');
-      const btn2 = document.getElementById('w-tab-2');
-      if (btn1 && btn2) {
-        btn1.className = taskNum === 1 ? "px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold" : "px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold";
-        btn2.className = taskNum === 2 ? "px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold" : "px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold";
-      }
+      const passagePane = document.getElementById('passageContent');
+      const questionsPane = document.getElementById('questionsContent');
 
       if (taskNum === 1) {
-        container.innerHTML = `
-          <div class="space-y-4">
-            <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
-              <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">WRITING TASK 1</span>
-              <h3 class="font-extrabold text-slate-800 text-xs">History Graduates Employment & Salary Breakdown</h3>
-              <p class="text-xs text-slate-600">The chart below shows what History graduates did after completing their undergraduate degree course. The table shows the sectors these graduates were employed in and their average incomes.</p>
-              
-              <!-- VISUAL TABLE DATA SIMULATION -->
-              <div class="overflow-x-auto border border-slate-200 rounded-lg">
-                <table class="w-full text-left text-[11px] text-slate-700">
-                  <thead class="bg-slate-100 font-bold border-b border-slate-200">
-                    <tr>
-                      <th class="p-2">Employment Sector</th>
-                      <th class="p-2">Percentage</th>
-                      <th class="p-2">Average Income (£)</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-slate-100">
-                    <tr><td class="p-2">Solicitor</td><td class="p-2">18%</td><td class="p-2">£57,000</td></tr>
-                    <tr><td class="p-2">History Teacher</td><td class="p-2">30%</td><td class="p-2">£32,000</td></tr>
-                    <tr><td class="p-2">Archaeologist</td><td class="p-2">6%</td><td class="p-2">£29,000</td></tr>
-                    <tr><td class="p-2">Historian</td><td class="p-2">9%</td><td class="p-2">£49,000</td></tr>
-                  </tbody>
-                </table>
-              </div>
+        passagePane.innerHTML = `
+          <div class="space-y-3">
+            <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">WRITING TASK 1</span>
+            <h3 class="font-extrabold text-slate-800 text-xs">History Graduates Employment & Income</h3>
+            <p class="text-xs text-slate-600">The chart and table below give information about UK History graduates after finishing their degree.</p>
+            
+            <!-- OFFICIAL CAMBRIDGE EXAM GRAPHIC PLACEHOLDER IMAGE -->
+            <div class="bg-slate-100 p-2 rounded-xl border border-slate-200 flex flex-col items-center justify-center space-y-2">
+              <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80" alt="IELTS Chart" class="rounded shadow-sm max-h-48 object-cover w-full">
+              <span class="text-[9px] text-slate-400">Figure 1: Employment Sectors & Average Income Chart</span>
             </div>
+          </div>
+        `;
 
-            <!-- ESSAY INPUT & AI EVALUATOR -->
-            <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
-              <div class="flex items-center justify-between">
-                <label class="text-xs font-bold text-slate-800">Your Task 1 Essay Response:</label>
-                <span class="text-[10px] font-bold text-slate-400" id="wordCount">Words: 0</span>
-              </div>
-              <textarea id="essayInput" oninput="updateWordCount(1)" rows="8" placeholder="Summarise the information by selecting and reporting the main features..." class="w-full text-xs p-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 leading-relaxed"></textarea>
-              
-              <button onclick="evaluateWritingWithAI()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-extrabold py-2.5 rounded-xl shadow flex items-center justify-center gap-2">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> Evaluate Essay with AI
-              </button>
-              <p class="text-[9px] text-slate-400 text-center italic">* AI scores are estimations for practice purposes only and do not guarantee official results.</p>
-              
-              <div id="aiFeedbackResult" class="hidden space-y-3"></div>
+        questionsPane.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-bold text-slate-800">Your Task 1 Response:</label>
+              <span class="text-[10px] font-bold text-slate-400" id="wordCount">Words: 0</span>
             </div>
+            <textarea id="essayInput" oninput="updateWordCount(1)" rows="8" placeholder="Summarise the information by selecting and reporting the main features..." class="w-full text-xs p-3 bg-white border border-slate-300 rounded-xl leading-relaxed"></textarea>
+            <button onclick="evaluateWritingWithAI()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-extrabold py-2.5 rounded-xl shadow">
+              Evaluate Essay with AI
+            </button>
+            <div id="aiFeedbackResult" class="hidden space-y-3"></div>
           </div>
         `;
       } else {
-        container.innerHTML = `
-          <div class="space-y-4">
-            <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
-              <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">WRITING TASK 2</span>
-              <h3 class="font-extrabold text-slate-800 text-xs">University Tuition Fees Essay</h3>
-              <p class="text-xs text-slate-600">Some people believe that university education should be free for all students. To what extent do you agree or disagree? Write at least 250 words.</p>
-            </div>
+        passagePane.innerHTML = `
+          <div class="space-y-2">
+            <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">WRITING TASK 2</span>
+            <h3 class="font-extrabold text-slate-800 text-xs">University Tuition Fees Essay</h3>
+            <p class="text-xs text-slate-600">Some people believe that university education should be free for all students. To what extent do you agree or disagree? Write at least 250 words.</p>
+          </div>
+        `;
 
-            <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
-              <div class="flex items-center justify-between">
-                <label class="text-xs font-bold text-slate-800">Your Essay Response:</label>
-                <span class="text-[10px] font-bold text-slate-400" id="wordCount">Words: 0</span>
-              </div>
-              <textarea id="essayInput" oninput="updateWordCount(2)" rows="10" placeholder="Write your response here..." class="w-full text-xs p-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 leading-relaxed"></textarea>
-              <button onclick="evaluateWritingWithAI()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-extrabold py-2.5 rounded-xl shadow flex items-center justify-center gap-2">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> Evaluate Essay with AI
-              </button>
-              <div id="aiFeedbackResult" class="hidden space-y-3"></div>
+        questionsPane.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-bold text-slate-800">Your Essay Response:</label>
+              <span class="text-[10px] font-bold text-slate-400" id="wordCount">Words: 0</span>
             </div>
+            <textarea id="essayInput" oninput="updateWordCount(2)" rows="10" placeholder="Write your essay response here..." class="w-full text-xs p-3 bg-white border border-slate-300 rounded-xl leading-relaxed"></textarea>
+            <button onclick="evaluateWritingWithAI()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-extrabold py-2.5 rounded-xl shadow">
+              Evaluate Essay with AI
+            </button>
+            <div id="aiFeedbackResult" class="hidden space-y-3"></div>
           </div>
         `;
       }
     }
 
+    /* SPEAKING SECTION CLEAN OF PROMPTS/HINTS */
     function loadSpeakingSection() {
-      const container = document.getElementById('unifiedTestContainer');
-      container.innerHTML = `
-        <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
+      const passagePane = document.getElementById('passageContent');
+      const questionsPane = document.getElementById('questionsContent');
+
+      passagePane.innerHTML = `
+        <div class="bg-white p-2 rounded-xl space-y-2">
           <span class="bg-purple-100 text-purple-800 text-[10px] font-black px-2 py-0.5 rounded">SPEAKING PART 2 CUE CARD</span>
           <h3 class="font-bold text-slate-800 text-xs">Describe an interesting journey you have taken.</h3>
-          <p class="text-xs text-slate-600">You should say where you went, how you traveled, and why it was memorable.</p>
-          
-          <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl space-y-2">
-            <h4 class="font-bold text-slate-800 text-xs">Key Topic Collocations:</h4>
-            <div class="flex flex-wrap gap-1.5">
-              <span class="bg-purple-50 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded border border-purple-200">scenic route</span>
-              <span class="bg-purple-50 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded border border-purple-200">unforgettable experience</span>
-              <span class="bg-purple-50 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded border border-purple-200">breathtaking landscape</span>
-            </div>
+          <p class="text-xs text-slate-600 leading-relaxed">You should say where you went, how you traveled, and explain why this journey was particularly memorable to you.</p>
+        </div>
+      `;
+
+      questionsPane.innerHTML = `
+        <div class="space-y-3 text-center pt-4">
+          <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto text-2xl animate-pulse">
+            <i class="fa-solid fa-microphone"></i>
           </div>
+          <p class="text-xs font-bold text-slate-700">Record your response or practice speaking aloud.</p>
+          <button class="bg-purple-600 text-white font-extrabold text-xs px-4 py-2 rounded-xl shadow">Start Audio Recording</button>
         </div>
       `;
     }
@@ -559,17 +565,7 @@
             <span class="font-extrabold text-purple-900">Estimated Band Score: 6.5 - 7.0</span>
             <span class="text-[10px] bg-purple-200 text-purple-800 font-bold px-2 py-0.5 rounded">AI Evaluated</span>
           </div>
-
-          <div class="grid grid-cols-2 gap-2 mt-2">
-            <div class="bg-white p-2 rounded border border-purple-100">
-              <p class="font-bold text-purple-900 text-[11px]"><i class="fa-solid fa-book text-amber-500 mr-1"></i> Advanced Vocabulary</p>
-              <p class="text-[10px] text-slate-600 mt-1">Replace <i>"big change"</i> with <b>"substantial shift"</b>.</p>
-            </div>
-            <div class="bg-white p-2 rounded border border-purple-100">
-              <p class="font-bold text-purple-900 text-[11px]"><i class="fa-solid fa-link text-blue-500 mr-1"></i> Topic Collocations</p>
-              <p class="text-[10px] text-slate-600 mt-1">Use: <b>"lucrative salary"</b>, <b>"pursue higher education"</b>.</p>
-            </div>
-          </div>
+          <p class="text-[10px] text-slate-600">Great structural coherence. Upgrade vocabulary: replace <i>"big change"</i> with <b>"substantial shift"</b>.</p>
         </div>
       `;
     }
@@ -578,37 +574,25 @@
       clearInterval(timerInterval);
       switchTab('view-review');
 
-      // Update student dashboard stats after test completion
       document.getElementById('userBandScore').innerText = "7.0";
       document.getElementById('userBandScore').className = "text-base font-black text-blue-600";
       document.getElementById('userTestsDone').innerText = "1";
       document.getElementById('userAccuracy').innerText = "80%";
       document.getElementById('userAccuracy').className = "text-base font-black text-emerald-600";
 
-      const explanationsList = document.getElementById('explanationsList');
-      explanationsList.innerHTML = `
+      document.getElementById('explanationsList').innerHTML = `
         <div class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2">
           <div class="flex justify-between items-center">
             <span class="font-extrabold text-xs text-slate-800">Question 1</span>
             <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">Correct: TRUE</span>
           </div>
           <p class="text-xs text-slate-600">Your Answer: <span class="font-bold text-slate-800">${userAnswers[1] || 'Not answered'}</span></p>
-          
           <div class="bg-amber-50 border-l-4 border-amber-400 p-2.5 rounded-r text-[11px]">
-            <p class="font-bold text-amber-900 mb-1">Passage Citation & Evidence:</p>
-            <p class="italic text-amber-800">"...Researchers noted that urban agricultural modules significantly decrease municipal energy expenditures."</p>
-          </div>
-
-          <div class="bg-blue-50 p-2.5 rounded-lg text-[11px] text-blue-900">
-            <span class="font-bold">InGenious Explanation:</span> The text explicitly confirms that energy expenditures decrease, which matches the statement.
+            <p class="font-bold text-amber-900 mb-1">Evidence in Text:</p>
+            <p class="italic text-amber-800">"...urban agricultural modules significantly decrease municipal energy expenditures..."</p>
           </div>
         </div>
       `;
-    }
-
-    function startDailyChallenge() {
-      alert("Starting Daily Skill Quest!");
-      launchCDTest(20, 1, 'reading');
     }
 
     function renderPalette(total) {
@@ -620,9 +604,16 @@
         btn.id = `palette-q-${i}`;
         btn.innerText = i;
         btn.onclick = () => {
-          if (i >= 1 && i <= 13) switchReadingPassage(1);
-          else if (i >= 14 && i <= 26) switchReadingPassage(2);
-          else if (i >= 27 && i <= 40) switchReadingPassage(3);
+          if (currentSkill === 'reading') {
+            if (i >= 1 && i <= 13) switchReadingPassage(1);
+            else if (i >= 14 && i <= 26) switchReadingPassage(2);
+            else if (i >= 27 && i <= 40) switchReadingPassage(3);
+          } else if (currentSkill === 'listening') {
+            if (i >= 1 && i <= 10) loadListeningPart(1);
+            else if (i >= 11 && i <= 20) loadListeningPart(2);
+            else if (i >= 21 && i <= 30) loadListeningPart(3);
+            else if (i >= 31 && i <= 40) loadListeningPart(4);
+          }
           setTimeout(() => document.getElementById(`q-box-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
         };
         palette.appendChild(btn);
@@ -652,7 +643,7 @@
     }
 
     function confirmExitTest() {
-      if (confirm("Are you sure you want to exit? Your current test progress will be lost.")) {
+      if (confirm("Are you sure you want to exit? Your progress will be lost.")) {
         clearInterval(timerInterval);
         switchTab('view-home');
       }
@@ -663,7 +654,7 @@
       grid.innerHTML = '';
       for (let i = 21; i >= 1; i--) {
         const card = document.createElement('div');
-        card.className = 'bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer hover:border-blue-400 transition';
+        card.className = 'bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer hover:border-blue-400';
         card.onclick = () => openBookSelection('reading', i);
         card.innerHTML = `
           <div class="flex items-center gap-2">
@@ -684,6 +675,42 @@
         document.getElementById(t)?.classList.add('hidden');
       });
       document.getElementById(tabId)?.classList.remove('hidden');
+    }
+
+    /* RESIZER DRAG CONTROLLER */
+    const resizer = document.getElementById('resizerBar');
+    const topPane = document.getElementById('topPane');
+    const bottomPane = document.getElementById('bottomPane');
+    let isDragging = false;
+
+    if (resizer) {
+      resizer.addEventListener('mousedown', () => isDragging = true);
+      resizer.addEventListener('touchstart', () => isDragging = true);
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const containerHeight = document.getElementById('splitMainLayout').clientHeight;
+        const topHeight = e.clientY - 100;
+        const pct = (topHeight / containerHeight) * 100;
+        if (pct > 20 && pct < 80) {
+          topPane.style.height = `${pct}%`;
+          bottomPane.style.height = `${100 - pct}%`;
+        }
+      });
+
+      window.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        const containerHeight = document.getElementById('splitMainLayout').clientHeight;
+        const topHeight = e.touches[0].clientY - 100;
+        const pct = (topHeight / containerHeight) * 100;
+        if (pct > 20 && pct < 80) {
+          topPane.style.height = `${pct}%`;
+          bottomPane.style.height = `${100 - pct}%`;
+        }
+      });
+
+      window.addEventListener('mouseup', () => isDragging = false);
+      window.addEventListener('touchend', () => isDragging = false);
     }
 
     switchExamMode('IELTS');
