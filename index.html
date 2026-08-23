@@ -12,24 +12,20 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 0; user-select: none; }
     
-    /* Split view styling */
-    .cd-split-container {
-      display: flex;
-      flex-direction: column;
-      height: calc(100vh - 125px);
-    }
-    @media (min-width: 768px) {
-      .cd-split-container { flex-direction: row; }
-      .cd-pane { flex: 1; overflow-y: auto; }
-    }
     .q-badge {
-      display: inline-flex; items-center; justify-content: center;
+      display: inline-flex; align-items: center; justify-content: center;
       min-width: 28px; height: 28px; padding: 0 4px;
       border: 1px solid #cbd5e1; border-radius: 6px;
       font-size: 11px; font-weight: 700; background-color: #ffffff; color: #334155; cursor: pointer;
     }
     .q-badge.answered { background-color: #2563eb; color: #ffffff; border-color: #2563eb; }
     .q-badge.active { border: 2px solid #0f172a; }
+
+    /* Custom resizable split pane styling */
+    .test-scroll-area {
+      height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body class="pb-16">
@@ -44,13 +40,13 @@
       </div>
     </div>
 
-    <!-- STREAK & XP (DUOLINGO STYLE) -->
+    <!-- STREAK & XP -->
     <div class="flex items-center gap-2">
       <div class="flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-700 px-2 py-0.5 rounded-full text-xs font-black">
-        <i class="fa-solid fa-fire text-amber-500"></i> <span>5</span>
+        <i class="fa-solid fa-fire text-amber-500"></i> <span>0</span>
       </div>
       <div class="flex items-center gap-1 bg-purple-50 border border-purple-200 text-purple-700 px-2 py-0.5 rounded-full text-xs font-black">
-        <i class="fa-solid fa-bolt text-purple-500"></i> <span>340 XP</span>
+        <i class="fa-solid fa-bolt text-purple-500"></i> <span>0 XP</span>
       </div>
       <div class="bg-slate-100 p-0.5 rounded-xl flex gap-0.5 border border-slate-200 ml-1">
         <button id="btn-mode-ielts" onclick="switchExamMode('IELTS')" class="px-2 py-0.5 rounded-lg text-[11px] font-extrabold bg-white text-blue-600 shadow-sm">IELTS</button>
@@ -62,11 +58,11 @@
   <!-- DASHBOARD HOME VIEW -->
   <main id="view-home" class="p-4 space-y-4 max-w-md mx-auto">
 
-    <!-- DUOLINGO DAILY GAME CHALLENGE BANNER -->
+    <!-- DAILY GAME CHALLENGE BANNER -->
     <div onclick="startDailyChallenge()" class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-white shadow-md relative overflow-hidden cursor-pointer hover:opacity-95">
       <div class="flex justify-between items-start">
         <div>
-          <span class="bg-white/20 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">Daily Duolingo Quest</span>
+          <span class="bg-white/20 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">Daily Skill Quest</span>
           <h3 class="text-sm font-black mt-1">Vocabulary & Grammar Sprint</h3>
           <p class="text-[11px] text-emerald-100">Solve 5 quick exam questions & keep your streak active!</p>
         </div>
@@ -86,67 +82,52 @@
       <p class="text-[11px] text-purple-100 mt-0.5">Real Writing & Speaking prompts for upcoming test dates.</p>
     </div>
 
-    <!-- STATS SUMMARY -->
+    <!-- STATS SUMMARY FOR NEW USERS -->
     <div class="grid grid-cols-3 gap-2">
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Estimated Band</p>
-        <p class="text-base font-black text-blue-600">7.5</p>
+        <p class="text-base font-black text-slate-400" id="userBandScore">--</p>
       </div>
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Tests Done</p>
-        <p class="text-base font-black text-slate-800">12</p>
+        <p class="text-base font-black text-slate-800" id="userTestsDone">0</p>
       </div>
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Accuracy</p>
-        <p class="text-base font-black text-emerald-600">84%</p>
+        <p class="text-base font-black text-slate-400" id="userAccuracy">0%</p>
       </div>
+    </div>
+
+    <div class="bg-blue-50 border border-blue-200 p-2.5 rounded-xl text-center">
+      <p class="text-[11px] text-blue-800 font-medium"><i class="fa-solid fa-circle-info mr-1"></i> Pass your first practice test to calculate your official Band Score estimate.</p>
     </div>
 
     <h2 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Practice Modules</h2>
 
     <!-- MODULES GRID -->
     <div class="grid grid-cols-2 gap-3" id="mainModulesGrid"></div>
-
-    <!-- QUICK CONTINUATION -->
-    <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-bold">
-          <i class="fa-solid fa-clock-rotate-left"></i>
-        </div>
-        <div>
-          <h4 class="font-bold text-slate-800 text-xs">Cambridge 20 — Test 1</h4>
-          <p class="text-[10px] text-slate-400">Reading Passage 1 • In Progress</p>
-        </div>
-      </div>
-      <button onclick="launchCDTest(20, 1, 'reading')" class="bg-blue-600 text-white font-extrabold text-xs px-3 py-1.5 rounded-lg shadow">Continue</button>
-    </div>
   </main>
 
-  <!-- SELECT BOOK & TEST VIEW (CAMBRIDGE 1–21) -->
+  <!-- SELECT BOOK & TEST VIEW -->
   <section id="view-select-test" class="p-4 space-y-3 hidden max-w-md mx-auto">
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-sm font-extrabold text-slate-800" id="selectTestTitle">Cambridge IELTS Books</h2>
-        <p class="text-[11px] text-slate-500">Official Cambridge 1 — 21 Collection</p>
+        <h2 class="text-sm font-extrabold text-slate-800" id="selectTestTitle">Cambridge Books</h2>
+        <p class="text-[11px] text-slate-500">Official Collection 1 — 21</p>
       </div>
       <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg">Back</button>
-    </div>
-
-    <div class="bg-white p-2 rounded-xl border border-slate-200 flex items-center gap-2">
-      <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs ml-2"></i>
-      <input type="text" id="bookSearchInput" oninput="filterBooks()" placeholder="Search Cambridge Book (1–21)..." class="w-full text-xs bg-transparent focus:outline-none">
     </div>
 
     <div class="space-y-3" id="testSelectionList"></div>
   </section>
 
-  <!-- CD-IELTS TEST RUNNER VIEW -->
+  <!-- TEST RUNNER VIEW (UNIFIED SCROLLING LAYOUT) -->
   <section id="view-test-runner" class="hidden flex flex-col h-screen">
     <!-- TEST HEADER -->
     <div class="bg-slate-900 text-white px-4 py-2 flex items-center justify-between shadow-md">
       <div>
         <h2 class="text-xs font-bold text-slate-200" id="testTitle">Cambridge IELTS 20 — Test 1</h2>
-        <p class="text-[10px] text-slate-400" id="testSubtitle">Academic Reading Test</p>
+        <p class="text-[10px] text-emerald-400 font-semibold" id="testSubtitle">Academic Reading Test</p>
       </div>
       <div class="flex items-center gap-2">
         <div class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-mono font-bold px-2 py-0.5 rounded">
@@ -156,20 +137,11 @@
       </div>
     </div>
 
-    <!-- MOBILE VIEW TOGGLE (READING PASSAGE vs QUESTIONS) -->
-    <div class="bg-slate-200 p-1 flex border-b border-slate-300 md:hidden" id="mobileViewToggle">
-      <button onclick="toggleMobileView('passage')" id="btn-toggle-passage" class="flex-1 py-1 text-center text-xs font-bold rounded bg-white text-blue-600 shadow-sm">📖 Reading Text</button>
-      <button onclick="toggleMobileView('questions')" id="btn-toggle-questions" class="flex-1 py-1 text-center text-xs font-bold text-slate-600">📝 Questions</button>
-    </div>
-
     <!-- PASSAGE / PART TABS -->
     <div class="bg-slate-100 border-b border-slate-200 px-4 py-1.5 flex gap-2 overflow-x-auto" id="sectionNavTabs"></div>
 
-    <!-- SPLIT-SCREEN CONTAINER -->
-    <div class="cd-split-container">
-      <div class="cd-pane p-4 bg-white border-r border-slate-200 leading-relaxed text-xs overflow-y-auto" id="passagePane"></div>
-      <div class="cd-pane p-4 bg-slate-50 overflow-y-auto hidden md:block" id="questionsPane"></div>
-    </div>
+    <!-- MAIN SINGLE CONTENT AREA (TEXT & QUESTIONS TOGETHER) -->
+    <div class="test-scroll-area p-4 space-y-6" id="unifiedTestContainer"></div>
 
     <!-- BOTTOM PALETTE & SUBMIT -->
     <div class="bg-white border-t border-slate-200 px-4 py-2 sticky bottom-0 z-20 flex items-center justify-between gap-2 shadow-lg">
@@ -180,17 +152,16 @@
     </div>
   </section>
 
-  <!-- RESULT & INGENIOUS-STYLE EXPLANATION REVIEW VIEW -->
+  <!-- REVIEW & INGENIOUS EXPLANATIONS -->
   <section id="view-review" class="p-4 space-y-4 hidden max-w-md mx-auto pb-20">
     <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center space-y-2">
       <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">Test Completed</span>
-      <h2 class="text-xl font-black text-slate-800">Band Score: 7.5</h2>
-      <p class="text-xs text-slate-500">Correct Answers: 34 / 40</p>
+      <h2 class="text-xl font-black text-slate-800" id="reviewBandScore">Estimated Band: 7.0</h2>
+      <p class="text-xs text-slate-500" id="reviewScoreDetail">Score: 32 / 40</p>
       <button onclick="switchTab('view-home')" class="bg-blue-600 text-white font-bold text-xs px-4 py-2 rounded-xl mt-2 w-full">Back to Dashboard</button>
     </div>
 
     <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Answer Keys & Detailed InGenious Explanations</h3>
-
     <div id="explanationsList" class="space-y-3"></div>
   </section>
 
@@ -207,7 +178,7 @@
       <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2">
         <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">Writing Task 1 & 2</span>
         <h4 class="font-bold text-slate-800 text-xs">Recent Exam Recalls</h4>
-        <p class="text-[11px] text-slate-600">Leaked bar charts, process diagrams, and essay questions from active test centers.</p>
+        <p class="text-[11px] text-slate-600">Leaked pie charts, maps, and essay prompts from active test centers.</p>
       </div>
     </div>
   </section>
@@ -221,7 +192,7 @@
     <div class="grid grid-cols-2 gap-2.5" id="booksGrid"></div>
   </section>
 
-  <!-- BOTTOM FOOTER -->
+  <!-- FOOTER NAVIGATION -->
   <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2 flex justify-around items-center z-40 max-w-md mx-auto">
     <button onclick="switchTab('view-home')" id="nav-home" class="flex flex-col items-center gap-0.5 text-blue-600 font-bold text-[10px]">
       <i class="fa-solid fa-house text-base"></i><span>Home</span>
@@ -239,7 +210,7 @@
     if (tg) {
       tg.ready();
       tg.expand();
-      tg.enableClosingConfirmation(); // Protect against accidental swipe close
+      tg.enableClosingConfirmation();
       if (tg.initDataUnsafe?.user) {
         document.getElementById('userName').innerText = tg.initDataUnsafe.user.first_name;
         document.getElementById('userAvatar').innerText = tg.initDataUnsafe.user.first_name.charAt(0);
@@ -272,29 +243,29 @@
           <div onclick="openBookSelection('reading')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition">
             <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-book-reader"></i></div>
             <h4 class="font-bold text-slate-800 text-xs">Reading Practice</h4>
-            <p class="text-[10px] text-slate-400">Books 1–21 (40 Qs)</p>
+            <p class="text-[10px] text-slate-400">Books 1–21 (Passages 1-3)</p>
           </div>
           <div onclick="openBookSelection('listening')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition">
             <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-headphones"></i></div>
             <h4 class="font-bold text-slate-800 text-xs">Listening Practice</h4>
-            <p class="text-[10px] text-slate-400">Books 1–21 (Audio)</p>
+            <p class="text-[10px] text-slate-400">Books 1–21 (Parts 1-4)</p>
           </div>
           <div onclick="openBookSelection('writing')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition">
             <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-pen-nib"></i></div>
             <h4 class="font-bold text-slate-800 text-xs">Writing Simulator</h4>
-            <p class="text-[10px] text-slate-400">Task 1 & Task 2 AI</p>
+            <p class="text-[10px] text-slate-400">Charts, Maps & Essays</p>
           </div>
-          <div onclick="openSpeakingSimulator()" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition">
+          <div onclick="openBookSelection('speaking')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition">
             <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-microphone"></i></div>
             <h4 class="font-bold text-slate-800 text-xs">Speaking AI</h4>
-            <p class="text-[10px] text-slate-400">Parts 1, 2 & 3</p>
+            <p class="text-[10px] text-slate-400">Collocations & Vocabulary</p>
           </div>
         `;
       } else {
         grid.innerHTML = `
           <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-            <h4 class="font-bold text-slate-800 text-xs">Digital SAT Modules</h4>
-            <p class="text-[10px] text-slate-400 font-medium">Reading, Writing & Math</p>
+            <h4 class="font-bold text-slate-800 text-xs">Digital SAT Suite</h4>
+            <p class="text-[10px] text-slate-400">Reading, Writing & Math</p>
           </div>
         `;
       }
@@ -314,15 +285,14 @@
 
       for (let book = startBook; book >= endBook; book--) {
         const item = document.createElement('div');
-        item.className = 'bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2 book-card-item';
-        item.setAttribute('data-book', book);
+        item.className = 'bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2';
         item.innerHTML = `
           <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <div class="flex items-center gap-2">
               <span class="w-6 h-6 bg-blue-600 text-white rounded flex items-center justify-center font-black text-xs">C${book}</span>
               <h4 class="font-bold text-slate-800 text-xs">Cambridge IELTS ${book}</h4>
             </div>
-            <span class="text-[10px] bg-blue-50 text-blue-600 font-bold px-2 py-0.5 rounded">4 Tests</span>
+            <span class="text-[10px] bg-blue-50 text-blue-600 font-bold px-2 py-0.5 rounded uppercase">${currentSkill}</span>
           </div>
           <div class="grid grid-cols-2 gap-2">
             <button onclick="launchCDTest(${book}, 1, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition">Test 1</button>
@@ -356,18 +326,40 @@
         `;
         renderPalette(40);
         switchReadingPassage(1);
+      } else if (skill === 'listening') {
+        document.getElementById('testSubtitle').innerText = "Academic Listening Test (40 Questions)";
+        startTimer(2400);
+        navTabs.innerHTML = `
+          <button class="px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold">Part 1</button>
+          <button class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Part 2</button>
+          <button class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Part 3</button>
+          <button class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Part 4</button>
+        `;
+        renderPalette(40);
+        loadListeningSection();
       } else if (skill === 'writing') {
         document.getElementById('testSubtitle').innerText = "Academic Writing Test";
         startTimer(3600);
         navTabs.innerHTML = `
-          <button onclick="loadWritingTaskSection(1)" class="px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold">Task 1 (Report)</button>
-          <button onclick="loadWritingTaskSection(2)" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Task 2 (Essay)</button>
+          <button onclick="loadWritingTaskSection(1)" id="w-tab-1" class="px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold">Task 1 (Chart & Data)</button>
+          <button onclick="loadWritingTaskSection(2)" id="w-tab-2" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Task 2 (Essay)</button>
         `;
         renderPalette(2);
         loadWritingTaskSection(1);
+      } else if (skill === 'speaking') {
+        document.getElementById('testSubtitle').innerText = "Speaking Test Simulator";
+        startTimer(900);
+        navTabs.innerHTML = `
+          <button class="px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold">Part 1</button>
+          <button class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Part 2 Cue Card</button>
+          <button class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Part 3 Discussion</button>
+        `;
+        renderPalette(3);
+        loadSpeakingSection();
       }
     }
 
+    /* UNIFIED READING VIEW: TEXT ON TOP, QUESTIONS DIRECTLY BELOW */
     function switchReadingPassage(passageNum) {
       currentPassage = passageNum;
       [1, 2, 3].forEach(p => {
@@ -377,44 +369,47 @@
           : "px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold";
       });
 
-      const leftPane = document.getElementById('passagePane');
-      const rightPane = document.getElementById('questionsPane');
-
-      let textContent = "";
-      if (passageNum === 1) {
-        textContent = `
-          <h3 class="font-extrabold text-slate-800 text-sm mb-2">Reading Passage 1: The Evolution of Modern Architecture</h3>
-          <p class="mb-2">Architectural styles have transformed significantly over the past century. From industrial steel frameworks to sustainable bio-materials, modern architecture balances aesthetic values with environmental sustainability...</p>
-          <p class="mb-2"><mark class="bg-amber-200 px-1 rounded">By the mid-1920s, modern architects began incorporating organic design principles into urban planning.</mark> The integration of rooftop hydroponics and vertical farming allowed cities to reduce reliance on rural food supply chains.</p>
-          <p class="mb-2"><mark class="bg-amber-200 px-1 rounded">Recent trials carried out in Scandinavian municipalities have found clear evidence supporting sustainable urban growth.</mark> Researchers noted that urban agricultural modules significantly decrease municipal energy expenditures.</p>
-        `;
-      } else if (passageNum === 2) {
-        textContent = `
-          <h3 class="font-extrabold text-slate-800 text-sm mb-2">Reading Passage 2: Deep Sea Microorganisms</h3>
-          <p class="mb-2">Marine biologists exploring hydrothermal vents have discovered extremophile bacteria that survive without sunlight...</p>
-        `;
-      } else {
-        textContent = `
-          <h3 class="font-extrabold text-slate-800 text-sm mb-2">Reading Passage 3: Cognitive Benefits of Music</h3>
-          <p class="mb-2">Learning an instrument in childhood enhances neural plasticity and long-term memory capacity...</p>
-        `;
-      }
-
-      leftPane.innerHTML = textContent;
-
+      const container = document.getElementById('unifiedTestContainer');
       let startQ = passageNum === 1 ? 1 : passageNum === 2 ? 14 : 27;
       let endQ = passageNum === 1 ? 13 : passageNum === 2 ? 26 : 40;
 
-      let html = `<div class="space-y-3">
-        <div class="bg-blue-50/80 p-2.5 rounded-lg border border-blue-200">
-          <h4 class="font-bold text-blue-900 text-xs">Questions ${startQ}–${endQ}</h4>
-          <p class="text-[10px] text-blue-700">Choose TRUE, FALSE, or NOT GIVEN for each statement.</p>
-        </div>
+      let passageText = "";
+      if (passageNum === 1) {
+        passageText = `
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3 leading-relaxed text-xs">
+            <h3 class="font-extrabold text-slate-900 text-sm">Passage 1: The Evolution of Modern Architecture & Urban Design</h3>
+            <p>Architectural styles have transformed significantly over the past century. From industrial steel frameworks to sustainable bio-materials, modern architecture balances aesthetic values with environmental sustainability...</p>
+            <p><mark class="bg-amber-200 px-1 rounded">By the mid-1920s, modern architects began incorporating organic design principles into urban planning.</mark> The integration of rooftop hydroponics and vertical farming allowed cities to reduce reliance on rural food supply chains.</p>
+            <p><mark class="bg-amber-200 px-1 rounded">Recent trials carried out in Scandinavian municipalities have found clear evidence supporting sustainable urban growth.</mark> Researchers noted that urban agricultural modules significantly decrease municipal energy expenditures.</p>
+          </div>
+        `;
+      } else if (passageNum === 2) {
+        passageText = `
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3 leading-relaxed text-xs">
+            <h3 class="font-extrabold text-slate-900 text-sm">Passage 2: Deep Sea Microorganisms and Extremophiles</h3>
+            <p>Marine biologists exploring hydrothermal vents have discovered extremophile bacteria that survive without sunlight. These organisms utilize chemosynthesis instead of photosynthesis...</p>
+          </div>
+        `;
+      } else {
+        passageText = `
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3 leading-relaxed text-xs">
+            <h3 class="font-extrabold text-slate-900 text-sm">Passage 3: Cognitive Benefits of Early Music Education</h3>
+            <p>Neuroscience studies indicate that playing musical instruments in early childhood accelerates brain development and improves spatial-temporal skills...</p>
+          </div>
+        `;
+      }
+
+      let questionsHtml = `
+        <div class="space-y-3">
+          <div class="bg-blue-50/80 p-3 rounded-xl border border-blue-200">
+            <h4 class="font-bold text-blue-900 text-xs">Questions ${startQ}–${endQ}</h4>
+            <p class="text-[10px] text-blue-700">Choose TRUE, FALSE, or NOT GIVEN for each statement.</p>
+          </div>
       `;
 
       for (let i = startQ; i <= endQ; i++) {
-        html += `
-          <div id="q-box-${i}" class="bg-white p-3 rounded-xl border border-slate-200 space-y-2">
+        questionsHtml += `
+          <div id="q-box-${i}" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2">
             <p class="text-xs font-bold text-slate-800">${i}. Modern urban agricultural modules decrease city energy costs.</p>
             <select onchange="markAnswered(${i}, this.value)" class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 font-medium">
               <option value="">-- Select Answer --</option>
@@ -425,90 +420,127 @@
           </div>
         `;
       }
-      html += `</div>`;
-      rightPane.innerHTML = html;
+      questionsHtml += `</div>`;
+
+      container.innerHTML = passageText + questionsHtml;
     }
 
-    function toggleMobileView(view) {
-      const leftPane = document.getElementById('passagePane');
-      const rightPane = document.getElementById('questionsPane');
-      const btnPassage = document.getElementById('btn-toggle-passage');
-      const btnQuestions = document.getElementById('btn-toggle-questions');
-
-      if (view === 'passage') {
-        leftPane.classList.remove('hidden');
-        rightPane.classList.add('hidden');
-        btnPassage.className = "flex-1 py-1 text-center text-xs font-bold rounded bg-white text-blue-600 shadow-sm";
-        btnQuestions.className = "flex-1 py-1 text-center text-xs font-bold text-slate-600";
-      } else {
-        leftPane.classList.add('hidden');
-        rightPane.classList.remove('hidden');
-        btnQuestions.className = "flex-1 py-1 text-center text-xs font-bold rounded bg-white text-blue-600 shadow-sm";
-        btnPassage.className = "flex-1 py-1 text-center text-xs font-bold text-slate-600";
-      }
-    }
-
-    function renderPalette(total) {
-      const palette = document.getElementById('questionPalette');
-      palette.innerHTML = '';
-      for (let i = 1; i <= total; i++) {
-        const btn = document.createElement('div');
-        btn.className = `q-badge ${userAnswers[i] ? 'answered' : ''}`;
-        btn.id = `palette-q-${i}`;
-        btn.innerText = i;
-        btn.onclick = () => {
-          if (i >= 1 && i <= 13) switchReadingPassage(1);
-          else if (i >= 14 && i <= 26) switchReadingPassage(2);
-          else if (i >= 27 && i <= 40) switchReadingPassage(3);
-          toggleMobileView('questions');
-          setTimeout(() => document.getElementById(`q-box-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-        };
-        palette.appendChild(btn);
-      }
-    }
-
-    function markAnswered(qNum, value) {
-      if (value.trim() !== '') {
-        userAnswers[qNum] = value;
-        document.getElementById(`palette-q-${qNum}`)?.classList.add('answered');
-      } else {
-        delete userAnswers[qNum];
-        document.getElementById(`palette-q-${qNum}`)?.classList.remove('answered');
-      }
+    function loadListeningSection() {
+      const container = document.getElementById('unifiedTestContainer');
+      container.innerHTML = `
+        <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
+          <h3 class="font-bold text-slate-800 text-xs">Part 1 Audio Track</h3>
+          <audio controls class="w-full">
+            <source src="#" type="audio/mpeg">
+            Your browser does not support audio player.
+          </audio>
+          <div class="p-3 bg-slate-50 rounded-lg text-xs space-y-2">
+            <p class="font-bold text-slate-700">Questions 1–10: Complete the notes below.</p>
+            <p class="text-slate-600">Write ONE WORD AND/OR A NUMBER for each answer.</p>
+            <input type="text" oninput="markAnswered(1, this.value)" placeholder="1. Customer Name..." class="w-full p-2 bg-white border border-slate-300 rounded text-xs">
+          </div>
+        </div>
+      `;
     }
 
     function loadWritingTaskSection(taskNum) {
-      const leftPane = document.getElementById('passagePane');
-      const rightPane = document.getElementById('questionsPane');
+      const container = document.getElementById('unifiedTestContainer');
+      
+      const btn1 = document.getElementById('w-tab-1');
+      const btn2 = document.getElementById('w-tab-2');
+      if (btn1 && btn2) {
+        btn1.className = taskNum === 1 ? "px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold" : "px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold";
+        btn2.className = taskNum === 2 ? "px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold" : "px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold";
+      }
 
-      leftPane.innerHTML = `
-        <div class="space-y-3">
-          <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">WRITING TASK ${taskNum} PROMPT</span>
-          <h3 class="font-extrabold text-slate-800 text-sm">${taskNum === 1 ? 'Task 1: Report / Data Analysis' : 'Task 2: Essay Prompt'}</h3>
-          <p class="text-xs text-slate-700 leading-relaxed font-medium">
-            ${taskNum === 1 
-              ? 'The chart below shows global renewable energy adoption between 2010 and 2025. Summarise the information by selecting and reporting the main features. Write at least 150 words.' 
-              : 'Some people believe that university education should be free for all students. To what extent do you agree or disagree? Write at least 250 words.'}
-          </p>
-        </div>
-      `;
+      if (taskNum === 1) {
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
+              <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">WRITING TASK 1</span>
+              <h3 class="font-extrabold text-slate-800 text-xs">History Graduates Employment & Salary Breakdown</h3>
+              <p class="text-xs text-slate-600">The chart below shows what History graduates did after completing their undergraduate degree course. The table shows the sectors these graduates were employed in and their average incomes.</p>
+              
+              <!-- VISUAL TABLE DATA SIMULATION -->
+              <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                <table class="w-full text-left text-[11px] text-slate-700">
+                  <thead class="bg-slate-100 font-bold border-b border-slate-200">
+                    <tr>
+                      <th class="p-2">Employment Sector</th>
+                      <th class="p-2">Percentage</th>
+                      <th class="p-2">Average Income (£)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100">
+                    <tr><td class="p-2">Solicitor</td><td class="p-2">18%</td><td class="p-2">£57,000</td></tr>
+                    <tr><td class="p-2">History Teacher</td><td class="p-2">30%</td><td class="p-2">£32,000</td></tr>
+                    <tr><td class="p-2">Archaeologist</td><td class="p-2">6%</td><td class="p-2">£29,000</td></tr>
+                    <tr><td class="p-2">Historian</td><td class="p-2">9%</td><td class="p-2">£49,000</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
-      rightPane.innerHTML = `
-        <div class="space-y-2">
-          <div class="flex items-center justify-between">
-            <label class="text-xs font-bold text-slate-700">Type Your Response:</label>
-            <span class="text-[10px] font-bold text-slate-400" id="wordCount">Words: 0</span>
+            <!-- ESSAY INPUT & AI EVALUATOR -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
+              <div class="flex items-center justify-between">
+                <label class="text-xs font-bold text-slate-800">Your Task 1 Essay Response:</label>
+                <span class="text-[10px] font-bold text-slate-400" id="wordCount">Words: 0</span>
+              </div>
+              <textarea id="essayInput" oninput="updateWordCount(1)" rows="8" placeholder="Summarise the information by selecting and reporting the main features..." class="w-full text-xs p-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 leading-relaxed"></textarea>
+              
+              <button onclick="evaluateWritingWithAI()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-extrabold py-2.5 rounded-xl shadow flex items-center justify-center gap-2">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Evaluate Essay with AI
+              </button>
+              <p class="text-[9px] text-slate-400 text-center italic">* AI scores are estimations for practice purposes only and do not guarantee official results.</p>
+              
+              <div id="aiFeedbackResult" class="hidden space-y-3"></div>
+            </div>
           </div>
-          <textarea id="essayInput" oninput="updateWordCount(${taskNum})" rows="10" placeholder="Write your response..." class="w-full text-xs p-3 bg-white border border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 leading-relaxed"></textarea>
+        `;
+      } else {
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
+              <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">WRITING TASK 2</span>
+              <h3 class="font-extrabold text-slate-800 text-xs">University Tuition Fees Essay</h3>
+              <p class="text-xs text-slate-600">Some people believe that university education should be free for all students. To what extent do you agree or disagree? Write at least 250 words.</p>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
+              <div class="flex items-center justify-between">
+                <label class="text-xs font-bold text-slate-800">Your Essay Response:</label>
+                <span class="text-[10px] font-bold text-slate-400" id="wordCount">Words: 0</span>
+              </div>
+              <textarea id="essayInput" oninput="updateWordCount(2)" rows="10" placeholder="Write your response here..." class="w-full text-xs p-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 leading-relaxed"></textarea>
+              <button onclick="evaluateWritingWithAI()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-extrabold py-2.5 rounded-xl shadow flex items-center justify-center gap-2">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Evaluate Essay with AI
+              </button>
+              <div id="aiFeedbackResult" class="hidden space-y-3"></div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function loadSpeakingSection() {
+      const container = document.getElementById('unifiedTestContainer');
+      container.innerHTML = `
+        <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
+          <span class="bg-purple-100 text-purple-800 text-[10px] font-black px-2 py-0.5 rounded">SPEAKING PART 2 CUE CARD</span>
+          <h3 class="font-bold text-slate-800 text-xs">Describe an interesting journey you have taken.</h3>
+          <p class="text-xs text-slate-600">You should say where you went, how you traveled, and why it was memorable.</p>
           
-          <button onclick="evaluateWritingWithAI()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-extrabold py-2.5 rounded-xl shadow flex items-center justify-center gap-2">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> Evaluate Essay with AI
-          </button>
-          <p class="text-[9px] text-slate-400 text-center italic">* AI scores are estimations for practice purposes only and do not guarantee official IELTS results.</p>
-          <div id="aiFeedbackResult" class="hidden bg-purple-50 border border-purple-200 p-3 rounded-xl text-xs space-y-2"></div>
+          <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl space-y-2">
+            <h4 class="font-bold text-slate-800 text-xs">Key Topic Collocations:</h4>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="bg-purple-50 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded border border-purple-200">scenic route</span>
+              <span class="bg-purple-50 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded border border-purple-200">unforgettable experience</span>
+              <span class="bg-purple-50 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded border border-purple-200">breathtaking landscape</span>
+            </div>
+          </div>
         </div>
       `;
-      toggleMobileView('questions');
     }
 
     function updateWordCount(taskNum) {
@@ -522,18 +554,36 @@
       const res = document.getElementById('aiFeedbackResult');
       res.classList.remove('hidden');
       res.innerHTML = `
-        <div class="flex items-center justify-between">
-          <span class="font-extrabold text-purple-900">Estimated Band Score: 7.0</span>
-          <span class="text-[10px] bg-purple-200 text-purple-800 font-bold px-2 py-0.5 rounded">AI Evaluated</span>
+        <div class="bg-purple-50 border border-purple-200 p-3 rounded-xl space-y-2 text-xs">
+          <div class="flex items-center justify-between">
+            <span class="font-extrabold text-purple-900">Estimated Band Score: 6.5 - 7.0</span>
+            <span class="text-[10px] bg-purple-200 text-purple-800 font-bold px-2 py-0.5 rounded">AI Evaluated</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 mt-2">
+            <div class="bg-white p-2 rounded border border-purple-100">
+              <p class="font-bold text-purple-900 text-[11px]"><i class="fa-solid fa-book text-amber-500 mr-1"></i> Advanced Vocabulary</p>
+              <p class="text-[10px] text-slate-600 mt-1">Replace <i>"big change"</i> with <b>"substantial shift"</b>.</p>
+            </div>
+            <div class="bg-white p-2 rounded border border-purple-100">
+              <p class="font-bold text-purple-900 text-[11px]"><i class="fa-solid fa-link text-blue-500 mr-1"></i> Topic Collocations</p>
+              <p class="text-[10px] text-slate-600 mt-1">Use: <b>"lucrative salary"</b>, <b>"pursue higher education"</b>.</p>
+            </div>
+          </div>
         </div>
-        <p class="text-[11px] text-purple-900 font-semibold">Grammar & Vocabulary Feedback:</p>
-        <p class="text-[11px] text-purple-800">Great vocabulary usage! Consider replacing basic connectors like "and also" with advanced transitions such as "furthermore" or "consequently".</p>
       `;
     }
 
     function submitTest() {
       clearInterval(timerInterval);
       switchTab('view-review');
+
+      // Update student dashboard stats after test completion
+      document.getElementById('userBandScore').innerText = "7.0";
+      document.getElementById('userBandScore').className = "text-base font-black text-blue-600";
+      document.getElementById('userTestsDone').innerText = "1";
+      document.getElementById('userAccuracy').innerText = "80%";
+      document.getElementById('userAccuracy').className = "text-base font-black text-emerald-600";
 
       const explanationsList = document.getElementById('explanationsList');
       explanationsList.innerHTML = `
@@ -550,15 +600,43 @@
           </div>
 
           <div class="bg-blue-50 p-2.5 rounded-lg text-[11px] text-blue-900">
-            <span class="font-bold">InGenious Explanation:</span> The text directly states that agricultural modules decrease energy expenditures (costs), making the statement TRUE.
+            <span class="font-bold">InGenious Explanation:</span> The text explicitly confirms that energy expenditures decrease, which matches the statement.
           </div>
         </div>
       `;
     }
 
     function startDailyChallenge() {
-      alert("Starting Duolingo Daily Challenge! 5 quick questions coming up...");
+      alert("Starting Daily Skill Quest!");
       launchCDTest(20, 1, 'reading');
+    }
+
+    function renderPalette(total) {
+      const palette = document.getElementById('questionPalette');
+      palette.innerHTML = '';
+      for (let i = 1; i <= total; i++) {
+        const btn = document.createElement('div');
+        btn.className = `q-badge ${userAnswers[i] ? 'answered' : ''}`;
+        btn.id = `palette-q-${i}`;
+        btn.innerText = i;
+        btn.onclick = () => {
+          if (i >= 1 && i <= 13) switchReadingPassage(1);
+          else if (i >= 14 && i <= 26) switchReadingPassage(2);
+          else if (i >= 27 && i <= 40) switchReadingPassage(3);
+          setTimeout(() => document.getElementById(`q-box-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+        };
+        palette.appendChild(btn);
+      }
+    }
+
+    function markAnswered(qNum, value) {
+      if (value.trim() !== '') {
+        userAnswers[qNum] = value;
+        document.getElementById(`palette-q-${qNum}`)?.classList.add('answered');
+      } else {
+        delete userAnswers[qNum];
+        document.getElementById(`palette-q-${qNum}`)?.classList.remove('answered');
+      }
     }
 
     function startTimer(seconds) {
