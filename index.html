@@ -5,32 +5,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>IELTS & SAT Genius Prep</title>
-  <!-- Telegram Web App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--tg-theme-bg-color, #f4f6f9);
-      color: var(--tg-theme-text-color, #1e293b);
+      background-color: var(--tg-theme-bg-color, #f8fafc);
+      color: var(--tg-theme-text-color, #0f172a);
       user-select: none;
       -webkit-user-select: none;
     }
-    .card-gradient-1 {
+    .card-gradient-ielts {
       background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
     }
-    .hide-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .hide-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
+    .card-gradient-sat {
+      background: linear-gradient(135deg, #0d9488 0%, #059669 100%);
     }
     .bottom-nav {
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
@@ -38,100 +31,102 @@
 </head>
 <body class="pb-24">
 
-  <!-- TOP HEADER & USER STATS -->
-  <div class="px-4 pt-4 pb-2 bg-white border-b border-slate-100 shadow-sm">
+  <!-- TOP HEADER & EXAM MODE SELECTOR -->
+  <div class="px-4 pt-4 pb-3 bg-white border-b border-slate-100 shadow-sm sticky top-0 z-30">
     <div class="flex items-center justify-between mb-3">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-lg shadow-md" id="userAvatar">
-          G
+          S
         </div>
         <div>
-          <h2 class="font-bold text-slate-800 text-base leading-tight" id="userName">IELTS Student</h2>
-          <p class="text-xs text-indigo-600 font-medium">Target Band: <span class="font-bold">8.0+</span></p>
+          <h2 class="font-bold text-slate-800 text-base leading-tight" id="userName">Student</h2>
+          <p class="text-xs text-slate-400 font-medium">Подготовка к экзаменам</p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <div class="flex items-center gap-1 bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full text-xs font-semibold border border-amber-200/60">
-          <i class="fa-solid fa-fire text-amber-500"></i>
-          <span>5 Дней</span>
-        </div>
+      
+      <!-- MODE SWITCHER (IELTS vs SAT) -->
+      <div class="bg-slate-100 p-1 rounded-xl flex gap-1 border border-slate-200/60">
+        <button id="btn-mode-ielts" onclick="switchExamMode('IELTS')" class="px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm bg-white text-indigo-600">
+          IELTS
+        </button>
+        <button id="btn-mode-sat" onclick="switchExamMode('SAT')" class="px-3 py-1 rounded-lg text-xs font-bold transition text-slate-500 hover:text-slate-800">
+          SAT
+        </button>
       </div>
     </div>
 
-    <!-- QUICK METRICS -->
-    <div class="grid grid-cols-3 gap-2 py-2">
-      <div class="bg-slate-50 p-2.5 rounded-xl text-center border border-slate-100">
-        <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Books Done</p>
-        <p class="text-sm font-extrabold text-slate-700">4 / 21</p>
-      </div>
-      <div class="bg-slate-50 p-2.5 rounded-xl text-center border border-slate-100">
-        <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Avg Listening</p>
-        <p class="text-sm font-extrabold text-indigo-600">7.5</p>
-      </div>
-      <div class="bg-slate-50 p-2.5 rounded-xl text-center border border-slate-100">
-        <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Avg Reading</p>
-        <p class="text-sm font-extrabold text-emerald-600">8.0</p>
-      </div>
+    <!-- DYNAMIC USER STATS / DIAGNOSTIC BANNER -->
+    <div id="userStatsCard" class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70">
+      <!-- Generated via JS based on test history -->
     </div>
   </div>
 
   <!-- VIEW: MAIN DASHBOARD -->
-  <div id="view-home" class="p-4 space-y-5">
+  <div id="view-home" class="p-4 space-y-4">
 
-    <!-- HERO BANNER -->
-    <div class="card-gradient-1 rounded-2xl p-4 text-white shadow-lg relative overflow-hidden">
+    <!-- HERO DIAGNOSTIC PROMPT -->
+    <div id="heroBanner" class="card-gradient-ielts rounded-2xl p-4 text-white shadow-lg relative overflow-hidden">
       <div class="flex items-center justify-between mb-2">
-        <span class="bg-white/20 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Быстрый доступ</span>
-        <i class="fa-solid fa-bolt text-amber-300"></i>
+        <span id="bannerTag" class="bg-white/20 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">AI Diagnostic Test</span>
+        <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
       </div>
-      <h3 class="text-lg font-bold">Мгновенные ключи и ответы</h3>
-      <p class="text-xs text-indigo-100 mt-0.5 mb-3">Выберите книгу Кембриджа (1–21) и мгновенно откройте ответы.</p>
+      <h3 id="bannerTitle" class="text-lg font-bold">Определите ваш реальный балл</h3>
+      <p id="bannerDesc" class="text-xs text-indigo-100 mt-0.5 mb-3">Пройдите полный тест (Reading, Listening, Writing & Speaking с ИИ) для персонального анализа.</p>
       
-      <button onclick="switchTab('view-answers')" class="w-full bg-white text-indigo-600 font-bold text-xs py-2.5 px-4 rounded-xl shadow hover:bg-indigo-50 transition flex items-center justify-center gap-2">
-        <i class="fa-solid fa-key"></i> Открыть Поиск Ответов (1-21)
+      <button onclick="startDiagnosticTest()" class="w-full bg-white text-indigo-600 font-bold text-xs py-2.5 px-4 rounded-xl shadow hover:bg-indigo-50 transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-play"></i> Пройти Входной Тест
       </button>
     </div>
 
-    <!-- QUICK CATEGORIES -->
+    <!-- QUICK MODULES GRID -->
     <div>
-      <div class="flex items-center justify-between mb-2.5">
-        <h3 class="font-bold text-slate-800 text-sm">Разделы подготовки</h3>
-        <span class="text-xs text-indigo-600 font-semibold cursor-pointer" onclick="switchTab('view-books')">Все 21 Книги →</span>
+      <h3 class="font-bold text-slate-800 text-sm mb-2.5" id="sectionsHeader">Разделы подготовки IELTS</h3>
+      <div class="grid grid-cols-2 gap-3" id="mainModulesGrid">
+        <!-- Injected via JS depending on IELTS / SAT -->
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW: DIAGNOSTIC TEST RUNNER -->
+  <div id="view-diagnostic" class="p-4 space-y-4 hidden">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-lg font-extrabold text-slate-800" id="diagTitle">Диагностический Тест</h2>
+        <p class="text-xs text-slate-500">Секция 1 из 4: Reading & Listening</p>
+      </div>
+      <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1.5 rounded-xl">Отмена</button>
+    </div>
+
+    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+      <div class="border-b border-slate-100 pb-3">
+        <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">Вопрос 1 из 5</span>
+        <p class="text-sm font-bold text-slate-800 mt-1">Внимательно прочтите отрывок и выберите правильный ответ:</p>
+        <p class="text-xs text-slate-600 mt-2 italic bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+          "Recent studies in marine biology demonstrate that microplastics affect copepods by reducing their feeding rates and reproductive output..."
+        </p>
       </div>
 
-      <div class="grid grid-cols-2 gap-3">
-        <div onclick="switchTab('view-books')" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer">
-          <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base mb-2">
-            <i class="fa-solid fa-book-bookmark"></i>
-          </div>
-          <h4 class="font-bold text-slate-800 text-sm">Cambridge 1–21</h4>
-          <p class="text-[11px] text-slate-400">Все 21 книг</p>
-        </div>
-
-        <div onclick="openAnswersFor(21, 1)" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer">
-          <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-base mb-2">
-            <i class="fa-solid fa-check-double"></i>
-          </div>
-          <h4 class="font-bold text-slate-800 text-sm">Cambridge 21</h4>
-          <p class="text-[11px] text-slate-400">Релиз 2026</p>
-        </div>
-
-        <div onclick="switchTab('view-calc')" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer">
-          <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-base mb-2">
-            <i class="fa-solid fa-calculator"></i>
-          </div>
-          <h4 class="font-bold text-slate-800 text-sm">Band Calculator</h4>
-          <p class="text-[11px] text-slate-400">Перевод баллов</p>
-        </div>
-
-        <div onclick="switchTab('view-books')" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer">
-          <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-base mb-2">
-            <i class="fa-solid fa-graduation-cap"></i>
-          </div>
-          <h4 class="font-bold text-slate-800 text-sm">SAT Digital</h4>
-          <p class="text-[11px] text-slate-400">Practice Tests</p>
-        </div>
+      <div class="space-y-2">
+        <button onclick="selectDiagAnswer(this)" class="w-full text-left p-3 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:border-indigo-500 hover:bg-indigo-50/50 transition">
+          A) Microplastics increase copepod reproduction rates.
+        </button>
+        <button onclick="selectDiagAnswer(this)" class="w-full text-left p-3 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:border-indigo-500 hover:bg-indigo-50/50 transition">
+          B) Copepods consume less food when microplastics are present.
+        </button>
+        <button onclick="selectDiagAnswer(this)" class="w-full text-left p-3 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:border-indigo-500 hover:bg-indigo-50/50 transition">
+          C) Marine biology studies are currently inconclusive.
+        </button>
       </div>
+
+      <!-- AI WRITING MODULE SUBMISSION -->
+      <div class="pt-3 border-t border-slate-100">
+        <label class="text-xs font-bold text-slate-700 block mb-1"><i class="fa-solid fa-robot text-indigo-500"></i> AI Writing Assessment:</label>
+        <textarea id="aiWritingInput" rows="3" placeholder="Введите ваше эссе для ИИ-анализа..." class="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500"></textarea>
+      </div>
+
+      <button onclick="finishDiagnosticTest()" class="w-full bg-indigo-600 text-white font-bold text-xs py-3 rounded-xl shadow hover:bg-indigo-700 transition">
+        Завершить и Рассчитать Балл с ИИ
+      </button>
     </div>
   </div>
 
@@ -139,9 +134,8 @@
   <div id="view-books" class="p-4 space-y-4 hidden">
     <div>
       <h2 class="text-lg font-extrabold text-slate-800">Каталог Cambridge IELTS</h2>
-      <p class="text-xs text-slate-500">Полный список материалов с 1 по 21 книгу</p>
+      <p class="text-xs text-slate-500">Официальные материалы с 1 по 21 книгу</p>
     </div>
-
     <div class="grid grid-cols-2 gap-3" id="booksGrid"></div>
   </div>
 
@@ -181,38 +175,6 @@
     <div id="answerResults" class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3"></div>
   </div>
 
-  <!-- VIEW: BAND CALCULATOR -->
-  <div id="view-calc" class="p-4 space-y-4 hidden">
-    <div>
-      <h2 class="text-lg font-extrabold text-slate-800">IELTS Band Calculator</h2>
-      <p class="text-xs text-slate-500">Переведите количество верных ответов в балл</p>
-    </div>
-
-    <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-      <div class="flex justify-between items-center">
-        <label class="text-xs font-bold text-slate-600">Верные ответы (0-40):</label>
-        <span id="scoreValue" class="text-sm font-extrabold text-indigo-600">30 / 40</span>
-      </div>
-      <input type="range" id="scoreInput" min="0" max="40" value="30" oninput="calculateBand()" class="w-full accent-indigo-600 h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer">
-
-      <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-2xl text-center">
-        <p class="text-xs uppercase tracking-wider font-bold text-indigo-400">Ваш балл</p>
-        <p id="calculatedBand" class="text-4xl font-black text-indigo-600 my-1">7.0</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- BOOK MODAL -->
-  <div id="bookModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-end justify-center hidden">
-    <div class="bg-white w-full max-w-md rounded-t-3xl p-5 space-y-4">
-      <div class="flex items-center justify-between">
-        <h3 id="modalBookTitle" class="text-lg font-extrabold text-slate-800">Cambridge IELTS</h3>
-        <button onclick="closeBookModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-bold">✕</button>
-      </div>
-      <div class="grid grid-cols-2 gap-2.5" id="modalTestsGrid"></div>
-    </div>
-  </div>
-
   <!-- BOTTOM NAV -->
   <div class="bottom-nav fixed bottom-0 left-0 right-0 border-t border-slate-200/80 px-4 py-2 flex justify-around items-center z-40">
     <button onclick="switchTab('view-home')" id="nav-home" class="flex flex-col items-center gap-0.5 text-indigo-600 font-bold text-[10px]">
@@ -221,15 +183,11 @@
     </button>
     <button onclick="switchTab('view-books')" id="nav-books" class="flex flex-col items-center gap-0.5 text-slate-400 font-medium text-[10px]">
       <i class="fa-solid fa-book-open text-lg"></i>
-      <span>Книги (1-21)</span>
+      <span id="navBooksLabel">Книги (1-21)</span>
     </button>
     <button onclick="switchTab('view-answers')" id="nav-answers" class="flex flex-col items-center gap-0.5 text-slate-400 font-medium text-[10px]">
       <i class="fa-solid fa-key text-lg"></i>
-      <span>Ответы</span>
-    </button>
-    <button onclick="switchTab('view-calc')" id="nav-calc" class="flex flex-col items-center gap-0.5 text-slate-400 font-medium text-[10px]">
-      <i class="fa-solid fa-calculator text-lg"></i>
-      <span>Band Calc</span>
+      <span>Ключи</span>
     </button>
   </div>
 
@@ -242,6 +200,135 @@
         document.getElementById('userName').innerText = `${tg.initDataUnsafe.user.first_name}`;
         document.getElementById('userAvatar').innerText = tg.initDataUnsafe.user.first_name.charAt(0);
       }
+    }
+
+    let currentMode = 'IELTS'; // 'IELTS' or 'SAT'
+    let userDiagnosticResults = null; // Stores results after test completion
+
+    function switchExamMode(mode) {
+      currentMode = mode;
+      const btnIelts = document.getElementById('btn-mode-ielts');
+      const btnSat = document.getElementById('btn-mode-sat');
+      const heroBanner = document.getElementById('heroBanner');
+      const sectionsHeader = document.getElementById('sectionsHeader');
+
+      if (mode === 'IELTS') {
+        btnIelts.className = "px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm bg-white text-indigo-600";
+        btnSat.className = "px-3 py-1 rounded-lg text-xs font-bold transition text-slate-500 hover:text-slate-800";
+        heroBanner.className = "card-gradient-ielts rounded-2xl p-4 text-white shadow-lg relative overflow-hidden";
+        sectionsHeader.innerText = "Разделы подготовки IELTS";
+      } else {
+        btnSat.className = "px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm bg-white text-teal-600";
+        btnIelts.className = "px-3 py-1 rounded-lg text-xs font-bold transition text-slate-500 hover:text-slate-800";
+        heroBanner.className = "card-gradient-sat rounded-2xl p-4 text-white shadow-lg relative overflow-hidden";
+        sectionsHeader.innerText = "Разделы подготовки SAT Digital";
+      }
+
+      renderUserStatsCard();
+      renderMainModules();
+    }
+
+    function renderUserStatsCard() {
+      const container = document.getElementById('userStatsCard');
+      if (!userDiagnosticResults) {
+        container.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs font-bold text-slate-700">Уровень не определен</p>
+              <p class="text-[11px] text-slate-400">Пройдите входной тест для персонального разбора</p>
+            </div>
+            <button onclick="startDiagnosticTest()" class="bg-indigo-600 text-white font-bold text-[11px] px-3 py-1.5 rounded-xl shadow">
+              Тест
+            </button>
+          </div>
+        `;
+      } else {
+        if (currentMode === 'IELTS') {
+          container.innerHTML = `
+            <div class="grid grid-cols-4 gap-1.5 text-center">
+              <div class="bg-white p-2 rounded-xl border border-slate-100">
+                <p class="text-[9px] uppercase font-extrabold text-slate-400">Listening</p>
+                <p class="text-xs font-black text-indigo-600">${userDiagnosticResults.listening || '7.0'}</p>
+              </div>
+              <div class="bg-white p-2 rounded-xl border border-slate-100">
+                <p class="text-[9px] uppercase font-extrabold text-slate-400">Reading</p>
+                <p class="text-xs font-black text-emerald-600">${userDiagnosticResults.reading || '7.5'}</p>
+              </div>
+              <div class="bg-white p-2 rounded-xl border border-slate-100">
+                <p class="text-[9px] uppercase font-extrabold text-slate-400">Writing</p>
+                <p class="text-xs font-black text-amber-600">${userDiagnosticResults.writing || '6.5'}</p>
+              </div>
+              <div class="bg-white p-2 rounded-xl border border-slate-100">
+                <p class="text-[9px] uppercase font-extrabold text-slate-400">Speaking</p>
+                <p class="text-xs font-black text-purple-600">${userDiagnosticResults.speaking || '7.0'}</p>
+              </div>
+            </div>
+          `;
+        } else {
+          container.innerHTML = `
+            <div class="grid grid-cols-2 gap-2 text-center">
+              <div class="bg-white p-2 rounded-xl border border-slate-100">
+                <p class="text-[9px] uppercase font-extrabold text-slate-400">Reading & Writing</p>
+                <p class="text-xs font-black text-teal-600">680 / 800</p>
+              </div>
+              <div class="bg-white p-2 rounded-xl border border-slate-100">
+                <p class="text-[9px] uppercase font-extrabold text-slate-400">Math</p>
+                <p class="text-xs font-black text-indigo-600">720 / 800</p>
+              </div>
+            </div>
+          `;
+        }
+      }
+    }
+
+    function renderMainModules() {
+      const grid = document.getElementById('mainModulesGrid');
+      if (currentMode === 'IELTS') {
+        grid.innerHTML = `
+          <div onclick="switchTab('view-books')" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer">
+            <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base mb-2">
+              <i class="fa-solid fa-book-bookmark"></i>
+            </div>
+            <h4 class="font-bold text-slate-800 text-sm">Cambridge 1–21</h4>
+            <p class="text-[11px] text-slate-400">Практика тестов</p>
+          </div>
+          <div onclick="startDiagnosticTest()" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer">
+            <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-base mb-2">
+              <i class="fa-solid fa-pen-nib"></i>
+            </div>
+            <h4 class="font-bold text-slate-800 text-sm">AI Writing Check</h4>
+            <p class="text-[11px] text-slate-400">Проверка эссе ИИ</p>
+          </div>
+        `;
+      } else {
+        grid.innerHTML = `
+          <div onclick="startDiagnosticTest()" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer">
+            <div class="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-base mb-2">
+              <i class="fa-solid fa-calculator"></i>
+            </div>
+            <h4 class="font-bold text-slate-800 text-sm">SAT Digital Practice</h4>
+            <p class="text-[11px] text-slate-400">Модули RW & Math</p>
+          </div>
+          <div onclick="switchTab('view-answers')" class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer">
+            <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-base mb-2">
+              <i class="fa-solid fa-key"></i>
+            </div>
+            <h4 class="font-bold text-slate-800 text-sm">SAT Answer Keys</h4>
+            <p class="text-[11px] text-slate-400">Разборы решений</p>
+          </div>
+        `;
+      }
+    }
+
+    function startDiagnosticTest() {
+      switchTab('view-diagnostic');
+    }
+
+    function finishDiagnosticTest() {
+      userDiagnosticResults = { listening: '7.5', reading: '8.0', writing: '6.5', speaking: '7.0' };
+      renderUserStatsCard();
+      switchTab('view-home');
+      if (tg) tg.showAlert("Диагностика завершена! Ваши реальные результаты сохранены.");
     }
 
     function renderBooksGrid() {
@@ -258,11 +345,11 @@
 
         const card = document.createElement('div');
         card.className = 'bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between cursor-pointer';
-        card.onclick = () => openBookModal(i);
+        card.onclick = () => openAnswersFor(i, 1);
 
         card.innerHTML = `
           <div class="flex items-start justify-between mb-2">
-            <div class="w-10 h-14 bg-indigo-600 text-white rounded-lg flex items-center justify-center font-black text-xs shadow">
+            <div class="w-10 h-10 bg-indigo-600 text-white rounded-lg flex items-center justify-center font-black text-xs shadow">
               C${i}
             </div>
             ${i === 21 ? '<span class="bg-emerald-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase">New</span>' : ''}
@@ -274,29 +361,6 @@
         `;
         grid.appendChild(card);
       }
-    }
-
-    function openBookModal(bookNum) {
-      document.getElementById('modalBookTitle').innerText = `Cambridge IELTS ${bookNum}`;
-      const testsGrid = document.getElementById('modalTestsGrid');
-      testsGrid.innerHTML = '';
-
-      for (let t = 1; t <= 4; t++) {
-        const btn = document.createElement('div');
-        btn.className = 'bg-slate-50 hover:bg-indigo-50 p-3 rounded-2xl border border-slate-200/60 cursor-pointer';
-        btn.onclick = () => {
-          closeBookModal();
-          openAnswersFor(bookNum, t);
-        };
-        btn.innerHTML = `<span class="font-extrabold text-slate-800 text-sm">Test ${t}</span>`;
-        testsGrid.appendChild(btn);
-      }
-
-      document.getElementById('bookModal').classList.remove('hidden');
-    }
-
-    function closeBookModal() {
-      document.getElementById('bookModal').classList.add('hidden');
     }
 
     function openAnswersFor(book, test) {
@@ -336,28 +400,17 @@
       `;
     }
 
-    function calculateBand() {
-      const score = parseInt(document.getElementById('scoreInput').value);
-      document.getElementById('scoreValue').innerText = `${score} / 40`;
-      
-      let band = 5.0;
-      if (score >= 39) band = 9.0;
-      else if (score >= 37) band = 8.5;
-      else if (score >= 35) band = 8.0;
-      else if (score >= 32) band = 7.5;
-      else if (score >= 30) band = 7.0;
-      else if (score >= 26) band = 6.5;
-
-      document.getElementById('calculatedBand').innerText = band.toFixed(1);
-    }
-
     function switchTab(tabId) {
-      ['view-home', 'view-books', 'view-answers', 'view-calc'].forEach(t => {
-        document.getElementById(t).classList.add('hidden');
+      ['view-home', 'view-diagnostic', 'view-books', 'view-answers'].forEach(t => {
+        const el = document.getElementById(t);
+        if (el) el.classList.add('hidden');
       });
-      document.getElementById(tabId).classList.remove('hidden');
+      const target = document.getElementById(tabId);
+      if (target) target.classList.remove('hidden');
     }
 
+    // Init
+    switchExamMode('IELTS');
     renderBooksGrid();
     updateAnswerView();
   </script>
