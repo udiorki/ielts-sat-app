@@ -280,6 +280,7 @@
       }
     }
 
+   
     function launchCDTest(book, testNumber, skill='reading') {
       currentBookNum = book; 
       currentTestNum = testNumber; 
@@ -296,11 +297,25 @@
           const bookStr = String(book);
           const testStr = String(testNumber);
 
+          // Проверяем наличие данных для конкретного теста
           if (!window.CAMBRIDGE_DATA || !window.CAMBRIDGE_DATA[bookStr] || !window.CAMBRIDGE_DATA[bookStr][testStr]) {
-            alert(`Данные для Cambridge ${book} (Test ${testNumber}) пока не добавлены.`);
+            alert(`Данные для Cambridge ${book} (Test ${testNumber}) пока не добавлены в reading_data.js.`);
             switchTab('view-home');
             return;
           }
+
+          TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
+          const tabs = document.getElementById('sectionNavTabs');
+          if (tabs && TEST.passages) {
+            tabs.innerHTML = TEST.passages.map((p, i) => 
+              `<button id="pass-tab-${i+1}" onclick="switchReadingPassage(${i+1})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors">Passage ${i+1}</button>`
+            ).join('');
+          }
+          renderPalette(40); 
+          startTimer(3600); 
+          switchReadingPassage(1);
+      }
+    }
 
           TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
           const tabs = document.getElementById('sectionNavTabs');
