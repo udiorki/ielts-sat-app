@@ -404,83 +404,41 @@ function launchCDTest(book, testNumber, skill='reading') {
       const passagePane = document.getElementById('passageContent');
       const questionsPane = document.getElementById('questionsContent');
 
-      if (passageNum === 1) {
-        passagePane.innerHTML = `
-          <div class="space-y-3 leading-relaxed text-xs text-slate-800">
-            <h3 class="font-extrabold text-slate-900 text-sm">Passage 1: The Davies Sisters</h3>
-            <p>Between 1908 and 1924, Gwendoline and Margaret Davies amassed one of the largest collections of late-nineteenth and early-twentieth-century French paintings in Britain. Born into a wealthy Welsh family, the sisters inherited a substantial fortune from their grandfather, a prominent industrialist. Unlike many contemporary collectors who focused primarily on established European masters, the Davies sisters collected French Impressionist paintings at a time when such art was routinely ignored by individuals and institutions alike.</p>
-            <p>Their collection included major works by Cézanne, Monet, Renoir, and Van Gogh. During the First World War, both sisters volunteered in France, working with the Red Cross. This experience further deepened their connection to French culture, literature, and artistic expression.</p>
-            <p>Upon returning to Wales, they transformed their home, Gregynog Hall, into a cultural center. They established a printing press that became renowned for producing high-quality illustrated books. Furthermore, they hosted annual music festivals, bringing prominent musicians and composers to the Welsh countryside.</p>
-            <p>The Gwendoline and Margaret Davies collection, donated in 1951 and 1963 respectively to the National Museum Wales, contains major examples of modern art that transformed public appreciation of Impressionism in Great Britain. Their visionary approach to collecting left an enduring legacy on the cultural landscape of Wales.</p>
-            
-            <div class="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-[11px] text-slate-600">
-              <p class="font-bold text-slate-800">*** Impressionist:</p>
-              <p class="italic">An artist with a style of painting that developed in France in the late 1800s by Renoir, Monet, and others, emphasizing light and movement.</p>
-            </div>
-          </div>
-        `;
-
-        questionsPane.innerHTML = `
-          <div class="space-y-3 pb-6">
-            <div class="bg-blue-50/80 p-3 rounded-xl border border-blue-200 sticky top-0 z-10 backdrop-blur-md">
-              <h4 class="font-bold text-blue-900 text-xs">Questions 1–7</h4>
-              <p class="text-[10px] text-blue-700">Complete the notes below. Choose ONE WORD ONLY from the passage for each answer.</p>
-            </div>
-            
-            <div id="q-box-1" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-1.5">
-              <p class="text-xs font-bold text-slate-800">1. The sisters received their wealth from their <input type="text" oninput="markAnswered(1, this.value)" value="${userAnswers[1] || ''}" class="border-b-2 border-blue-500 px-1 text-blue-600 font-bold focus:outline-none w-28 text-center bg-slate-50">.</p>
-            </div>
-            <div id="q-box-2" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-1.5">
-              <p class="text-xs font-bold text-slate-800">2. French Impressionist art was largely <input type="text" oninput="markAnswered(2, this.value)" value="${userAnswers[2] || ''}" class="border-b-2 border-blue-500 px-1 text-blue-600 font-bold focus:outline-none w-28 text-center bg-slate-50"> by public institutions during that era.</p>
-            </div>
-            <div id="q-box-3" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-1.5">
-              <p class="text-xs font-bold text-slate-800">3. During the war, the sisters volunteered for the <input type="text" oninput="markAnswered(3, this.value)" value="${userAnswers[3] || ''}" class="border-b-2 border-blue-500 px-1 text-blue-600 font-bold focus:outline-none w-28 text-center bg-slate-50"> in France.</p>
-            </div>
-            <div id="q-box-4" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-1.5">
-              <p class="text-xs font-bold text-slate-800">4. Their wartime experience increased their interest in French <input type="text" oninput="markAnswered(4, this.value)" value="${userAnswers[4] || ''}" class="border-b-2 border-blue-500 px-1 text-blue-600 font-bold focus:outline-none w-28 text-center bg-slate-50"> and culture.</p>
-            </div>
-            <div id="q-box-5" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-1.5">
-              <p class="text-xs font-bold text-slate-800">5. Gregynog Hall was turned into a <input type="text" oninput="markAnswered(5, this.value)" value="${userAnswers[5] || ''}" class="border-b-2 border-blue-500 px-1 text-blue-600 font-bold focus:outline-none w-28 text-center bg-slate-50"> center after they returned.</p>
-            </div>
-            <div id="q-box-6" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-1.5">
-              <p class="text-xs font-bold text-slate-800">6. They set up a printing press to produce illustrated <input type="text" oninput="markAnswered(6, this.value)" value="${userAnswers[6] || ''}" class="border-b-2 border-blue-500 px-1 text-blue-600 font-bold focus:outline-none w-28 text-center bg-slate-50">.</p>
-            </div>
-            <div id="q-box-7" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-1.5">
-              <p class="text-xs font-bold text-slate-800">7. They organised <input type="text" oninput="markAnswered(7, this.value)" value="${userAnswers[7] || ''}" class="border-b-2 border-blue-500 px-1 text-blue-600 font-bold focus:outline-none w-28 text-center bg-slate-50"> festivals every year at their home.</p>
-            </div>
-
-            <div class="bg-blue-50/80 p-3 rounded-xl border border-blue-200 mt-6 sticky top-0 z-10 backdrop-blur-md">
-              <h4 class="font-bold text-blue-900 text-xs">Questions 8–13</h4>
-              <p class="text-[10px] text-blue-700">Do the following statements agree with the information given in Reading Passage 1?</p>
-            </div>
-
-            ${[8, 9, 10, 11, 12, 13].map(qNum => `
-            <div id="q-box-${qNum}" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2">
-              <p class="text-xs font-bold text-slate-800">${qNum}. ${
-                qNum === 8 ? "The Davies sisters bought paintings directly from Monet in France." :
-                qNum === 9 ? "Their grandfather initially disapproved of their art collection." :
-                qNum === 10 ? "The sisters' collection changed how the British public viewed Impressionist art." :
-                qNum === 11 ? "Gregynog Hall was originally built by a famous French architect." :
-                qNum === 12 ? "The National Museum Wales received the entire collection in a single donation." :
-                "Other collectors of the time preferred to buy art by established European masters."
-              }</p>
-              <select onchange="markAnswered(${qNum}, this.value)" class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none">
-                <option value="">-- Select Answer --</option>
-                <option value="TRUE" ${userAnswers[qNum] === 'TRUE' ? 'selected' : ''}>TRUE</option>
-                <option value="FALSE" ${userAnswers[qNum] === 'FALSE' ? 'selected' : ''}>FALSE</option>
-                <option value="NOT GIVEN" ${userAnswers[qNum] === 'NOT GIVEN' ? 'selected' : ''}>NOT GIVEN</option>
-              </select>
-            </div>
-            `).join('')}
-          </div>
-        `;
-      } else if (passageNum === 2) {
-        passagePane.innerHTML = `<p class="text-xs text-slate-600 p-2">Full Passage 2 content goes here...</p>`;
-        questionsPane.innerHTML = `<p class="text-xs text-slate-600 p-2">Questions 14-26 will be rendered here.</p>`;
-      } else {
-        passagePane.innerHTML = `<p class="text-xs text-slate-600 p-2">Full Passage 3 content goes here...</p>`;
-        questionsPane.innerHTML = `<p class="text-xs text-slate-600 p-2">Questions 27-40 will be rendered here.</p>`;
+      // Проверяем, загрузился ли тест
+      if (!TEST || !TEST.passages || !TEST.passages[passageNum - 1]) {
+        passagePane.innerHTML = `<p class="p-4 text-xs">Данные пассажа не найдены.</p>`;
+        return;
       }
+
+      const pData = TEST.passages[passageNum - 1];
+
+      // Отрисовка текста (с разбивкой на абзацы)
+      const textHtml = pData.passage_text.split('\n').map(para => `<p class="mb-2">${para}</p>`).join('');
+      passagePane.innerHTML = `
+        <div class="space-y-3 leading-relaxed text-xs text-slate-800 p-2">
+          <h3 class="font-extrabold text-slate-900 text-sm">Passage ${passageNum}: ${pData.title}</h3>
+          ${textHtml}
+        </div>
+      `;
+
+      // Отрисовка вопросов из базы данных
+      let qHtml = `<div class="space-y-3 pb-6">
+        <div class="bg-blue-50/80 p-3 rounded-xl border border-blue-200 sticky top-0 z-10 backdrop-blur-md">
+          <h4 class="font-bold text-blue-900 text-xs">Questions</h4>
+        </div>
+      `;
+      
+      pData.questions.forEach(q => {
+        qHtml += `
+          <div id="q-box-${q.id}" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2">
+            <p class="text-xs font-bold text-slate-800">${q.prompt}</p>
+            <input type="text" oninput="markAnswered(${q.id}, this.value)" value="${userAnswers[q.id] || ''}" placeholder="Your answer..." class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none">
+          </div>
+        `;
+      });
+      
+      qHtml += `</div>`;
+      questionsPane.innerHTML = qHtml;
     }
 
     /* FULL LISTENING PART */
