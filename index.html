@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,7 +20,6 @@
     }
     .q-badge.answered { background-color: #2563eb; color: #ffffff; border-color: #2563eb; }
     
-    /* Resizer Split Layout */
     .split-container { display: flex; flex-direction: column; height: calc(100vh - 125px); }
     .split-pane { overflow-y: auto; padding: 14px; }
     .resizer-bar {
@@ -31,14 +29,12 @@
     }
     .resizer-bar::after { content: "•••"; color: #64748b; font-size: 10px; font-weight: bold; letter-spacing: 2px; }
 
-    /* Evidence Highlight for Review Mode Only */
     .evidence-highlight { background-color: #6ee7b7; color: #064e3b; font-weight: 600; padding: 2px 4px; border-radius: 4px; position: relative; }
     .evidence-num { background-color: #047857; color: #ffffff; font-size: 9px; font-weight: bold; padding: 1px 4px; border-radius: 3px; margin-left: 3px; }
   </style>
 </head>
 <body class="pb-16">
 
-  <!-- TOP HEADER -->
   <header class="bg-white border-b border-slate-200 px-4 py-2.5 sticky top-0 z-30 shadow-sm flex items-center justify-between">
     <div class="flex items-center gap-2.5">
       <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black flex items-center justify-center text-sm shadow" id="userAvatar">S</div>
@@ -47,7 +43,6 @@
         <p class="text-[10px] text-slate-500 font-medium">Cambridge Official Dataset</p>
       </div>
     </div>
-
     <div class="flex items-center gap-2">
       <div class="flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-700 px-2 py-0.5 rounded-full text-xs font-black">
         <i class="fa-solid fa-fire text-amber-500"></i> <span>0</span>
@@ -62,10 +57,7 @@
     </div>
   </header>
 
-  <!-- DASHBOARD HOME VIEW -->
   <main id="view-home" class="p-4 space-y-4 max-w-md mx-auto">
-
-    <!-- BAND 9 COLLOCATIONS & VOCAB BANK (CLICKABLE) -->
     <div onclick="openCollocationsModal()" class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 text-white shadow-md space-y-2 cursor-pointer hover:opacity-95">
       <div class="flex items-center justify-between">
         <span class="bg-white/20 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">Band 9 Lexical Resource</span>
@@ -79,8 +71,6 @@
       </div>
       <p class="text-[10px] text-blue-100 pt-1 flex items-center gap-1 font-bold"><i class="fa-solid fa-arrow-right-long"></i> Tap to open Lexical Flashcards</p>
     </div>
-
-    <!-- VOCABULARY GAME WIDGET (RETURNED) -->
     <div onclick="openVocabGame()" class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-white shadow-md cursor-pointer hover:opacity-95">
       <div class="flex items-center justify-between mb-1">
         <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Interactive Mini-Game</span>
@@ -89,8 +79,6 @@
       <h3 class="text-sm font-black">Vocabulary Match Challenge</h3>
       <p class="text-[11px] text-emerald-100 mt-0.5">Test your Academic Word List (AWL) knowledge and earn XP!</p>
     </div>
-
-    <!-- PREDICTIONS POOL -->
     <div onclick="switchTab('view-predictions')" class="bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl p-4 text-white shadow-md cursor-pointer">
       <div class="flex items-center justify-between mb-1">
         <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Exam Predictions</span>
@@ -99,8 +87,6 @@
       <h3 class="text-sm font-black">2026 Official Cambridge Exam Pool</h3>
       <p class="text-[11px] text-purple-100 mt-0.5">Real Writing & Speaking prompts for upcoming test dates.</p>
     </div>
-
-    <!-- USER STATS -->
     <div class="grid grid-cols-3 gap-2">
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Estimated Band</p>
@@ -115,12 +101,10 @@
         <p class="text-base font-black text-slate-400" id="userAccuracy">0%</p>
       </div>
     </div>
-
     <h2 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Practice Modules</h2>
     <div class="grid grid-cols-2 gap-3" id="mainModulesGrid"></div>
   </main>
 
-  <!-- SELECT BOOK & TEST VIEW -->
   <section id="view-select-test" class="p-4 space-y-3 hidden max-w-md mx-auto">
     <div class="flex items-center justify-between">
       <div>
@@ -132,9 +116,7 @@
     <div class="space-y-3" id="testSelectionList"></div>
   </section>
 
-  <!-- TEST RUNNER VIEW -->
   <section id="view-test-runner" class="hidden flex flex-col h-screen overflow-hidden">
-    <!-- HEADER -->
     <div class="bg-slate-900 text-white px-4 py-2 flex items-center justify-between shadow-md">
       <div>
         <h2 class="text-xs font-bold text-slate-200" id="testTitle">Cambridge IELTS 21 — Test 1</h2>
@@ -147,27 +129,16 @@
         <button onclick="confirmExitTest()" class="bg-rose-600 text-white font-bold text-xs px-2.5 py-1 rounded">Exit</button>
       </div>
     </div>
-
-    <!-- SECTION NAV TABS -->
     <div class="bg-slate-100 border-b border-slate-200 px-4 py-1.5 flex gap-2 overflow-x-auto" id="sectionNavTabs"></div>
-
-    <!-- SPLIT VIEW AREA -->
     <div class="split-container" id="splitMainLayout">
-      <!-- TOP PANE: PASSAGE / TASK IMAGE -->
       <div class="split-pane bg-white" id="topPane" style="height: 50%;">
         <div id="passageContent"></div>
       </div>
-
-      <!-- RESIZER SLIDER BAR -->
       <div class="resizer-bar" id="resizerBar"></div>
-
-      <!-- BOTTOM PANE: QUESTIONS / INPUT -->
       <div class="split-pane bg-slate-50" id="bottomPane" style="height: 50%;">
         <div id="questionsContent"></div>
       </div>
     </div>
-
-    <!-- BOTTOM PALETTE -->
     <div class="bg-white border-t border-slate-200 px-4 py-2 sticky bottom-0 z-20 flex items-center justify-between gap-2 shadow-lg">
       <div class="flex items-center gap-1 overflow-x-auto py-1 max-w-[65%]" id="questionPalette"></div>
       <button onclick="submitTest()" class="bg-emerald-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-lg shadow whitespace-nowrap">
@@ -176,7 +147,6 @@
     </div>
   </section>
 
-  <!-- REVIEW VIEW (EXPLANATION & ENGNOVATE HIGHLIGHTS) -->
   <section id="view-review" class="p-4 space-y-4 hidden max-w-md mx-auto pb-20">
     <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center space-y-2">
       <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">Test Completed</span>
@@ -184,15 +154,12 @@
       <p class="text-xs text-slate-500" id="reviewScoreDetail">Score: 34 / 40</p>
       <button onclick="switchTab('view-home')" class="bg-blue-600 text-white font-bold text-xs px-4 py-2 rounded-xl mt-2 w-full">Back to Dashboard</button>
     </div>
-
     <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Passage with Answer Evidence</h3>
     <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3 text-xs leading-relaxed" id="reviewPassageHighlighted"></div>
-
     <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Detailed Answer Breakdown</h3>
     <div id="explanationsList" class="space-y-3"></div>
   </section>
 
-  <!-- PREDICTIONS VIEW -->
   <section id="view-predictions" class="p-4 space-y-3 hidden max-w-md mx-auto">
     <div class="flex justify-between items-center">
       <div>
@@ -208,7 +175,6 @@
     </div>
   </section>
 
-  <!-- BOOKS CATALOG -->
   <section id="view-books" class="p-4 space-y-3 hidden max-w-md mx-auto">
     <div>
       <h2 class="text-sm font-extrabold text-slate-800">Cambridge IELTS Complete Collection</h2>
@@ -217,8 +183,6 @@
     <div class="grid grid-cols-2 gap-2.5" id="booksGrid"></div>
   </section>
 
-  <!-- MODALS -->
-  <!-- COLLOCATIONS MODAL -->
   <div id="modalCollocations" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-md rounded-2xl p-4 space-y-3 shadow-xl">
       <div class="flex justify-between items-center border-b border-slate-100 pb-2">
@@ -230,19 +194,10 @@
           <p class="font-bold text-blue-600 text-xs">Profound impact</p>
           <p class="text-[11px] text-slate-600">A very deep or significant effect on something.</p>
         </div>
-        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-          <p class="font-bold text-blue-600 text-xs">Dwindling resources</p>
-          <p class="text-[11px] text-slate-600">Assets or natural supplies that are gradually diminishing.</p>
-        </div>
-        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-          <p class="font-bold text-blue-600 text-xs">Foster innovation</p>
-          <p class="text-[11px] text-slate-600">To encourage and promote new ideas or creative solutions.</p>
-        </div>
       </div>
     </div>
   </div>
 
-  <!-- VOCAB GAME MODAL -->
   <div id="modalVocabGame" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-md rounded-2xl p-4 space-y-4 shadow-xl text-center">
       <div class="flex justify-between items-center border-b border-slate-100 pb-2">
@@ -251,16 +206,13 @@
       </div>
       <p class="text-xs text-slate-600 font-medium">Select the correct synonym for: <span class="font-extrabold text-emerald-600" id="gameWord">Lucrative</span></p>
       <div class="grid grid-cols-2 gap-2" id="gameOptions">
-        <button onclick="checkGameAnswer(true)" class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs text-slate-700 hover:bg-emerald-50 hover:border-emerald-500">Profitable</button>
-        <button onclick="checkGameAnswer(false)" class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs text-slate-700 hover:bg-rose-50 hover:border-rose-500">Unstable</button>
-        <button onclick="checkGameAnswer(false)" class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs text-slate-700 hover:bg-rose-50 hover:border-rose-500">Complicated</button>
-        <button onclick="checkGameAnswer(false)" class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs text-slate-700 hover:bg-rose-50 hover:border-rose-500">Temporary</button>
+        <button onclick="checkGameAnswer(true)" class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs text-slate-700 hover:bg-emerald-50">Profitable</button>
+        <button onclick="checkGameAnswer(false)" class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs text-slate-700 hover:bg-rose-50">Unstable</button>
       </div>
       <p class="text-[10px] text-slate-400 font-bold" id="gameResultText"></p>
     </div>
   </div>
 
-  <!-- FOOTER NAVIGATION -->
   <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2 flex justify-around items-center z-40 max-w-md mx-auto">
     <button onclick="switchTab('view-home')" class="flex flex-col items-center gap-0.5 text-blue-600 font-bold text-[10px]">
       <i class="fa-solid fa-house text-base"></i><span>Home</span>
@@ -284,6 +236,7 @@
     let timerInterval = null;
     let userAnswers = {};
     let userXP = 150;
+    let TEST = null;
 
     function switchExamMode(mode) {
       currentMode = mode;
@@ -302,22 +255,7 @@
         <div onclick="openBookSelection('reading')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400">
           <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-book-reader"></i></div>
           <h4 class="font-bold text-slate-800 text-xs">Reading Practice</h4>
-          <p class="text-[10px] text-slate-400">Books 1–21 (Passages 1-3)</p>
-        </div>
-        <div onclick="openBookSelection('listening')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400">
-          <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-headphones"></i></div>
-          <h4 class="font-bold text-slate-800 text-xs">Listening Practice</h4>
-          <p class="text-[10px] text-slate-400">Books 1–21 (Parts 1-4)</p>
-        </div>
-        <div onclick="openBookSelection('writing')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400">
-          <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-pen-nib"></i></div>
-          <h4 class="font-bold text-slate-800 text-xs">Writing Simulator</h4>
-          <p class="text-[10px] text-slate-400">Charts, Maps & Essays</p>
-        </div>
-        <div onclick="openBookSelection('speaking')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400">
-          <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-microphone"></i></div>
-          <h4 class="font-bold text-slate-800 text-xs">Speaking AI</h4>
-          <p class="text-[10px] text-slate-400">Parts 1, 2 & 3</p>
+          <p class="text-[10px] text-slate-400">Books 1–21</p>
         </div>
       `;
     }
@@ -347,52 +285,43 @@
           </div>
           <div class="grid grid-cols-2 gap-2">
             <button onclick="launchCDTest(${book}, 1, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white">Test 1</button>
-            <button onclick="launchCDTest(${book}, 2, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white">Test 2</button>
-            <button onclick="launchCDTest(${book}, 3, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white">Test 3</button>
-            <button onclick="launchCDTest(${book}, 4, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white">Test 4</button>
           </div>
         `;
         list.appendChild(item);
       }
     }
 
-    
-function launchCDTest(book, testNumber, skill='reading') {
-  const bookStr = String(book);
-  const testStr = String(testNumber);
+    function launchCDTest(book, testNumber, skill='reading') {
+      const bookStr = String(book);
+      const testStr = String(testNumber);
 
-  if (!window.CAMBRIDGE_DATA || !window.CAMBRIDGE_DATA[bookStr] || !window.CAMBRIDGE_DATA[bookStr][testStr]) {
-    alert(`Данные для Cambridge ${book} (Test ${testNumber}) пока не добавлены.`);
-    return;
-  }
+      if (!window.CAMBRIDGE_DATA || !window.CAMBRIDGE_DATA[bookStr] || !window.CAMBRIDGE_DATA[bookStr][testStr]) {
+        alert(`Данные для Cambridge ${book} (Test ${testNumber}) пока не добавлены.`);
+        return;
+      }
 
-  TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
-  currentBookNum = book; 
-  currentTestNum = testNumber; 
-  currentPassage = 1; 
-  userAnswers = {};
+      TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
+      currentBookNum = book; 
+      currentTestNum = testNumber; 
+      userAnswers = {};
 
-  switchTab('view-test-runner');
-  
-  const titleEl = document.getElementById('testTitle');
-  if (titleEl) titleEl.textContent = `Cambridge IELTS ${book} — Test ${testNumber}`;
+      switchTab('view-test-runner');
+      
+      const titleEl = document.getElementById('testTitle');
+      if (titleEl) titleEl.textContent = `Cambridge IELTS ${book} — Test ${testNumber}`;
 
-  const tabs = document.getElementById('sectionNavTabs');
-  if (tabs && TEST.passages) {
-    tabs.innerHTML = TEST.passages.map((p, i) => 
-      `<button id="pass-tab-${i+1}" onclick="switchReadingPassage(${i+1})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Passage ${i+1}</button>`
-    ).join('');
-  }
+      const tabs = document.getElementById('sectionNavTabs');
+      if (tabs && TEST.passages) {
+        tabs.innerHTML = TEST.passages.map((p, i) => 
+          `<button id="pass-tab-${i+1}" onclick="switchReadingPassage(${i+1})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Passage ${i+1}</button>`
+        ).join('');
+      }
 
-  if (typeof renderPalette === 'function') renderPalette(40); 
-  if (typeof startTimer === 'function') startTimer(3600); 
-  if (typeof switchReadingPassage === 'function') switchReadingPassage(1);
-}
+      renderPalette(40); 
+      startTimer(3600); 
+      switchReadingPassage(1);
+    }
 
-    /* CAMBRIDGE READING PASSAGES WITH VOCABULARY GLOSSARY AT BOTTOM (ENGNOVATE EXACT STYLE) */
-    
-
-    /* CAMBRIDGE READING PASSAGES - FULL TEXT AND ALL 13 QUESTIONS */
     function switchReadingPassage(passageNum) {
       [1, 2, 3].forEach(p => {
         const btn = document.getElementById(`pass-tab-${p}`);
@@ -404,7 +333,6 @@ function launchCDTest(book, testNumber, skill='reading') {
       const passagePane = document.getElementById('passageContent');
       const questionsPane = document.getElementById('questionsContent');
 
-      // Проверяем, загрузился ли тест
       if (!TEST || !TEST.passages || !TEST.passages[passageNum - 1]) {
         passagePane.innerHTML = `<p class="p-4 text-xs">Данные пассажа не найдены.</p>`;
         return;
@@ -412,8 +340,8 @@ function launchCDTest(book, testNumber, skill='reading') {
 
       const pData = TEST.passages[passageNum - 1];
 
-      // Отрисовка текста (с разбивкой на абзацы)
-      const textHtml = pData.passage_text.split('\n').map(para => `<p class="mb-2">${para}</p>`).join('');
+      // Отрисовка текста
+      const textHtml = (pData.passage_text || "").split('\\n').map(para => `<p class="mb-2">${para}</p>`).join('');
       passagePane.innerHTML = `
         <div class="space-y-3 leading-relaxed text-xs text-slate-800 p-2">
           <h3 class="font-extrabold text-slate-900 text-sm">Passage ${passageNum}: ${pData.title}</h3>
@@ -421,7 +349,7 @@ function launchCDTest(book, testNumber, skill='reading') {
         </div>
       `;
 
-      // Отрисовка вопросов из базы данных
+      // Отрисовка вопросов 
       let qHtml = `<div class="space-y-3 pb-6">
         <div class="bg-blue-50/80 p-3 rounded-xl border border-blue-200 sticky top-0 z-10 backdrop-blur-md">
           <h4 class="font-bold text-blue-900 text-xs">Questions</h4>
@@ -441,211 +369,6 @@ function launchCDTest(book, testNumber, skill='reading') {
       questionsPane.innerHTML = qHtml;
     }
 
-    /* FULL LISTENING PART */
-    function loadListeningPart(partNum) {
-      const passagePane = document.getElementById('passageContent');
-      const questionsPane = document.getElementById('questionsContent');
-
-      passagePane.innerHTML = `
-        <div class="space-y-2">
-          <h3 class="font-bold text-slate-800 text-xs">Part ${partNum} Audio Track</h3>
-          <audio controls class="w-full">
-            <source src="#" type="audio/mpeg">
-            Audio Player Simulation
-          </audio>
-        </div>
-      `;
-
-      let startQ = (partNum - 1) * 10 + 1;
-      let endQ = partNum * 10;
-
-      let qHtml = `
-        <div class="space-y-3">
-          <div class="bg-blue-50/80 p-3 rounded-xl border border-blue-200">
-            <h4 class="font-bold text-blue-900 text-xs">Questions ${startQ}–${endQ}: Complete the notes below</h4>
-            <p class="text-[10px] text-blue-700">Write ONE WORD AND/OR A NUMBER for each answer.</p>
-          </div>
-      `;
-
-      for (let i = startQ; i <= endQ; i++) {
-        qHtml += `
-          <div id="q-box-${i}" class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5">
-            <label class="text-xs font-bold text-slate-700">Question ${i}:</label>
-            <input type="text" oninput="markAnswered(${i}, this.value)" value="${userAnswers[i] || ''}" placeholder="Type answer..." class="w-full p-2 bg-slate-50 border border-slate-300 rounded text-xs">
-          </div>
-        `;
-      }
-      qHtml += `</div>`;
-      questionsPane.innerHTML = qHtml;
-    }
-
-    /* WRITING TASK WITH ACCURATE CAMBRIDGE TASK 1 LINE CHART (ENGNOVATE SCREENSHOT MATCH) */
-    function loadWritingTaskSection(taskNum) {
-      const passagePane = document.getElementById('passageContent');
-      const questionsPane = document.getElementById('questionsContent');
-
-      if (taskNum === 1) {
-        passagePane.innerHTML = `
-          <div class="space-y-3">
-            <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">WRITING TASK 1</span>
-            <h3 class="font-extrabold text-slate-800 text-xs">Number of participants, by activity 2000–2020</h3>
-            <p class="text-xs text-slate-600">The line graph below shows participation trends in five different activities between 2000 and 2020.</p>
-            
-            <!-- ACCURATE SVG LINE GRAPH (EXACT ENGNOVATE FORMAT) -->
-            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2">
-              <svg viewBox="0 0 400 200" class="w-full h-auto bg-slate-50 rounded border border-slate-100">
-                <!-- Axes -->
-                <line x1="40" y1="20" x2="40" y2="160" stroke="#94a3b8" stroke-width="2"/>
-                <line x1="40" y1="160" x2="380" y2="160" stroke="#94a3b8" stroke-width="2"/>
-                
-                <!-- Y-Labels -->
-                <text x="15" y="30" font-size="9" fill="#64748b">70</text>
-                <text x="15" y="65" font-size="9" fill="#64748b">50</text>
-                <text x="15" y="100" font-size="9" fill="#64748b">30</text>
-                <text x="15" y="135" font-size="9" fill="#64748b">10</text>
-
-                <!-- X-Labels -->
-                <text x="50" y="175" font-size="9" fill="#64748b">2000</text>
-                <text x="130" y="175" font-size="9" fill="#64748b">2005</text>
-                <text x="210" y="175" font-size="9" fill="#64748b">2010</text>
-                <text x="290" y="175" font-size="9" fill="#64748b">2015</text>
-                <text x="350" y="175" font-size="9" fill="#64748b">2020</text>
-
-                <!-- Lines -->
-                <!-- Film club -->
-                <polyline points="50,40 130,45 210,50 290,42 350,38" fill="none" stroke="#2563eb" stroke-width="2"/>
-                <!-- Table tennis -->
-                <polyline points="50,130 130,120 210,120 290,85 350,55" fill="none" stroke="#16a34a" stroke-dasharray="4" stroke-width="2"/>
-                <!-- Martial arts -->
-                <polyline points="50,90 130,100 210,85 290,92 350,90" fill="none" stroke="#d97706" stroke-width="2"/>
-              </svg>
-              <div class="flex justify-around text-[10px] font-bold text-slate-600 pt-1">
-                <span class="text-blue-600">━ Film club</span>
-                <span class="text-emerald-600">┈ Table tennis</span>
-                <span class="text-amber-600">━ Martial arts</span>
-              </div>
-            </div>
-          </div>
-        `;
-
-        questionsPane.innerHTML = `
-          <div class="space-y-3">
-            <div class="flex items-center justify-between">
-              <label class="text-xs font-bold text-slate-800">Your Task 1 Answer:</label>
-              <span class="text-[10px] font-bold text-slate-400" id="wordCount">Words: 0</span>
-            </div>
-            <textarea id="essayInput" oninput="updateWordCount(1)" rows="8" placeholder="Enter your part 1 answer..." class="w-full text-xs p-3 bg-white border border-slate-300 rounded-xl leading-relaxed"></textarea>
-            <button onclick="evaluateWritingWithAI()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-extrabold py-2.5 rounded-xl shadow">
-              Evaluate Essay with AI
-            </button>
-            <div id="aiFeedbackResult" class="hidden space-y-3"></div>
-          </div>
-        `;
-      } else {
-        passagePane.innerHTML = `
-          <div class="space-y-2">
-            <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">WRITING TASK 2</span>
-            <h3 class="font-extrabold text-slate-800 text-xs">University Education Accessibility Essay</h3>
-            <p class="text-xs text-slate-600">Some people believe that university education should be free for all students. To what extent do you agree or disagree?</p>
-          </div>
-        `;
-
-        questionsPane.innerHTML = `
-          <div class="space-y-3">
-            <div class="flex items-center justify-between">
-              <label class="text-xs font-bold text-slate-800">Your Essay Response:</label>
-              <span class="text-[10px] font-bold text-slate-400" id="wordCount">Words: 0</span>
-            </div>
-            <textarea id="essayInput" oninput="updateWordCount(2)" rows="10" placeholder="Write your essay response here..." class="w-full text-xs p-3 bg-white border border-slate-300 rounded-xl leading-relaxed"></textarea>
-            <button onclick="evaluateWritingWithAI()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-extrabold py-2.5 rounded-xl shadow">
-              Evaluate Essay with AI
-            </button>
-            <div id="aiFeedbackResult" class="hidden space-y-3"></div>
-          </div>
-        `;
-      }
-    }
-
-    /* SPEAKING SECTION */
-    function loadSpeakingSection() {
-      const passagePane = document.getElementById('passageContent');
-      const questionsPane = document.getElementById('questionsContent');
-
-      passagePane.innerHTML = `
-        <div class="bg-white p-2 rounded-xl space-y-2">
-          <span class="bg-purple-100 text-purple-800 text-[10px] font-black px-2 py-0.5 rounded">SPEAKING PART 2 CUE CARD</span>
-          <h3 class="font-bold text-slate-800 text-xs">Describe an interesting journey you have taken.</h3>
-          <p class="text-xs text-slate-600 leading-relaxed">You should say where you went, how you traveled, and explain why this journey was particularly memorable to you.</p>
-        </div>
-      `;
-
-      questionsPane.innerHTML = `
-        <div class="space-y-3 text-center pt-4">
-          <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto text-2xl animate-pulse">
-            <i class="fa-solid fa-microphone"></i>
-          </div>
-          <p class="text-xs font-bold text-slate-700">Record your response or practice speaking aloud.</p>
-          <button class="bg-purple-600 text-white font-extrabold text-xs px-4 py-2 rounded-xl shadow">Start Audio Recording</button>
-        </div>
-      `;
-    }
-
-    function updateWordCount(taskNum) {
-      const text = document.getElementById('essayInput')?.value || '';
-      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-      document.getElementById('wordCount').innerText = `Words: ${words}`;
-      markAnswered(taskNum, text);
-    }
-
-    function evaluateWritingWithAI() {
-      const res = document.getElementById('aiFeedbackResult');
-      res.classList.remove('hidden');
-      res.innerHTML = `
-        <div class="bg-purple-50 border border-purple-200 p-3 rounded-xl space-y-2 text-xs">
-          <div class="flex items-center justify-between">
-            <span class="font-extrabold text-purple-900">Estimated Band Score: 7.0</span>
-            <span class="text-[10px] bg-purple-200 text-purple-800 font-bold px-2 py-0.5 rounded">AI Evaluated</span>
-          </div>
-          <p class="text-[10px] text-slate-600">Great structural coherence. Advanced vocabulary applied correctly.</p>
-        </div>
-      `;
-    }
-
-    /* SUBMIT TEST & SHOW REVIEW WITH ENGNOVATE HIGHLIGHTS */
-    function submitTest() {
-      clearInterval(timerInterval);
-      switchTab('view-review');
-
-      document.getElementById('userBandScore').innerText = "7.5";
-      document.getElementById('userBandScore').className = "text-base font-black text-blue-600";
-      document.getElementById('userTestsDone').innerText = "1";
-      document.getElementById('userAccuracy').innerText = "85%";
-      document.getElementById('userAccuracy').className = "text-base font-black text-emerald-600";
-
-      // HIGHLIGHTED PASSAGE FOR REVIEW (LIKE ENGNOVATE)
-      document.getElementById('reviewPassageHighlighted').innerHTML = `
-        <p>Between 1908 and 1924, Gwendoline and Margaret Davies amassed one of the largest collections of late-nineteenth and early-twentieth-century French paintings in Britain.</p>
-        <p>Born into a wealthy Welsh family, the sisters inherited a substantial fortune from their <span class="evidence-highlight">grandfather<span class="evidence-num">1</span></span>, a prominent industrialist. Unlike many contemporary collectors who focused primarily on established European masters, the sisters collected French Impressionist paintings at a time when such art was <span class="evidence-highlight">routinely ignored<span class="evidence-num">2</span></span> by individuals and institutions alike.</p>
-      `;
-
-      document.getElementById('explanationsList').innerHTML = `
-        <div class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2">
-          <div class="flex justify-between items-center">
-            <span class="font-extrabold text-xs text-slate-800">Question 1</span>
-            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">Correct: grandfather</span>
-          </div>
-          <p class="text-xs text-slate-600">Your Answer: <span class="font-bold text-slate-800">${userAnswers[1] || 'Not answered'}</span></p>
-        </div>
-        <div class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2">
-          <div class="flex justify-between items-center">
-            <span class="font-extrabold text-xs text-slate-800">Question 2</span>
-            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">Correct: ignored</span>
-          </div>
-          <p class="text-xs text-slate-600">Your Answer: <span class="font-bold text-slate-800">${userAnswers[2] || 'Not answered'}</span></p>
-        </div>
-      `;
-    }
-
     function renderPalette(total) {
       const palette = document.getElementById('questionPalette');
       palette.innerHTML = '';
@@ -655,16 +378,9 @@ function launchCDTest(book, testNumber, skill='reading') {
         btn.id = `palette-q-${i}`;
         btn.innerText = i;
         btn.onclick = () => {
-          if (currentSkill === 'reading') {
             if (i >= 1 && i <= 13) switchReadingPassage(1);
             else if (i >= 14 && i <= 26) switchReadingPassage(2);
             else if (i >= 27 && i <= 40) switchReadingPassage(3);
-          } else if (currentSkill === 'listening') {
-            if (i >= 1 && i <= 10) loadListeningPart(1);
-            else if (i >= 11 && i <= 20) loadListeningPart(2);
-            else if (i >= 21 && i <= 30) loadListeningPart(3);
-            else if (i >= 31 && i <= 40) loadListeningPart(4);
-          }
           setTimeout(() => document.getElementById(`q-box-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
         };
         palette.appendChild(btn);
@@ -700,50 +416,6 @@ function launchCDTest(book, testNumber, skill='reading') {
       }
     }
 
-    /* MODAL HELPERS */
-    function openCollocationsModal() { document.getElementById('modalCollocations').classList.remove('hidden'); }
-    function closeCollocationsModal() { document.getElementById('modalCollocations').classList.add('hidden'); }
-    
-    function openVocabGame() { 
-      document.getElementById('modalVocabGame').classList.remove('hidden'); 
-      document.getElementById('gameResultText').innerText = '';
-    }
-    function closeVocabGame() { document.getElementById('modalVocabGame').classList.add('hidden'); }
-
-    function checkGameAnswer(isCorrect) {
-      const txt = document.getElementById('gameResultText');
-      if (isCorrect) {
-        txt.innerText = "Correct! +25 XP Earned!";
-        txt.className = "text-[10px] text-emerald-600 font-bold";
-        userXP += 25;
-        document.getElementById('userXPDisplay').innerText = `${userXP} XP`;
-      } else {
-        txt.innerText = "Incorrect. Try again!";
-        txt.className = "text-[10px] text-rose-600 font-bold";
-      }
-    }
-
-    function renderBooksGrid() {
-      const grid = document.getElementById('booksGrid');
-      grid.innerHTML = '';
-      for (let i = 21; i >= 1; i--) {
-        const card = document.createElement('div');
-        card.className = 'bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer hover:border-blue-400';
-        card.onclick = () => openBookSelection('reading', i);
-        card.innerHTML = `
-          <div class="flex items-center gap-2">
-            <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-black text-xs">C${i}</span>
-            <div>
-              <h4 class="font-bold text-slate-800 text-xs">Cambridge ${i}</h4>
-              <p class="text-[10px] text-slate-400">4 Full Tests</p>
-            </div>
-          </div>
-          <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-        `;
-        grid.appendChild(card);
-      }
-    }
-
     function switchTab(tabId) {
       ['view-home', 'view-select-test', 'view-test-runner', 'view-review', 'view-books', 'view-predictions'].forEach(t => {
         document.getElementById(t)?.classList.add('hidden');
@@ -751,44 +423,13 @@ function launchCDTest(book, testNumber, skill='reading') {
       document.getElementById(tabId)?.classList.remove('hidden');
     }
 
-    /* RESIZER DRAG CONTROLLER */
-    const resizer = document.getElementById('resizerBar');
-    const topPane = document.getElementById('topPane');
-    const bottomPane = document.getElementById('bottomPane');
-    let isDragging = false;
-
-    if (resizer) {
-      resizer.addEventListener('mousedown', () => isDragging = true);
-      resizer.addEventListener('touchstart', () => isDragging = true);
-
-      window.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        const containerHeight = document.getElementById('splitMainLayout').clientHeight;
-        const topHeight = e.clientY - 100;
-        const pct = (topHeight / containerHeight) * 100;
-        if (pct > 20 && pct < 80) {
-          topPane.style.height = `${pct}%`;
-          bottomPane.style.height = `${100 - pct}%`;
-        }
-      });
-
-      window.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        const containerHeight = document.getElementById('splitMainLayout').clientHeight;
-        const topHeight = e.touches[0].clientY - 100;
-        const pct = (topHeight / containerHeight) * 100;
-        if (pct > 20 && pct < 80) {
-          topPane.style.height = `${pct}%`;
-          bottomPane.style.height = `${100 - pct}%`;
-        }
-      });
-
-      window.addEventListener('mouseup', () => isDragging = false);
-      window.addEventListener('touchend', () => isDragging = false);
-    }
+    function openCollocationsModal() { document.getElementById('modalCollocations').classList.remove('hidden'); }
+    function closeCollocationsModal() { document.getElementById('modalCollocations').classList.add('hidden'); }
+    function openVocabGame() { document.getElementById('modalVocabGame').classList.remove('hidden'); }
+    function closeVocabGame() { document.getElementById('modalVocabGame').classList.add('hidden'); }
+    function submitTest() { switchTab('view-review'); }
 
     switchExamMode('IELTS');
-    renderBooksGrid();
   </script>
 </body>
 </html>
