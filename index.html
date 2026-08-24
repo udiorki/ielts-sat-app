@@ -10,13 +10,14 @@
   <script src="reading_data.js"></script>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 0; user-select: none; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 0; user-select: none; overflow: hidden; overscroll-behavior-y: none; touch-action: none; }
     
     .q-badge {
       display: inline-flex; align-items: center; justify-content: center;
       min-width: 28px; height: 28px; padding: 0 4px;
       border: 1px solid #cbd5e1; border-radius: 6px;
       font-size: 11px; font-weight: 700; background-color: #ffffff; color: #334155; cursor: pointer;
+      transition: all 0.2s;
     }
     .q-badge.answered { background-color: #2563eb; color: #ffffff; border-color: #2563eb; }
     
@@ -28,18 +29,15 @@
       border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1;
     }
     .resizer-bar::after { content: "•••"; color: #64748b; font-size: 10px; font-weight: bold; letter-spacing: 2px; }
-
-    .evidence-highlight { background-color: #6ee7b7; color: #064e3b; font-weight: 600; padding: 2px 4px; border-radius: 4px; position: relative; }
-    .evidence-num { background-color: #047857; color: #ffffff; font-size: 9px; font-weight: bold; padding: 1px 4px; border-radius: 3px; margin-left: 3px; }
   </style>
 </head>
 <body class="pb-16">
 
   <header class="bg-white border-b border-slate-200 px-4 py-2.5 sticky top-0 z-30 shadow-sm flex items-center justify-between">
     <div class="flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black flex items-center justify-center text-sm shadow" id="userAvatar">S</div>
+      <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black flex items-center justify-center text-sm shadow">S</div>
       <div>
-        <h1 class="font-extrabold text-slate-800 text-xs leading-tight" id="userName">Student</h1>
+        <h1 class="font-extrabold text-slate-800 text-xs leading-tight">Student</h1>
         <p class="text-[10px] text-slate-500 font-medium">Cambridge Official Dataset</p>
       </div>
     </div>
@@ -48,57 +46,35 @@
         <i class="fa-solid fa-fire text-amber-500"></i> <span>0</span>
       </div>
       <div class="flex items-center gap-1 bg-purple-50 border border-purple-200 text-purple-700 px-2 py-0.5 rounded-full text-xs font-black">
-        <i class="fa-solid fa-bolt text-purple-500"></i> <span id="userXPDisplay">150 XP</span>
-      </div>
-      <div class="bg-slate-100 p-0.5 rounded-xl flex gap-0.5 border border-slate-200 ml-1">
-        <button id="btn-mode-ielts" onclick="switchExamMode('IELTS')" class="px-2 py-0.5 rounded-lg text-[11px] font-extrabold bg-white text-blue-600 shadow-sm">IELTS</button>
-        <button id="btn-mode-sat" onclick="switchExamMode('SAT')" class="px-2 py-0.5 rounded-lg text-[11px] font-extrabold text-slate-500">SAT</button>
+        <i class="fa-solid fa-bolt text-purple-500"></i> <span>150 XP</span>
       </div>
     </div>
   </header>
 
   <main id="view-home" class="p-4 space-y-4 max-w-md mx-auto">
-    <div onclick="openCollocationsModal()" class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 text-white shadow-md space-y-2 cursor-pointer hover:opacity-95">
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 text-white shadow-md space-y-2">
       <div class="flex items-center justify-between">
         <span class="bg-white/20 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">Band 9 Lexical Resource</span>
         <i class="fa-solid fa-layer-group text-amber-300 text-xs"></i>
       </div>
       <h3 class="text-xs font-black">Key Topic Collocations & Metaphors</h3>
       <div class="flex flex-wrap gap-1.5 pt-1">
-        <span class="bg-white/10 text-white text-[10px] font-semibold px-2 py-0.5 rounded border border-white/20">profound impact</span>
-        <span class="bg-white/10 text-white text-[10px] font-semibold px-2 py-0.5 rounded border border-white/20">dwindling resources</span>
-        <span class="bg-white/10 text-white text-[10px] font-semibold px-2 py-0.5 rounded border border-white/20">foster innovation</span>
+        <span class="bg-white/10 text-white text-[10px] font-semibold px-2 py-0.5 rounded border border-white/25">profound impact</span>
+        <span class="bg-white/10 text-white text-[10px] font-semibold px-2 py-0.5 rounded border border-white/25">dwindling resources</span>
       </div>
-      <p class="text-[10px] text-blue-100 pt-1 flex items-center gap-1 font-bold"><i class="fa-solid fa-arrow-right-long"></i> Tap to open Lexical Flashcards</p>
-    </div>
-    <div onclick="openVocabGame()" class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-white shadow-md cursor-pointer hover:opacity-95">
-      <div class="flex items-center justify-between mb-1">
-        <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Interactive Mini-Game</span>
-        <i class="fa-solid fa-gamepad text-emerald-200 text-xs"></i>
-      </div>
-      <h3 class="text-sm font-black">Vocabulary Match Challenge</h3>
-      <p class="text-[11px] text-emerald-100 mt-0.5">Test your Academic Word List (AWL) knowledge and earn XP!</p>
-    </div>
-    <div onclick="switchTab('view-predictions')" class="bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl p-4 text-white shadow-md cursor-pointer">
-      <div class="flex items-center justify-between mb-1">
-        <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Exam Predictions</span>
-        <i class="fa-solid fa-fire text-amber-300 text-xs"></i>
-      </div>
-      <h3 class="text-sm font-black">2026 Official Cambridge Exam Pool</h3>
-      <p class="text-[11px] text-purple-100 mt-0.5">Real Writing & Speaking prompts for upcoming test dates.</p>
     </div>
     <div class="grid grid-cols-3 gap-2">
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Estimated Band</p>
-        <p class="text-base font-black text-slate-400" id="userBandScore">--</p>
+        <p class="text-base font-black text-slate-400">--</p>
       </div>
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Tests Done</p>
-        <p class="text-base font-black text-slate-800" id="userTestsDone">0</p>
+        <p class="text-base font-black text-slate-800">0</p>
       </div>
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Accuracy</p>
-        <p class="text-base font-black text-slate-400" id="userAccuracy">0%</p>
+        <p class="text-base font-black text-slate-400">0%</p>
       </div>
     </div>
     <h2 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Practice Modules</h2>
@@ -108,7 +84,7 @@
   <section id="view-select-test" class="p-4 space-y-3 hidden max-w-md mx-auto">
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-sm font-extrabold text-slate-800" id="selectTestTitle">Cambridge Books</h2>
+        <h2 class="text-sm font-extrabold text-slate-800">Cambridge Books</h2>
         <p class="text-[11px] text-slate-500">Official Collection 1 — 21</p>
       </div>
       <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg">Back</button>
@@ -141,87 +117,18 @@
     </div>
     <div class="bg-white border-t border-slate-200 px-4 py-2 sticky bottom-0 z-20 flex items-center justify-between gap-2 shadow-lg">
       <div class="flex items-center gap-1 overflow-x-auto py-1 max-w-[65%]" id="questionPalette"></div>
-      <button onclick="submitTest()" class="bg-emerald-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-lg shadow whitespace-nowrap">
+      <button onclick="switchTab('view-home')" class="bg-emerald-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-lg shadow whitespace-nowrap">
         Submit Test
       </button>
     </div>
   </section>
 
-  <section id="view-review" class="p-4 space-y-4 hidden max-w-md mx-auto pb-20">
-    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center space-y-2">
-      <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">Test Completed</span>
-      <h2 class="text-xl font-black text-slate-800" id="reviewBandScore">Estimated Band: 7.5</h2>
-      <p class="text-xs text-slate-500" id="reviewScoreDetail">Score: 34 / 40</p>
-      <button onclick="switchTab('view-home')" class="bg-blue-600 text-white font-bold text-xs px-4 py-2 rounded-xl mt-2 w-full">Back to Dashboard</button>
-    </div>
-    <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Passage with Answer Evidence</h3>
-    <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3 text-xs leading-relaxed" id="reviewPassageHighlighted"></div>
-    <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Detailed Answer Breakdown</h3>
-    <div id="explanationsList" class="space-y-3"></div>
-  </section>
-
-  <section id="view-predictions" class="p-4 space-y-3 hidden max-w-md mx-auto">
-    <div class="flex justify-between items-center">
-      <div>
-        <h2 class="text-sm font-extrabold text-slate-800">Real Exam Predictions</h2>
-        <p class="text-[11px] text-slate-500">Upcoming exam prompts pool</p>
-      </div>
-      <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg">Back</button>
-    </div>
-    <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2">
-      <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">Writing Task 1 & 2</span>
-      <h4 class="font-bold text-slate-800 text-xs">Leaked Cambridge Recalls</h4>
-      <p class="text-[11px] text-slate-600">Charts, process diagrams, and essay questions collected from current test centers.</p>
-    </div>
-  </section>
-
-  <section id="view-books" class="p-4 space-y-3 hidden max-w-md mx-auto">
-    <div>
-      <h2 class="text-sm font-extrabold text-slate-800">Cambridge IELTS Complete Collection</h2>
-      <p class="text-[11px] text-slate-500">Books 1 to 21</p>
-    </div>
-    <div class="grid grid-cols-2 gap-2.5" id="booksGrid"></div>
-  </section>
-
-  <div id="modalCollocations" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-md rounded-2xl p-4 space-y-3 shadow-xl">
-      <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-        <h3 class="font-extrabold text-slate-800 text-sm">Band 9 Lexical Flashcards</h3>
-        <button onclick="closeCollocationsModal()" class="text-slate-400 font-bold text-sm">&times;</button>
-      </div>
-      <div class="space-y-2 max-h-80 overflow-y-auto">
-        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-          <p class="font-bold text-blue-600 text-xs">Profound impact</p>
-          <p class="text-[11px] text-slate-600">A very deep or significant effect on something.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="modalVocabGame" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-md rounded-2xl p-4 space-y-4 shadow-xl text-center">
-      <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-        <h3 class="font-extrabold text-slate-800 text-sm"><i class="fa-solid fa-gamepad text-emerald-500 mr-1"></i> AWL Vocabulary Challenge</h3>
-        <button onclick="closeVocabGame()" class="text-slate-400 font-bold text-sm">&times;</button>
-      </div>
-      <p class="text-xs text-slate-600 font-medium">Select the correct synonym for: <span class="font-extrabold text-emerald-600" id="gameWord">Lucrative</span></p>
-      <div class="grid grid-cols-2 gap-2" id="gameOptions">
-        <button onclick="checkGameAnswer(true)" class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs text-slate-700 hover:bg-emerald-50">Profitable</button>
-        <button onclick="checkGameAnswer(false)" class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs text-slate-700 hover:bg-rose-50">Unstable</button>
-      </div>
-      <p class="text-[10px] text-slate-400 font-bold" id="gameResultText"></p>
-    </div>
-  </div>
-
   <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2 flex justify-around items-center z-40 max-w-md mx-auto">
     <button onclick="switchTab('view-home')" class="flex flex-col items-center gap-0.5 text-blue-600 font-bold text-[10px]">
       <i class="fa-solid fa-house text-base"></i><span>Home</span>
     </button>
-    <button onclick="switchTab('view-books')" class="flex flex-col items-center gap-0.5 text-slate-400 font-medium text-[10px]">
-      <i class="fa-solid fa-book-open text-base"></i><span>Books 1–21</span>
-    </button>
-    <button onclick="switchTab('view-predictions')" class="flex flex-col items-center gap-0.5 text-slate-400 font-medium text-[10px]">
-      <i class="fa-solid fa-fire text-base"></i><span>Predictions</span>
+    <button onclick="switchTab('view-select-test')" class="flex flex-col items-center gap-0.5 text-slate-400 font-medium text-[10px]">
+      <i class="fa-solid fa-book-open text-base"></i><span>Books</span>
     </button>
   </nav>
 
@@ -229,50 +136,34 @@
     const tg = window.Telegram?.WebApp;
     if (tg) { tg.ready(); tg.expand(); }
 
-    let currentMode = 'IELTS';
-    let currentSkill = 'reading';
-    let currentBookNum = 21;
-    let currentTestNum = 1;
-    let timerInterval = null;
     let userAnswers = {};
-    let userXP = 150;
     let TEST = null;
-
-    function switchExamMode(mode) {
-      currentMode = mode;
-      document.getElementById('btn-mode-ielts').className = mode === 'IELTS' 
-        ? "px-2 py-0.5 rounded-lg text-[11px] font-extrabold bg-white text-blue-600 shadow-sm"
-        : "px-2 py-0.5 rounded-lg text-[11px] font-extrabold text-slate-500";
-      document.getElementById('btn-mode-sat').className = mode === 'SAT'
-        ? "px-2 py-0.5 rounded-lg text-[11px] font-extrabold bg-white text-teal-600 shadow-sm"
-        : "px-2 py-0.5 rounded-lg text-[11px] font-extrabold text-slate-500";
-      renderMainModules();
-    }
 
     function renderMainModules() {
       const grid = document.getElementById('mainModulesGrid');
       grid.innerHTML = `
-        <div onclick="openBookSelection('reading')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400">
+        <div onclick="openBookSelection('reading')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
           <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-book-reader"></i></div>
           <h4 class="font-bold text-slate-800 text-xs">Reading Practice</h4>
-          <p class="text-[10px] text-slate-400">Books 1–21</p>
+          <p class="text-[10px] text-slate-400">Books 1–21 (Passages 1-3)</p>
+        </div>
+        <div onclick="openBookSelection('listening')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-headphones"></i></div>
+          <h4 class="font-bold text-slate-800 text-xs">Listening Practice</h4>
+          <p class="text-[10px] text-slate-400">Books 1–21 (Parts 1-4)</p>
         </div>
       `;
     }
 
-    function openBookSelection(skill, filterBookNumber = null) {
-      currentSkill = skill;
+    function openBookSelection(skill) {
       switchTab('view-select-test');
-      renderTestSelectionList(filterBookNumber);
+      renderTestSelectionList();
     }
 
-    function renderTestSelectionList(filterBookNumber = null) {
+    function renderTestSelectionList() {
       const list = document.getElementById('testSelectionList');
       list.innerHTML = '';
-      let startBook = filterBookNumber || 21;
-      let endBook = filterBookNumber || 1;
-
-      for (let book = startBook; book >= endBook; book--) {
+      for (let book = 21; book >= 1; book--) {
         const item = document.createElement('div');
         item.className = 'bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2';
         item.innerHTML = `
@@ -281,44 +172,40 @@
               <span class="w-6 h-6 bg-blue-600 text-white rounded flex items-center justify-center font-black text-xs">C${book}</span>
               <h4 class="font-bold text-slate-800 text-xs">Cambridge IELTS ${book}</h4>
             </div>
-            <span class="text-[10px] bg-blue-50 text-blue-600 font-bold px-2 py-0.5 rounded uppercase">${currentSkill}</span>
+            <span class="text-[10px] bg-blue-50 text-blue-600 font-bold px-2 py-0.5 rounded uppercase">reading</span>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <button onclick="launchCDTest(${book}, 1, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white">Test 1</button>
+            <button onclick="launchCDTest(${book}, 1)" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">Test 1</button>
+            <button onclick="launchCDTest(${book}, 2)" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">Test 2</button>
           </div>
         `;
         list.appendChild(item);
       }
     }
 
-    function launchCDTest(book, testNumber, skill='reading') {
+    function launchCDTest(book, testNumber) {
+      userAnswers = {};
+      switchTab('view-test-runner');
+      
       const bookStr = String(book);
       const testStr = String(testNumber);
 
       if (!window.CAMBRIDGE_DATA || !window.CAMBRIDGE_DATA[bookStr] || !window.CAMBRIDGE_DATA[bookStr][testStr]) {
         alert(`Данные для Cambridge ${book} (Test ${testNumber}) пока не добавлены.`);
+        switchTab('view-home');
         return;
       }
 
       TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
-      currentBookNum = book; 
-      currentTestNum = testNumber; 
-      userAnswers = {};
-
-      switchTab('view-test-runner');
+      document.getElementById('testTitle').textContent = `Cambridge IELTS ${book} — Test ${testNumber}`;
       
-      const titleEl = document.getElementById('testTitle');
-      if (titleEl) titleEl.textContent = `Cambridge IELTS ${book} — Test ${testNumber}`;
-
       const tabs = document.getElementById('sectionNavTabs');
       if (tabs && TEST.passages) {
         tabs.innerHTML = TEST.passages.map((p, i) => 
-          `<button id="pass-tab-${i+1}" onclick="switchReadingPassage(${i+1})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold">Passage ${i+1}</button>`
+          `<button id="pass-tab-${i+1}" onclick="switchReadingPassage(${i+1})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors">Passage ${i+1}</button>`
         ).join('');
       }
-
       renderPalette(40); 
-      startTimer(3600); 
       switchReadingPassage(1);
     }
 
@@ -327,50 +214,105 @@
         const btn = document.getElementById(`pass-tab-${p}`);
         if (btn) btn.className = p === passageNum 
           ? "px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold"
-          : "px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold";
+          : "px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors hover:bg-slate-50";
       });
 
       const passagePane = document.getElementById('passageContent');
       const questionsPane = document.getElementById('questionsContent');
 
       if (!TEST || !TEST.passages || !TEST.passages[passageNum - 1]) {
-        passagePane.innerHTML = `<p class="p-4 text-xs">Данные пассажа не найдены.</p>`;
+        passagePane.innerHTML = `<p class="p-4 text-xs">Данные пассажа отсутствуют.</p>`;
         return;
       }
 
       const pData = TEST.passages[passageNum - 1];
 
-      // Отрисовка текста
-      const textHtml = (pData.passage_text || "").split('\\n').map(para => `<p class="mb-2">${para}</p>`).join('');
+      const textHtml = (pData.passage_text || "").split(/\n+/).map(para => {
+        if (para.match(/^[A-G]\s/)) {
+            return `<p class="mb-4 leading-relaxed"><strong class="text-base mr-2 text-slate-900">${para[0]}</strong> ${para.substring(2)}</p>`;
+        }
+        return `<p class="mb-4 leading-relaxed">${para}</p>`;
+      }).join('');
+
       passagePane.innerHTML = `
-        <div class="space-y-3 leading-relaxed text-xs text-slate-800 p-2">
-          <h3 class="font-extrabold text-slate-900 text-sm">Passage ${passageNum}: ${pData.title}</h3>
+        <div class="space-y-2 text-xs text-slate-800 p-3">
+          <h3 class="font-extrabold text-slate-900 text-sm mb-4">Passage ${passageNum}: ${pData.title}</h3>
           ${textHtml}
         </div>
       `;
 
-      // Отрисовка вопросов 
-      let qHtml = `<div class="space-y-3 pb-6">
-        <div class="bg-blue-50/80 p-3 rounded-xl border border-blue-200 sticky top-0 z-10 backdrop-blur-md">
-          <h4 class="font-bold text-blue-900 text-xs">Questions</h4>
-        </div>
-      `;
-      
+      let qHtml = `<div class="space-y-5 pb-8">`;
       pData.questions.forEach(q => {
-        qHtml += `
-          <div id="q-box-${q.id}" class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2">
-            <p class="text-xs font-bold text-slate-800">${q.prompt}</p>
-            <input type="text" oninput="markAnswered(${q.id}, this.value)" value="${userAnswers[q.id] || ''}" placeholder="Your answer..." class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none">
-          </div>
-        `;
+        if (q.type === 'instruction') {
+           qHtml += `<div class="bg-blue-50/90 p-3.5 rounded-xl border border-blue-200 sticky top-0 z-10 backdrop-blur-md shadow-sm">
+             <h4 class="font-bold text-blue-900 text-xs leading-relaxed">${q.prompt}</h4>
+           </div>`;
+           return;
+        }
+
+        qHtml += `<div id="q-box-${q.id}" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">`;
+        let promptText = q.prompt;
+
+        if (q.type === 'grid') {
+          qHtml += `<div class="text-[12px] font-medium text-slate-800 leading-relaxed mb-3">${promptText}</div>`;
+          qHtml += `<div class="overflow-x-auto"><table class="w-full text-left border-collapse bg-slate-50/50 rounded-lg"><thead><tr><th class="p-2 border-b border-slate-200"></th>`;
+          q.options.forEach(opt => {
+            qHtml += `<th class="p-2 border-b border-slate-200 text-center text-slate-600 font-extrabold w-10">${opt}</th>`;
+          });
+          qHtml += `</tr></thead><tbody>`;
+          q.sub_questions.forEach(subQ => {
+            qHtml += `<tr><td class="p-3 border-b border-slate-200 text-[12px] font-medium text-slate-700 leading-snug"><span class='border border-slate-400 bg-white px-1.5 py-0.5 rounded text-[11px] font-black mr-2 shadow-sm'>${subQ.id}</span>${subQ.text}</td>`;
+            q.options.forEach(opt => {
+              let isChecked = userAnswers[subQ.id] === opt ? 'checked' : '';
+              qHtml += `<td class="p-2 border-b border-slate-200 text-center bg-white"><input type="radio" name="q-${subQ.id}" value="${opt}" ${isChecked} onchange="markAnswered(${subQ.id}, this.value)" class="w-4 h-4 cursor-pointer accent-blue-600"></td>`;
+            });
+            qHtml += `</tr>`;
+          });
+          qHtml += `</tbody></table></div>`;
+        } else if (q.type === 'fill_in') {
+          let inputHtml = `<input type="text" oninput="markAnswered(${q.id}, this.value)" value="${userAnswers[q.id] || ''}" class="border-b-2 border-blue-500 bg-slate-50 px-2 py-0.5 text-blue-700 font-bold focus:outline-none focus:bg-blue-100 w-32 text-center mx-1 rounded-t transition-colors">`;
+          let formattedPrompt = promptText.replace(/_+/g, inputHtml);
+          qHtml += `<div class="text-[13px] font-medium text-slate-800 leading-relaxed">${formattedPrompt}</div>`;
+        } else if (q.type === 'tfng' || q.type === 'mcq') {
+          qHtml += `<div class="text-[13px] font-bold text-slate-800 leading-relaxed mb-2">${promptText}</div>`;
+          qHtml += `<div class="space-y-2 mt-2">`;
+          q.options.forEach(opt => {
+             let isChecked = userAnswers[q.id] === opt ? 'checked' : '';
+             let activeClass = isChecked ? 'bg-blue-50 border-blue-300' : 'border-slate-200 hover:bg-slate-50';
+             qHtml += `
+               <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${activeClass}" onclick="updateRadioUI(this, ${q.id}, '${opt}')">
+                 <input type="radio" name="q-${q.id}" value="${opt}" ${isChecked} class="hidden">
+                 <div class="w-4 h-4 rounded-full border border-slate-400 flex items-center justify-center ${isChecked ? 'border-blue-600' : ''}">
+                    <div class="w-2 h-2 rounded-full ${isChecked ? 'bg-blue-600' : 'bg-transparent'}"></div>
+                 </div>
+                 <span class="text-[13px] text-slate-700 font-medium">${opt}</span>
+               </label>
+             `;
+          });
+          qHtml += `</div>`;
+        }
+        qHtml += `</div>`;
       });
-      
       qHtml += `</div>`;
       questionsPane.innerHTML = qHtml;
     }
 
+    function updateRadioUI(labelElement, qId, value) {
+        markAnswered(qId, value);
+        const container = labelElement.parentElement;
+        container.querySelectorAll('label').forEach(lbl => {
+            lbl.className = 'flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors border-slate-200 hover:bg-slate-50';
+            lbl.querySelector('.w-4').className = 'w-4 h-4 rounded-full border border-slate-400 flex items-center justify-center';
+            lbl.querySelector('.w-2').className = 'w-2 h-2 rounded-full bg-transparent';
+        });
+        labelElement.className = 'flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors bg-blue-50 border-blue-300';
+        labelElement.querySelector('.w-4').className = 'w-4 h-4 rounded-full border border-blue-600 flex items-center justify-center';
+        labelElement.querySelector('.w-2').className = 'w-2 h-2 rounded-full bg-blue-600';
+    }
+
     function renderPalette(total) {
       const palette = document.getElementById('questionPalette');
+      if(!palette) return;
       palette.innerHTML = '';
       for (let i = 1; i <= total; i++) {
         const btn = document.createElement('div');
@@ -388,7 +330,7 @@
     }
 
     function markAnswered(qNum, value) {
-      if (value.trim() !== '') {
+      if (value && value.trim() !== '') {
         userAnswers[qNum] = value;
         document.getElementById(`palette-q-${qNum}`)?.classList.add('answered');
       } else {
@@ -397,39 +339,18 @@
       }
     }
 
-    function startTimer(seconds) {
-      clearInterval(timerInterval);
-      let remain = seconds;
-      timerInterval = setInterval(() => {
-        remain--;
-        const m = Math.floor(remain / 60);
-        const s = remain % 60;
-        document.getElementById('testTimer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-        if (remain <= 0) { clearInterval(timerInterval); submitTest(); }
-      }, 1000);
-    }
-
-    function confirmExitTest() {
-      if (confirm("Are you sure you want to exit? Your progress will be lost.")) {
-        clearInterval(timerInterval);
-        switchTab('view-home');
-      }
-    }
-
     function switchTab(tabId) {
-      ['view-home', 'view-select-test', 'view-test-runner', 'view-review', 'view-books', 'view-predictions'].forEach(t => {
+      ['view-home', 'view-select-test', 'view-test-runner'].forEach(t => {
         document.getElementById(t)?.classList.add('hidden');
       });
       document.getElementById(tabId)?.classList.remove('hidden');
     }
 
-    function openCollocationsModal() { document.getElementById('modalCollocations').classList.remove('hidden'); }
-    function closeCollocationsModal() { document.getElementById('modalCollocations').classList.add('hidden'); }
-    function openVocabGame() { document.getElementById('modalVocabGame').classList.remove('hidden'); }
-    function closeVocabGame() { document.getElementById('modalVocabGame').classList.add('hidden'); }
-    function submitTest() { switchTab('view-review'); }
+    function confirmExitTest() {
+      if (confirm("Exit test?")) { switchTab('view-home'); }
+    }
 
-    switchExamMode('IELTS');
+    renderMainModules();
   </script>
 </body>
 </html>
