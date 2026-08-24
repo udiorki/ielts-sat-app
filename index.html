@@ -297,7 +297,7 @@
           const testStr = String(testNumber);
 
           // Берем тест напрямую из базы без всяких условий
-          TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
+           TEST = window.CAMBRIDGE_DATA[bookStr]?.[testStr] || window.CAMBRIDGE_DATA[bookStr]?.["1"] || { passages: [] };
 
           const tabs = document.getElementById('sectionNavTabs');
           if (tabs && TEST && TEST.passages) {
