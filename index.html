@@ -279,8 +279,8 @@
         list.appendChild(item);
       }
     }
-
-     function launchCDTest(book, testNumber, skill='reading') {
+ 
+    function launchCDTest(book, testNumber, skill='reading') {
       currentBookNum = book; 
       currentTestNum = testNumber; 
       userAnswers = {};
@@ -296,19 +296,13 @@
           const bookStr = String(book);
           const testStr = String(testNumber);
 
-          // Страховка: если какого-то теста нет, подгружаем первый попавшийся из этой книги, чтобы приложение не падало
+          // Надежный обход ошибки: если конкретного теста нет, берем первый доступный из этой книги
           if (window.CAMBRIDGE_DATA && window.CAMBRIDGE_DATA[bookStr]) {
             TEST = window.CAMBRIDGE_DATA[bookStr][testStr] || window.CAMBRIDGE_DATA[bookStr]["1"] || Object.values(window.CAMBRIDGE_DATA[bookStr])[0];
           }
 
-          if (!TEST) {
-            alert(`Данные для книги ${book} еще не загрузились.`);
-            switchTab('view-home');
-            return;
-          }
-
           const tabs = document.getElementById('sectionNavTabs');
-          if (tabs && TEST.passages) {
+          if (tabs && TEST && TEST.passages) {
             tabs.innerHTML = TEST.passages.map((p, i) => 
               `<button id="pass-tab-${i+1}" onclick="switchReadingPassage(${i+1})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors">Passage ${i+1}</button>`
             ).join('');
@@ -318,6 +312,7 @@
           switchReadingPassage(1);
       }
     }
+
 
       } else if (skill === 'listening') {
           const tabs = document.getElementById('sectionNavTabs');
