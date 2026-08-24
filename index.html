@@ -279,8 +279,6 @@
         list.appendChild(item);
       }
     }
-
-   
     function launchCDTest(book, testNumber, skill='reading') {
       currentBookNum = book; 
       currentTestNum = testNumber; 
@@ -288,21 +286,25 @@
       
       switchTab('view-test-runner');
       
+      const bookStr = String(book);
+      const testStr = String(testNumber);
+
+      // Принудительно берем данные, даже если код сомневается
+      TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
+      
       const titleEl = document.getElementById('testTitle');
       if (titleEl) titleEl.textContent = `Cambridge IELTS ${book} — Test ${testNumber}`;
-      const subtitleEl = document.getElementById('testSubtitle');
-      if (subtitleEl) subtitleEl.textContent = `Academic ${skill.charAt(0).toUpperCase() + skill.slice(1)} Test`;
 
-      if (skill === 'reading') {
-          const bookStr = String(book);
-          const testStr = String(testNumber);
-
-          // Проверяем наличие данных для конкретного теста
-          if (!window.CAMBRIDGE_DATA || !window.CAMBRIDGE_DATA[bookStr] || !window.CAMBRIDGE_DATA[bookStr][testStr]) {
-            alert(`Данные для Cambridge ${book} (Test ${testNumber}) пока не добавлены в reading_data.js.`);
-            switchTab('view-home');
-            return;
-          }
+      const tabs = document.getElementById('sectionNavTabs');
+      if (tabs && TEST && TEST.passages) {
+        tabs.innerHTML = TEST.passages.map((p, i) => 
+          `<button id="pass-tab-${i+1}" onclick="switchReadingPassage(${i+1})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors">Passage ${i+1}</button>`
+        ).join('');
+      }
+      renderPalette(40); 
+      startTimer(3600); 
+      switchReadingPassage(1);
+    }
 
           TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
           const tabs = document.getElementById('sectionNavTabs');
