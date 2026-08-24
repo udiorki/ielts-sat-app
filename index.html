@@ -30,6 +30,9 @@
       border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1;
     }
     .resizer-bar::after { content: "•••"; color: #64748b; font-size: 10px; font-weight: bold; letter-spacing: 2px; }
+
+    .evidence-highlight { background-color: #6ee7b7; color: #064e3b; font-weight: 600; padding: 2px 4px; border-radius: 4px; position: relative; }
+    .evidence-num { background-color: #047857; color: #ffffff; font-size: 9px; font-weight: bold; padding: 1px 4px; border-radius: 3px; margin-left: 3px; }
   </style>
 </head>
 <body class="pb-16">
@@ -69,6 +72,14 @@
         <span class="bg-white/10 text-white text-[10px] font-semibold px-2 py-0.5 rounded border border-white/20">foster innovation</span>
       </div>
       <p class="text-[10px] text-blue-100 pt-1 flex items-center gap-1 font-bold"><i class="fa-solid fa-arrow-right-long"></i> Tap to open Lexical Flashcards</p>
+    </div>
+    <div onclick="openVocabGame()" class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-white shadow-md cursor-pointer hover:opacity-95">
+      <div class="flex items-center justify-between mb-1">
+        <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Interactive Mini-Game</span>
+        <i class="fa-solid fa-gamepad text-emerald-200 text-xs"></i>
+      </div>
+      <h3 class="text-sm font-black">Vocabulary Match Challenge</h3>
+      <p class="text-[11px] text-emerald-100 mt-0.5">Test your Academic Word List (AWL) knowledge and earn XP!</p>
     </div>
     <div onclick="switchTab('view-predictions')" class="bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl p-4 text-white shadow-md cursor-pointer">
       <div class="flex items-center justify-between mb-1">
@@ -138,6 +149,19 @@
     </div>
   </section>
 
+  <section id="view-review" class="p-4 space-y-4 hidden max-w-md mx-auto pb-20">
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center space-y-2">
+      <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">Test Completed</span>
+      <h2 class="text-xl font-black text-slate-800" id="reviewBandScore">Estimated Band: 7.5</h2>
+      <p class="text-xs text-slate-500" id="reviewScoreDetail">Score: 34 / 40</p>
+      <button onclick="switchTab('view-home')" class="bg-blue-600 text-white font-bold text-xs px-4 py-2 rounded-xl mt-2 w-full">Back to Dashboard</button>
+    </div>
+    <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Passage with Answer Evidence</h3>
+    <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-3 text-xs leading-relaxed" id="reviewPassageHighlighted"></div>
+    <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Detailed Answer Breakdown</h3>
+    <div id="explanationsList" class="space-y-3"></div>
+  </section>
+
   <section id="view-predictions" class="p-4 space-y-3 hidden max-w-md mx-auto">
     <div class="flex justify-between items-center">
       <div>
@@ -160,6 +184,34 @@
     </div>
     <div class="grid grid-cols-2 gap-2.5" id="booksGrid"></div>
   </section>
+
+  <div id="modalCollocations" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[80vh] overflow-y-auto shadow-xl">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="font-black text-slate-800 text-sm">Band 9 Collocations</h3>
+        <button onclick="closeCollocationsModal()" class="text-xs font-bold text-slate-400">Close</button>
+      </div>
+      <div class="space-y-3 text-xs" id="collocationsContent">
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+          <p class="font-bold text-blue-600">Profound impact</p>
+          <p class="text-slate-600 mt-1">Has a deep and significant effect on something.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalVocabGame" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl p-5 space-y-4 shadow-xl">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="font-black text-slate-800 text-sm">Vocabulary Match Challenge</h3>
+        <button onclick="closeVocabGame()" class="text-xs font-bold text-slate-400">Close</button>
+      </div>
+      <div class="text-center py-6 space-y-3">
+        <p class="text-xs text-slate-600">Match academic words with their definitions to earn XP!</p>
+        <button onclick="closeVocabGame()" class="bg-emerald-600 text-white font-bold text-xs px-4 py-2 rounded-xl">Start Challenge</button>
+      </div>
+    </div>
+  </div>
 
   <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2 flex justify-around items-center z-40 max-w-md mx-auto">
     <button onclick="switchTab('view-home')" class="flex flex-col items-center gap-0.5 text-blue-600 font-bold text-[10px]">
@@ -188,7 +240,6 @@
     function switchExamMode(mode) {
       currentMode = mode;
       document.getElementById('btn-mode-ielts').className = mode === 'IELTS' ? "px-2 py-0.5 rounded-lg text-[11px] font-extrabold bg-white text-blue-600 shadow-sm" : "px-2 py-0.5 rounded-lg text-[11px] font-extrabold text-slate-500";
-      document.getElementById('btn-mode-sat').className = mode === 'SAT' ? "px-2 py-0.5 rounded-lg text-[11px] font-extrabold bg-white text-teal-600 shadow-sm" : "px-2 py-0.5 rounded-lg text-[11px] font-extrabold text-slate-500";
       renderMainModules();
     }
 
@@ -269,14 +320,13 @@
           const testStr = String(testNumber);
 
           if (!window.CAMBRIDGE_DATA || !window.CAMBRIDGE_DATA[bookStr] || !window.CAMBRIDGE_DATA[bookStr][testStr]) {
-            // Фолбек: если тест 2 или другой еще не заполнили глубоко, подгружаем Test 1 чтобы приложение не падало
-            TEST = window.CAMBRIDGE_DATA[bookStr]["1"] || window.CAMBRIDGE_DATA["21"]["1"];
+            TEST = window.CAMBRIDGE_DATA[bookStr]?.["1"] || window.CAMBRIDGE_DATA["21"]["1"];
           } else {
             TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
           }
 
           const tabs = document.getElementById('sectionNavTabs');
-          if (tabs && TEST.passages) {
+          if (tabs && TEST && TEST.passages) {
             tabs.innerHTML = TEST.passages.map((p, i) => 
               `<button id="pass-tab-${i+1}" onclick="switchReadingPassage(${i+1})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors">Passage ${i+1}</button>`
             ).join('');
@@ -440,14 +490,43 @@
       }
     }
 
+    function openCollocationsModal() { document.getElementById('modalCollocations').classList.remove('hidden'); }
+    function closeCollocationsModal() { document.getElementById('modalCollocations').classList.add('hidden'); }
+    function openVocabGame() { document.getElementById('modalVocabGame').classList.remove('hidden'); }
+    function closeVocabGame() { document.getElementById('modalVocabGame').classList.add('hidden'); }
+    function submitTest() { switchTab('view-review'); }
+
     function switchTab(tabId) {
-      ['view-home', 'view-select-test', 'view-test-runner', 'view-books', 'view-predictions'].forEach(t => {
+      ['view-home', 'view-select-test', 'view-test-runner', 'view-review', 'view-books', 'view-predictions'].forEach(t => {
         document.getElementById(t)?.classList.add('hidden');
       });
       document.getElementById(tabId)?.classList.remove('hidden');
     }
 
     renderMainModules();
+    renderBooksGrid && renderBooksGrid();
+
+    function renderBooksGrid() {
+      const grid = document.getElementById('booksGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      for (let i = 21; i >= 1; i--) {
+        const card = document.createElement('div');
+        card.className = 'bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer hover:border-blue-400 transition-colors';
+        card.onclick = () => openBookSelection('reading', i);
+        card.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-black text-xs">C${i}</span>
+            <div>
+              <h4 class="font-bold text-slate-800 text-xs">Cambridge ${i}</h4>
+              <p class="text-[10px] text-slate-400">4 Full Tests</p>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+        `;
+        grid.appendChild(card);
+      }
+    }
   </script>
 </body>
 </html>
