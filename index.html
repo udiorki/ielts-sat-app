@@ -280,7 +280,7 @@
       }
     }
  
-    function launchCDTest(book, testNumber, skill='reading') {
+ function launchCDTest(book, testNumber, skill='reading') {
       currentBookNum = book; 
       currentTestNum = testNumber; 
       userAnswers = {};
@@ -296,10 +296,8 @@
           const bookStr = String(book);
           const testStr = String(testNumber);
 
-          // Надежный обход ошибки: если конкретного теста нет, берем первый доступный из этой книги
-          if (window.CAMBRIDGE_DATA && window.CAMBRIDGE_DATA[bookStr]) {
-            TEST = window.CAMBRIDGE_DATA[bookStr][testStr] || window.CAMBRIDGE_DATA[bookStr]["1"] || Object.values(window.CAMBRIDGE_DATA[bookStr])[0];
-          }
+          // Берем тест напрямую из базы без всяких условий
+          TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
 
           const tabs = document.getElementById('sectionNavTabs');
           if (tabs && TEST && TEST.passages) {
@@ -312,7 +310,6 @@
           switchReadingPassage(1);
       }
     }
-
 
       } else if (skill === 'listening') {
           const tabs = document.getElementById('sectionNavTabs');
