@@ -104,7 +104,30 @@
     </div>
     
     <h2 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Practice Modules</h2>
-    <div class="grid grid-cols-2 gap-3" id="mainModulesGrid"></div>
+    
+    <!-- ЖЕСТКО ВШИТЫЕ МОДУЛИ ДЛЯ ПРЕЗЕНТАЦИИ (Они появятся всегда!) -->
+    <div class="grid grid-cols-2 gap-3" id="mainModulesGrid">
+      <div onclick="openBookSelection('reading')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
+        <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-book-reader"></i></div>
+        <h4 class="font-bold text-slate-800 text-xs">Reading Practice</h4>
+        <p class="text-[10px] text-slate-400">Books 1–21 (Passages 1-3)</p>
+      </div>
+      <div onclick="openBookSelection('listening')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
+        <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-headphones"></i></div>
+        <h4 class="font-bold text-slate-800 text-xs">Listening Practice</h4>
+        <p class="text-[10px] text-slate-400">Books 1–21 (Parts 1-4)</p>
+      </div>
+      <div onclick="openBookSelection('writing')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
+        <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-pen-nib"></i></div>
+        <h4 class="font-bold text-slate-800 text-xs">Writing Simulator</h4>
+        <p class="text-[10px] text-slate-400">Charts, Maps & Essays</p>
+      </div>
+      <div onclick="openBookSelection('speaking')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
+        <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-microphone"></i></div>
+        <h4 class="font-bold text-slate-800 text-xs">Speaking AI</h4>
+        <p class="text-[10px] text-slate-400">Parts 1, 2 & 3</p>
+      </div>
+    </div>
   </main>
 
   <section id="view-select-test" class="p-4 space-y-3 hidden max-w-md mx-auto">
@@ -203,33 +226,6 @@
         : "px-2 py-0.5 rounded-lg text-[11px] font-extrabold text-slate-500";
     }
 
-    function renderMainModules() {
-      const grid = document.getElementById('mainModulesGrid');
-      if (!grid) return;
-      grid.innerHTML = `
-        <div onclick="openBookSelection('reading')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
-          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-book-reader"></i></div>
-          <h4 class="font-bold text-slate-800 text-xs">Reading Practice</h4>
-          <p class="text-[10px] text-slate-400">Books 1–21 (Passages 1-3)</p>
-        </div>
-        <div onclick="openBookSelection('listening')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
-          <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-headphones"></i></div>
-          <h4 class="font-bold text-slate-800 text-xs">Listening Practice</h4>
-          <p class="text-[10px] text-slate-400">Books 1–21 (Parts 1-4)</p>
-        </div>
-        <div onclick="openBookSelection('writing')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
-          <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-pen-nib"></i></div>
-          <h4 class="font-bold text-slate-800 text-xs">Writing Simulator</h4>
-          <p class="text-[10px] text-slate-400">Charts, Maps & Essays</p>
-        </div>
-        <div onclick="openBookSelection('speaking')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
-          <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-microphone"></i></div>
-          <h4 class="font-bold text-slate-800 text-xs">Speaking AI</h4>
-          <p class="text-[10px] text-slate-400">Parts 1, 2 & 3</p>
-        </div>
-      `;
-    }
-
     function openBookSelection(skill, filterBookNumber = null) {
       currentSkill = skill;
       switchTab('view-select-test');
@@ -281,20 +277,14 @@
           const bookStr = String(book);
           const testStr = String(testNumber);
 
-          TEST = null;
-          if (window.CAMBRIDGE_DATA && window.CAMBRIDGE_DATA[bookStr]) {
-            TEST = window.CAMBRIDGE_DATA[bookStr][testStr] || window.CAMBRIDGE_DATA[bookStr]["1"] || Object.values(window.CAMBRIDGE_DATA[bookStr])[0];
-          }
+          // Твой оригинальный код, где Тест 1 и Тест 2 работали 100%
+          TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
 
           const tabs = document.getElementById('sectionNavTabs');
-          if (tabs) {
-             if (TEST && TEST.passages) {
-                tabs.innerHTML = TEST.passages.map((p, i) => 
-                  `<button id="pass-tab-${i+1}" onclick="switchReadingPassage(${i+1})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors">Passage ${i+1}</button>`
-                ).join('');
-             } else {
-                tabs.innerHTML = '';
-             }
+          if (tabs && TEST && TEST.passages) {
+            tabs.innerHTML = TEST.passages.map((p, i) => 
+              `<button id="pass-tab-${i+1}" onclick="switchReadingPassage(${i+1})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors">Passage ${i+1}</button>`
+            ).join('');
           }
           renderPalette(40); 
           startTimer(3600); 
@@ -490,7 +480,7 @@
 
     function renderPalette(total) {
       const palette = document.getElementById('questionPalette');
-      if(!palette) return; // Защита от ошибки
+      if(!palette) return;
       
       palette.innerHTML = '';
       for (let i = 1; i <= total; i++) {
@@ -571,16 +561,11 @@
       }
     }
 
-    // Жесткая инициализация при загрузке
     document.addEventListener("DOMContentLoaded", () => {
-      renderMainModules();
       renderBooksGrid();
     });
     
-    // Резервная инициализация для мгновенной отрисовки
-    renderMainModules();
     renderBooksGrid();
-
   </script>
 </body>
 </html>
