@@ -8,7 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <!-- Подключение базы тестов -->
+  <!-- Подключение базы тестов Cambridge 1-21 -->
   <script src="reading_data.js"></script>
   
   <style>
@@ -34,6 +34,11 @@
     }
     .resizer-bar::after { content: "•••"; color: #64748b; font-size: 10px; font-weight: bold; letter-spacing: 2px; }
     .highlighted { background-color: #fef08a; border-radius: 2px; padding: 1px 2px; }
+    
+    @media (min-width: 768px) {
+      .split-container { flex-direction: row; }
+      .resizer-bar { width: 12px; height: auto; cursor: col-resize; border-left: 1px solid #cbd5e1; border-right: 1px solid #cbd5e1; border-top: none; border-bottom: none; }
+    }
   </style>
 </head>
 <body class="pb-16">
@@ -102,7 +107,7 @@
     <div class="grid grid-cols-3 gap-2">
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Estimated Band</p>
-        <p class="text-base font-black text-slate-400" id="statBand">--</p>
+        <p class="text-base font-black text-slate-700" id="statBand">--</p>
       </div>
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Tests Done</p>
@@ -110,7 +115,7 @@
       </div>
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Accuracy</p>
-        <p class="text-base font-black text-slate-400" id="statAccuracy">0%</p>
+        <p class="text-base font-black text-slate-700" id="statAccuracy">0%</p>
       </div>
     </div>
     
@@ -148,7 +153,7 @@
         <h2 class="text-sm font-extrabold text-slate-800">Cambridge Books</h2>
         <p class="text-[11px] text-slate-500">Official Collection 1 — 21</p>
       </div>
-      <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg">Back</button>
+      <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg hover:bg-slate-300">Back</button>
     </div>
     <div class="space-y-3" id="testSelectionList"></div>
   </section>
@@ -157,17 +162,17 @@
   <section id="view-test-runner" class="hidden flex flex-col h-screen overflow-hidden">
     <div class="bg-slate-900 text-white px-4 py-2 flex items-center justify-between shadow-md shrink-0">
       <div>
-        <h2 class="text-xs font-bold text-slate-200" id="testTitle">Cambridge IELTS 19 — Test 1</h2>
+        <h2 class="text-xs font-bold text-slate-200" id="testTitle">Cambridge IELTS 21 — Test 1</h2>
         <p class="text-[10px] text-emerald-400 font-semibold" id="testSubtitle">Academic Reading Test</p>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="highlightSelection()" class="bg-slate-800 text-amber-300 px-2 py-0.5 rounded text-xs font-bold border border-slate-700 flex items-center gap-1">
+        <button onclick="highlightSelection()" title="Highlight selected text" class="bg-slate-800 text-amber-300 px-2 py-0.5 rounded text-xs font-bold border border-slate-700 flex items-center gap-1 active:scale-95 transition-transform">
           <i class="fa-solid fa-highlighter"></i>
         </button>
         <div class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-mono font-bold px-2 py-0.5 rounded flex items-center gap-1">
           <i class="fa-regular fa-clock"></i><span id="testTimer">60:00</span>
         </div>
-        <button onclick="confirmExitTest()" class="bg-rose-600 text-white font-bold text-xs px-2.5 py-1 rounded">Exit</button>
+        <button onclick="confirmExitTest()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-2.5 py-1 rounded active:scale-95 transition-transform">Exit</button>
       </div>
     </div>
     
@@ -185,7 +190,7 @@
     
     <div class="bg-white border-t border-slate-200 px-4 py-2 sticky bottom-0 z-20 flex items-center justify-between gap-2 shadow-lg shrink-0">
       <div class="flex items-center gap-1 overflow-x-auto py-1 max-w-[65%]" id="questionPalette"></div>
-      <button onclick="submitTest()" class="bg-emerald-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-lg shadow whitespace-nowrap active:scale-95 transition-transform">
+      <button onclick="submitTest()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-3.5 py-2 rounded-lg shadow whitespace-nowrap active:scale-95 transition-transform">
         Submit Test
       </button>
     </div>
@@ -226,7 +231,7 @@
       </div>
       <div class="p-4 overflow-y-auto space-y-2 flex-1 divide-y divide-slate-100" id="resBreakdownList"></div>
       <div class="p-3 bg-slate-50 border-t border-slate-200 flex gap-2 shrink-0">
-        <button onclick="closeResultModal()" class="w-full bg-blue-600 text-white font-extrabold text-xs py-2.5 rounded-xl shadow">Finish & Back to Home</button>
+        <button onclick="closeResultModal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs py-2.5 rounded-xl shadow active:scale-95 transition-transform">Finish & Back to Home</button>
       </div>
     </div>
   </div>
@@ -247,11 +252,16 @@
   <!-- JAVASCRIPT ENGINE -->
   <script>
     const tg = window.Telegram?.WebApp;
-    if (tg) { tg.ready(); tg.expand(); }
+    if (tg) { 
+      try {
+        tg.ready(); 
+        tg.expand(); 
+      } catch(e) {}
+    }
 
     let currentMode = 'IELTS';
     let currentSkill = 'reading';
-    let currentBookNum = 19;
+    let currentBookNum = 21;
     let currentTestNum = 1;
     let timerInterval = null;
     let userAnswers = {};
@@ -278,12 +288,18 @@
 
     function switchExamMode(mode) {
       currentMode = mode;
-      document.getElementById('btn-mode-ielts').className = mode === 'IELTS' 
-        ? "px-2 py-0.5 rounded-lg text-[11px] font-extrabold bg-white text-blue-600 shadow-sm"
-        : "px-2 py-0.5 rounded-lg text-[11px] font-extrabold text-slate-500";
-      document.getElementById('btn-mode-sat').className = mode === 'SAT'
-        ? "px-2 py-0.5 rounded-lg text-[11px] font-extrabold bg-white text-teal-600 shadow-sm"
-        : "px-2 py-0.5 rounded-lg text-[11px] font-extrabold text-slate-500";
+      const btnIelts = document.getElementById('btn-mode-ielts');
+      const btnSat = document.getElementById('btn-mode-sat');
+      if (btnIelts) {
+        btnIelts.className = mode === 'IELTS' 
+          ? "px-2 py-0.5 rounded-lg text-[11px] font-extrabold bg-white text-blue-600 shadow-sm"
+          : "px-2 py-0.5 rounded-lg text-[11px] font-extrabold text-slate-500";
+      }
+      if (btnSat) {
+        btnSat.className = mode === 'SAT'
+          ? "px-2 py-0.5 rounded-lg text-[11px] font-extrabold bg-white text-teal-600 shadow-sm"
+          : "px-2 py-0.5 rounded-lg text-[11px] font-extrabold text-slate-500";
+      }
     }
 
     function openBookSelection(skill, filterBookNumber = null) {
@@ -296,8 +312,9 @@
       const list = document.getElementById('testSelectionList');
       if (!list) return;
       list.innerHTML = '';
-      let startBook = filterBookNumber || 21;
-      let endBook = filterBookNumber || 1;
+      
+      let startBook = filterBookNumber !== null ? filterBookNumber : 21;
+      let endBook = filterBookNumber !== null ? filterBookNumber : 1;
 
       for (let book = startBook; book >= endBook; book--) {
         const item = document.createElement('div');
@@ -311,10 +328,10 @@
             <span class="text-[10px] bg-blue-50 text-blue-600 font-bold px-2 py-0.5 rounded uppercase">${currentSkill}</span>
           </div>
           <div class="grid grid-cols-4 gap-1.5">
-            <button onclick="launchCDTest(${book}, 1, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">T1</button>
-            <button onclick="launchCDTest(${book}, 2, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">T2</button>
-            <button onclick="launchCDTest(${book}, 3, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">T3</button>
-            <button onclick="launchCDTest(${book}, 4, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">T4</button>
+            <button onclick="launchCDTest(${book}, 1, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors active:scale-95">T1</button>
+            <button onclick="launchCDTest(${book}, 2, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors active:scale-95">T2</button>
+            <button onclick="launchCDTest(${book}, 3, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors active:scale-95">T3</button>
+            <button onclick="launchCDTest(${book}, 4, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors active:scale-95">T4</button>
           </div>
         `;
         list.appendChild(item);
@@ -349,6 +366,7 @@
           `<button id="pass-tab-${i+1}" onclick="switchReadingPassage(${i+1})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors">Passage ${i+1}</button>`
         ).join('');
       }
+      
       renderPalette(40); 
       startTimer(3600); 
       switchReadingPassage(1);
@@ -356,11 +374,13 @@
     }
 
     function switchReadingPassage(passageNum) {
-     .forEach(p => {
+      [1, 2, 3].forEach(p => {
         const btn = document.getElementById(`pass-tab-${p}`);
-        if (btn) btn.className = p === passageNum 
-          ? "px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold"
-          : "px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors hover:bg-slate-50";
+        if (btn) {
+          btn.className = p === passageNum 
+            ? "px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold shadow-sm"
+            : "px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors hover:bg-slate-50";
+        }
       });
 
       const passagePane = document.getElementById('passageContent');
@@ -369,7 +389,7 @@
       if (!passagePane || !questionsPane) return;
 
       if (!TEST || !TEST.passages || !TEST.passages[passageNum - 1]) {
-        passagePane.innerHTML = `<p class="p-4 text-xs font-bold text-slate-600">No data found for this test.</p>`;
+        passagePane.innerHTML = `<p class="p-4 text-xs font-bold text-slate-600">No passage data found for this test.</p>`;
         questionsPane.innerHTML = '';
         return;
       }
@@ -384,7 +404,7 @@
       }).join('');
 
       passagePane.innerHTML = `
-        <div class="space-y-2 text-xs text-slate-800 p-2">
+        <div class="space-y-2 text-xs text-slate-800 p-2 select-text">
           <h3 class="font-extrabold text-slate-900 text-sm mb-3">Passage ${passageNum}: ${pData.title || ''}</h3>
           ${textHtml}
         </div>
@@ -436,11 +456,12 @@
               qHtml += `<div class="space-y-1.5 mt-2">`;
               if (q.options) {
                   q.options.forEach(opt => {
-                     let isChecked = userAnswers[q.id] === opt ? 'checked' : '';
+                     let isChecked = userAnswers[q.id] === opt;
                      let activeClass = isChecked ? 'bg-blue-50 border-blue-300' : 'border-slate-200 hover:bg-slate-50';
+                     const escapedOpt = opt.replace(/'/g, "\\'");
                      qHtml += `
-                       <label class="flex items-center gap-2.5 p-2 border rounded-lg cursor-pointer transition-colors ${activeClass}" onclick="updateRadioUI(this, ${q.id}, '${opt}')">
-                         <input type="radio" name="q-${q.id}" value="${opt}" ${isChecked} class="hidden">
+                       <label class="flex items-center gap-2.5 p-2 border rounded-lg cursor-pointer transition-colors ${activeClass}" onclick="updateRadioUI(this, ${q.id}, '${escapedOpt}')">
+                         <input type="radio" name="q-${q.id}" value="${escapedOpt}" ${isChecked ? 'checked' : ''} class="hidden">
                          <div class="w-3.5 h-3.5 rounded-full border border-slate-400 flex items-center justify-center ${isChecked ? 'border-blue-600' : ''}">
                             <div class="w-1.5 h-1.5 rounded-full ${isChecked ? 'bg-blue-600' : 'bg-transparent'}"></div>
                          </div>
@@ -463,18 +484,20 @@
         const container = labelElement.parentElement;
         container.querySelectorAll('label').forEach(lbl => {
             lbl.className = 'flex items-center gap-2.5 p-2 border rounded-lg cursor-pointer transition-colors border-slate-200 hover:bg-slate-50';
-            lbl.querySelector('.w-3\\.5')?.classList.remove('border-blue-600');
+            const outerCircle = lbl.querySelector('.w-3\\.5');
+            if (outerCircle) outerCircle.classList.remove('border-blue-600');
             const inner = lbl.querySelector('.w-1\\.5');
             if(inner) inner.className = 'w-1.5 h-1.5 rounded-full bg-transparent';
         });
         labelElement.className = 'flex items-center gap-2.5 p-2 border rounded-lg cursor-pointer transition-colors bg-blue-50 border-blue-300';
-        labelElement.querySelector('.w-3\\.5')?.classList.add('border-blue-600');
+        const activeOuter = labelElement.querySelector('.w-3\\.5');
+        if (activeOuter) activeOuter.classList.add('border-blue-600');
         const activeInner = labelElement.querySelector('.w-1\\.5');
         if(activeInner) activeInner.className = 'w-1.5 h-1.5 rounded-full bg-blue-600';
     }
 
     function markAnswered(qNum, value) {
-      if (value && String(value).trim() !== '') {
+      if (value !== undefined && value !== null && String(value).trim() !== '') {
         userAnswers[qNum] = String(value).trim();
         document.getElementById(`palette-q-${qNum}`)?.classList.add('answered');
       } else {
@@ -499,7 +522,9 @@
                 else if (i >= 14 && i <= 26) switchReadingPassage(2);
                 else if (i >= 27 && i <= 40) switchReadingPassage(3);
             }
-          setTimeout(() => document.getElementById(`q-box-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80);
+          setTimeout(() => {
+            document.getElementById(`q-box-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 120);
         };
         palette.appendChild(btn);
       }
@@ -508,12 +533,14 @@
     function highlightSelection() {
       const sel = window.getSelection();
       if (!sel.rangeCount || sel.isCollapsed) return;
-      const range = sel.getRangeAt(0);
-      const span = document.createElement('span');
-      span.className = 'highlighted';
-      range.surroundContents(span);
-      sel.removeAllRanges();
-      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+      try {
+        const range = sel.getRangeAt(0);
+        const span = document.createElement('span');
+        span.className = 'highlighted';
+        range.surroundContents(span);
+        sel.removeAllRanges();
+        if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+      } catch(e) {}
     }
 
     function initResizer() {
@@ -562,7 +589,10 @@
         const s = remain % 60;
         const timerEl = document.getElementById('testTimer');
         if (timerEl) timerEl.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-        if (remain <= 0) { clearInterval(timerInterval); submitTest(); }
+        if (remain <= 0) { 
+          clearInterval(timerInterval); 
+          submitTest(); 
+        }
       }, 1000);
     }
 
@@ -571,6 +601,30 @@
         clearInterval(timerInterval);
         switchTab('view-home');
       }
+    }
+
+    function checkAnswerCorrectness(userVal, correctVal) {
+      if (!userVal || !correctVal) return false;
+      const u = String(userVal).trim().toLowerCase();
+      const c = String(correctVal).trim().toLowerCase();
+      
+      if (u === c) return true;
+      
+      // Match single-letter choices e.g. 'A' vs 'A They accurately...'
+      if (c.length === 1 && (u.startsWith(c + ' ') || u.startsWith(c + '.') || u.startsWith(c + ')') || u === c)) {
+        return true;
+      }
+      if (u.length === 1 && (c.startsWith(u + ' ') || c.startsWith(u + '.') || c.startsWith(u + ')') || c === u)) {
+        return true;
+      }
+      
+      // Handle slash alternatives e.g. 'mining/shipping'
+      if (c.includes('/')) {
+        const alts = c.split('/').map(s => s.trim().toLowerCase());
+        if (alts.includes(u)) return true;
+      }
+      
+      return false;
     }
 
     function submitTest() {
@@ -584,23 +638,26 @@
             p.questions.forEach(q => {
               if (q.type === 'grid' && q.sub_questions) {
                 q.sub_questions.forEach(subQ => {
-                  const uAns = String(userAnswers[subQ.id] || '').trim().toLowerCase();
-                  const cAns = String(subQ.answer || q.answer || '').trim().toLowerCase();
-                  const isCorrect = uAns === cAns && uAns !== '';
+                  const correctAns = subQ.answer || q.answer || '';
+                  const userAns = userAnswers[subQ.id] || '';
+                  const isCorrect = checkAnswerCorrectness(userAns, correctAns);
                   if (isCorrect) rawScore++;
-                  breakdown.push({ id: subQ.id, user: userAnswers[subQ.id] || '(Empty)', correct: subQ.answer || q.answer, isCorrect });
+                  breakdown.push({ id: subQ.id, user: userAns || '(Empty)', correct: correctAns, isCorrect });
                 });
               } else if (q.id && !isNaN(q.id)) {
-                const uAns = String(userAnswers[q.id] || '').trim().toLowerCase();
-                const cAns = String(q.answer || '').trim().toLowerCase();
-                const isCorrect = uAns === cAns && uAns !== '';
+                const correctAns = q.answer || '';
+                const userAns = userAnswers[q.id] || '';
+                const isCorrect = checkAnswerCorrectness(userAns, correctAns);
                 if (isCorrect) rawScore++;
-                breakdown.push({ id: q.id, user: userAnswers[q.id] || '(Empty)', correct: q.answer, isCorrect });
+                breakdown.push({ id: q.id, user: userAns || '(Empty)', correct: correctAns, isCorrect });
               }
             });
           }
         });
       }
+
+      // Sort breakdown by question ID
+      breakdown.sort((a, b) => Number(a.id) - Number(b.id));
 
       const band = calculateBandScore(rawScore);
       document.getElementById('resBandScore').textContent = `Band ${band}`;
@@ -621,18 +678,21 @@
 
       // Update stats
       document.getElementById('statBand').textContent = `Band ${band}`;
-      document.getElementById('statDone').textContent = '1';
+      const prevDone = parseInt(document.getElementById('statDone').textContent || '0', 10) || 0;
+      document.getElementById('statDone').textContent = String(prevDone + 1);
       document.getElementById('statAccuracy').textContent = `${Math.round((rawScore / 40) * 100)}%`;
       document.getElementById('streakDisplay').textContent = '1';
 
       if (tg?.sendData) {
-        tg.sendData(JSON.stringify({
-          exam: "IELTS Reading",
-          book: currentBookNum,
-          test: currentTestNum,
-          rawScore: rawScore,
-          band: band
-        }));
+        try {
+          tg.sendData(JSON.stringify({
+            exam: "IELTS Reading",
+            book: currentBookNum,
+            test: currentTestNum,
+            rawScore: rawScore,
+            band: band
+          }));
+        } catch(e) {}
       }
     }
 
@@ -654,7 +714,7 @@
       grid.innerHTML = '';
       for (let i = 21; i >= 1; i--) {
         const card = document.createElement('div');
-        card.className = 'bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer hover:border-blue-400 transition-colors';
+        card.className = 'bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer hover:border-blue-400 transition-colors active:scale-95';
         card.onclick = () => openBookSelection('reading', i);
         card.innerHTML = `
           <div class="flex items-center gap-2">
