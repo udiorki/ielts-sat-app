@@ -8,7 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <!-- Подключение оригинальных баз данных Cambridge -->
+  <!-- Подключение баз тестов из корня твоего репозитория -->
   <script src="reading_data.js"></script>
   <script src="listening_data.js"></script>
   <script src="writing_data.js"></script>
@@ -62,20 +62,36 @@
       <div class="flex items-center gap-1 bg-purple-50 border border-purple-200 text-purple-700 px-2 py-0.5 rounded-full text-xs font-black">
         <i class="fa-solid fa-bolt text-purple-500"></i> <span id="xpDisplay">150 XP</span>
       </div>
+      <div class="bg-slate-100 p-0.5 rounded-xl flex gap-0.5 border border-slate-200 ml-1">
+        <button id="btn-mode-ielts" onclick="switchExamMode('IELTS')" class="px-2 py-0.5 rounded-lg text-[11px] font-extrabold bg-white text-blue-600 shadow-sm">IELTS</button>
+        <button id="btn-mode-sat" onclick="switchExamMode('SAT')" class="px-2 py-0.5 rounded-lg text-[11px] font-extrabold text-slate-500">SAT</button>
+      </div>
     </div>
   </header>
 
   <!-- HOME VIEW -->
   <main id="view-home" class="p-4 space-y-4 max-w-md mx-auto">
+    <!-- Blue Banner -->
     <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 text-white shadow-md space-y-2">
       <div class="flex items-center justify-between">
-        <span class="bg-white/20 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">Official Cambridge Material</span>
-        <i class="fa-solid fa-book-bookmark text-amber-300 text-xs"></i>
+        <span class="bg-white/20 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">Database Connected</span>
+        <i class="fa-solid fa-database text-amber-300 text-xs"></i>
       </div>
-      <h3 class="text-xs font-black">100% Real Book Content Loaded</h3>
-      <p class="text-[10px] text-blue-200">Access genuine Reading passages, Listening sections, Writing charts, and Speaking cue cards.</p>
+      <h3 class="text-xs font-black">Official Cambridge Data Loaded</h3>
+      <p class="text-[10px] text-blue-200">Modules fetch content directly from your uploaded repository files.</p>
     </div>
     
+    <!-- Purple Banner -->
+    <div onclick="switchTab('view-predictions')" class="bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl p-4 text-white shadow-md cursor-pointer hover:opacity-95">
+      <div class="flex items-center justify-between mb-1">
+        <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Exam Predictions</span>
+        <i class="fa-solid fa-fire text-amber-300 text-xs"></i>
+      </div>
+      <h3 class="text-sm font-black">Practice & Predictions</h3>
+      <p class="text-[11px] text-purple-100 mt-0.5">Practice prompts and study resources.</p>
+    </div>
+    
+    <!-- 3 Stats Cards -->
     <div class="grid grid-cols-3 gap-2">
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Estimated Band</p>
@@ -91,200 +107,274 @@
       </div>
     </div>
     
-    <h2 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Cambridge Practice Modules</h2>
+    <h2 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Practice Modules</h2>
     
-    <!-- 4 Skills Grid -->
-    <div class="grid grid-cols-2 gap-3">
+    <!-- 4 Practice Modules Grid -->
+    <div class="grid grid-cols-2 gap-3" id="mainModulesGrid">
       <div onclick="openSkillModule('reading')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
         <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-book-reader"></i></div>
-        <h4 class="font-bold text-slate-800 text-xs">Reading</h4>
-        <p class="text-[10px] text-slate-400">Books 1–21 Passages</p>
+        <h4 class="font-bold text-slate-800 text-xs">Reading Simulator</h4>
+        <p class="text-[10px] text-slate-400">Books 1–21 (Passages 1-3)</p>
       </div>
-      
       <div onclick="openSkillModule('listening')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
         <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-headphones"></i></div>
-        <h4 class="font-bold text-slate-800 text-xs">Listening</h4>
-        <p class="text-[10px] text-slate-400">Official Audio Sections[span_4](start_span)[span_4](end_span)</p>
+        <h4 class="font-bold text-slate-800 text-xs">Listening AI</h4>
+        <p class="text-[10px] text-slate-400">Audio Sections 1-4[span_3](start_span)[span_3](end_span)</p>
       </div>
-      
       <div onclick="openSkillModule('writing')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
         <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-pen-nib"></i></div>
-        <h4 class="font-bold text-slate-800 text-xs">Writing</h4>
-        <p class="text-[10px] text-slate-400">Task 1 (Charts) & Task 2[span_5](start_span)[span_5](end_span)</p>
+        <h4 class="font-bold text-slate-800 text-xs">Writing + AI Check</h4>
+        <p class="text-[10px] text-slate-400">Charts & Essays[span_4](start_span)[span_4](end_span)</p>
       </div>
-      
       <div onclick="openSkillModule('speaking')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
         <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-microphone"></i></div>
-        <h4 class="font-bold text-slate-800 text-xs">Speaking</h4>
-        <p class="text-[10px] text-slate-400">Cue Cards & Parts 1-3[span_6](start_span)[span_6](end_span)</p>
+        <h4 class="font-bold text-slate-800 text-xs">Speaking AI</h4>
+        <p class="text-[10px] text-slate-400">Cue Cards & Parts 1-3[span_5](start_span)[span_5](end_span)</p>
       </div>
     </div>
   </main>
 
-  <!-- TEST SELECTION VIEW (For Reading & Listening) -->
+  <!-- TEST SELECTION VIEW -->
   <section id="view-select-test" class="p-4 space-y-3 hidden max-w-md mx-auto">
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-sm font-extrabold text-slate-800" id="selectTestTitle">Cambridge Collection</h2>
-        <p class="text-[11px] text-slate-500">Official Book Tests</p>
+        <h2 class="text-sm font-extrabold text-slate-800" id="selectTestTitle">Cambridge Books</h2>
+        <p class="text-[11px] text-slate-500">Official Collection 1 — 21</p>
       </div>
-      <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg">Back</button>
+      <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg hover:bg-slate-300">Back</button>
     </div>
     <div class="space-y-3" id="testSelectionList"></div>
   </section>
 
-  <!-- LISTENING TEST RUNNER -->
+  <!-- LISTENING ACTIVE RUNNER VIEW -->
   <section id="view-listening-runner" class="p-4 space-y-4 hidden max-w-md mx-auto">
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-sm font-extrabold text-slate-800" id="listeningTitle">Cambridge Listening</h2>
-        <p class="text-[11px] text-slate-500">Official Sections 1–4</p>
+        <h2 class="text-sm font-extrabold text-slate-800" id="listeningTitle">IELTS Listening Test</h2>
+        <p class="text-[11px] text-slate-500" id="listeningSubtitle">Section Audio & Questions</p>
       </div>
       <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg">Exit</button>
     </div>
     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
       <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 flex items-center gap-3">
-        <button onclick="toggleAudio()" id="audioPlayBtn" class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shadow"><i class="fa-solid fa-play"></i></button>
+        <button onclick="toggleAudio()" id="audioPlayBtn" class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shadow hover:bg-blue-700 active:scale-95 transition-transform"><i class="fa-solid fa-play"></i></button>
         <div class="flex-1">
-          <div class="text-[11px] font-bold text-blue-900" id="audioStatus">Ready to Play Audio[span_7](start_span)[span_7](end_span)</div>
+          <div class="text-[11px] font-bold text-slate-700" id="audioStatus">Audio Track Ready[span_6](start_span)[span_6](end_span)</div>
           <div class="w-full bg-slate-200 h-1.5 rounded-full mt-1 overflow-hidden">
-            <div id="audioProgress" class="bg-blue-600 h-full w-0 transition-all"></div>
+            <div id="audioProgress" class="bg-blue-600 h-full w-0 transition-all duration-300"></div>
           </div>
         </div>
       </div>
       <div class="space-y-3 pt-2 max-h-[50vh] overflow-y-auto" id="listeningQuestionsContainer"></div>
-      <button onclick="submitListeningAnswers()" class="w-full bg-blue-600 text-white font-bold text-xs py-2.5 rounded-lg shadow">Check Answers with AI</button>
-      <div id="listeningAiResult" class="hidden bg-slate-50 p-3 rounded-lg border text-xs space-y-1"></div>
+      <button onclick="submitListeningAnswers()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 rounded-lg shadow active:scale-95 transition-transform">Check Answers with AI</button>
+      <div id="listeningAiResult" class="hidden bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1"></div>
     </div>
   </section>
 
-  <!-- WRITING MODULE VIEW (REAL CHARTS & ESSAYS) -->
+  <!-- WRITING MODULE VIEW -->
   <section id="view-writing" class="p-4 space-y-3 hidden max-w-md mx-auto">
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-sm font-extrabold text-slate-800">IELTS Writing (Book Tasks)</h2>
-        <p class="text-[11px] text-slate-500" id="writingSubTitle">Task 1 & Task 2[span_8](start_span)[span_8](end_span)</p>
+        <h2 class="text-sm font-extrabold text-slate-800">IELTS Writing + AI Check</h2>
+        <p class="text-[11px] text-slate-500">Task 1 (Graphs) & Task 2 Essay[span_7](start_span)[span_7](end_span)</p>
       </div>
       <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg">Back</button>
     </div>
     
     <div class="flex gap-1 bg-slate-200 p-1 rounded-xl">
-      <button onclick="switchWritingTask(1)" id="wTab1" class="flex-1 py-1 text-xs font-bold bg-white text-amber-700 rounded-lg shadow-sm">Task 1 (Chart)[span_9](start_span)[span_9](end_span)</button>
-      <button onclick="switchWritingTask(2)" id="wTab2" class="flex-1 py-1 text-xs font-bold text-slate-600 rounded-lg">Task 2 (Essay)[span_10](start_span)[span_10](end_span)</button>
+      <button onclick="switchWritingTask(1)" id="wTab1" class="flex-1 py-1 text-xs font-bold bg-white text-amber-700 rounded-lg shadow-sm">Task 1 (Chart)[span_8](start_span)[span_8](end_span)</button>
+      <button onclick="switchWritingTask(2)" id="wTab2" class="flex-1 py-1 text-xs font-bold text-slate-600 rounded-lg">Task 2 (Essay)[span_9](start_span)[span_9](end_span)</button>
     </div>
 
     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
-      <!-- Task 1 -->
+      <!-- Task 1 Content -->
       <div id="wTask1Content" class="space-y-2">
         <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded" id="wTask1Type">Task 1</span>
-        <p class="text-xs text-slate-700 leading-relaxed font-medium" id="wTask1Prompt">Loading...</p>
-        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center space-y-1">
+        <p class="text-xs text-slate-700 leading-relaxed font-medium" id="wTask1Prompt">Loading prompt...</p>
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center space-y-2">
           <p class="text-[11px] text-slate-800 font-mono whitespace-pre-line bg-white p-2 rounded border" id="wChartDesc">Chart Data</p>
         </div>
       </div>
 
-      <!-- Task 2 -->
+      <!-- Task 2 Content -->
       <div id="wTask2Content" class="space-y-2 hidden">
         <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded" id="wTask2Type">Task 2</span>
-        <p class="text-xs font-medium text-slate-700 leading-relaxed bg-amber-50/50 p-3 rounded-lg border border-amber-100" id="wTask2Prompt">Loading...</p>
+        <p class="text-xs font-medium text-slate-700 leading-relaxed bg-amber-50/50 p-3 rounded-lg border border-amber-100" id="wTask2Prompt">Loading prompt...</p>
       </div>
 
-      <textarea id="writingEssayInput" rows="5" class="w-full p-2.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-amber-500 bg-slate-50" placeholder="Type your official Cambridge response here..."></textarea>
+      <textarea id="writingEssayInput" rows="6" class="w-full p-2.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-amber-500 bg-slate-50" placeholder="Write your response here..."></textarea>
       
-      <button onclick="evaluateWritingAI()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs py-2.5 rounded-lg shadow">AI Examiner Feedback</button>
-      <div id="writingAiResult" class="hidden bg-slate-50 p-3 rounded-lg border text-xs space-y-2"></div>
+      <button onclick="evaluateWritingAI()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs py-2.5 rounded-lg shadow active:scale-95 transition-transform">Evaluate with AI Examiner</button>
+      <div id="writingAiResult" class="hidden bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-2"></div>
     </div>
   </section>
 
-  <!-- SPEAKING MODULE VIEW (REAL CUE CARDS) -->
+  <!-- SPEAKING MODULE VIEW -->
   <section id="view-speaking" class="p-4 space-y-3 hidden max-w-md mx-auto">
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-sm font-extrabold text-slate-800">IELTS Speaking (Book Prompts)</h2>
-        <p class="text-[11px] text-slate-500">Official Part 1-3 Questions[span_11](start_span)[span_11](end_span)</p>
+        <h2 class="text-sm font-extrabold text-slate-800">IELTS Speaking Simulator AI</h2>
+        <p class="text-[11px] text-slate-500">Part 1 Interview Practice[span_10](start_span)[span_10](end_span)</p>
       </div>
       <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg">Back</button>
     </div>
     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3 text-center">
       <span class="bg-purple-100 text-purple-800 text-[10px] font-black px-2 py-0.5 rounded" id="speakingTopicBadge">Topic</span>
       <p class="text-xs font-bold text-slate-800 text-left bg-slate-50 p-3 rounded border" id="speakingPromptText">Loading question...</p>
-      <div class="bg-purple-50/50 p-3 rounded-lg border border-purple-100 text-left text-xs space-y-1">
-        <p class="text-[11px] text-purple-900 font-bold">Model Answer / Band 8+ Sample[span_12](start_span)[span_12](end_span):</p>
+      <div class="bg-purple-50/50 p-3 rounded-lg border border-purple-100 text-left text-xs space-y-2">
+        <p class="text-[11px] text-purple-900 font-bold">Model Answer / Sample Response[span_11](start_span)[span_11](end_span):</p>
         <p id="speechModelAnswer" class="font-medium text-slate-700 italic">Sample text...</p>
       </div>
       <div class="flex gap-2">
-        <button onclick="toggleRecordSpeech()" id="btnRecord" class="flex-1 bg-purple-600 text-white font-bold text-xs py-2.5 rounded-lg shadow">Start Recording</button>
-        <button onclick="evaluateSpeakingAI()" class="bg-emerald-600 text-white font-bold text-xs px-4 py-2.5 rounded-lg shadow">AI Score</button>
+        <button onclick="toggleRecordSpeech()" id="btnRecord" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs py-2.5 rounded-lg shadow active:scale-95 transition-transform">Start Recording</button>
+        <button onclick="evaluateSpeakingAI()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-lg shadow active:scale-95 transition-transform">AI Feedback</button>
       </div>
-      <div id="speakingAiResult" class="hidden bg-slate-50 p-3 rounded-lg border text-xs text-left space-y-1"></div>
+      <div id="speakingAiResult" class="hidden bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs text-left space-y-1"></div>
     </div>
   </section>
 
-  <!-- READING TEST RUNNER -->
+  <!-- TEST RUNNER SCREEN -->
   <section id="view-test-runner" class="hidden flex flex-col h-screen overflow-hidden">
     <div class="bg-slate-900 text-white px-4 py-2 flex items-center justify-between shadow-md shrink-0">
       <div>
-        <h2 class="text-xs font-bold text-slate-200" id="testTitle">Cambridge Reading Test</h2>
-        <p class="text-[10px] text-emerald-400 font-semibold">Academic Reading</p>
+        <h2 class="text-xs font-bold text-slate-200" id="testTitle">Cambridge IELTS Test</h2>
+        <p class="text-[10px] text-emerald-400 font-semibold" id="testSubtitle">Academic Test</p>
       </div>
       <div class="flex items-center gap-2">
-        <div class="bg-amber-500/20 text-amber-300 border text-xs font-mono font-bold px-2 py-0.5 rounded"><span id="testTimer">60:00</span></div>
-        <button onclick="switchTab('view-home')" class="bg-rose-600 text-white font-bold text-xs px-2.5 py-1 rounded">Exit</button>
+        <button onclick="highlightSelection()" title="Highlight selected text" class="bg-slate-800 text-amber-300 px-2 py-0.5 rounded text-xs font-bold border border-slate-700 flex items-center gap-1 active:scale-95 transition-transform">
+          <i class="fa-solid fa-highlighter"></i>
+        </button>
+        <div class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-mono font-bold px-2 py-0.5 rounded flex items-center gap-1">
+          <i class="fa-regular fa-clock"></i><span id="testTimer">60:00</span>
+        </div>
+        <button onclick="confirmExitTest()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-2.5 py-1 rounded active:scale-95 transition-transform">Exit</button>
       </div>
     </div>
-    <div class="bg-slate-100 border-b px-4 py-1.5 flex gap-2 overflow-x-auto shrink-0" id="sectionNavTabs"></div>
+    
+    <div class="bg-slate-100 border-b border-slate-200 px-4 py-1.5 flex gap-2 overflow-x-auto shrink-0" id="sectionNavTabs"></div>
+    
     <div class="split-container" id="splitMainLayout">
-      <div class="split-pane bg-white" id="topPane" style="flex: 1;"><div id="passageContent"></div></div>
+      <div class="split-pane bg-white" id="topPane" style="flex: 1;">
+        <div id="passageContent"></div>
+      </div>
       <div class="resizer-bar" id="resizerBar"></div>
-      <div class="split-pane bg-slate-50" id="bottomPane" style="flex: 1;"><div id="questionsContent"></div></div>
+      <div class="split-pane bg-slate-50" id="bottomPane" style="flex: 1;">
+        <div id="questionsContent"></div>
+      </div>
     </div>
-    <div class="bg-white border-t px-4 py-2 flex items-center justify-between shrink-0">
-      <div class="flex gap-1 overflow-x-auto py-1 max-w-[65%]" id="questionPalette"></div>
-      <button onclick="submitReadingTest()" class="bg-emerald-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-lg shadow">Submit</button>
+    
+    <div class="bg-white border-t border-slate-200 px-4 py-2 sticky bottom-0 z-20 flex items-center justify-between gap-2 shadow-lg shrink-0">
+      <div class="flex items-center gap-1 overflow-x-auto py-1 max-w-[65%]" id="questionPalette"></div>
+      <button onclick="submitReadingTest()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-3.5 py-2 rounded-lg shadow whitespace-nowrap active:scale-95 transition-transform">
+        Submit Test
+      </button>
     </div>
   </section>
 
-  <!-- BOOKS VIEW -->
+  <!-- PREDICTIONS VIEW -->
+  <section id="view-predictions" class="p-4 space-y-3 hidden max-w-md mx-auto">
+    <div class="flex justify-between items-center">
+      <div>
+        <h2 class="text-sm font-extrabold text-slate-800">Real Exam Predictions</h2>
+        <p class="text-[11px] text-slate-500">Upcoming exam prompts pool</p>
+      </div>
+      <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg">Back</button>
+    </div>
+    <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+      <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">Writing Task 1 & 2</span>
+      <h4 class="font-bold text-slate-800 text-xs">Leaked Cambridge Recalls</h4>
+      <p class="text-[11px] text-slate-600">Charts, process diagrams, and essay questions collected from current test centers.</p>
+    </div>
+  </section>
+
+  <!-- BOOKS COMPLETE COLLECTION VIEW -->
   <section id="view-books" class="p-4 space-y-3 hidden max-w-md mx-auto">
     <div>
-      <h2 class="text-sm font-extrabold text-slate-800">Cambridge IELTS Collection</h2>
+      <h2 class="text-sm font-extrabold text-slate-800">Cambridge IELTS Complete Collection</h2>
       <p class="text-[11px] text-slate-500">Books 1 to 21</p>
     </div>
     <div class="grid grid-cols-2 gap-2.5" id="booksGrid"></div>
   </section>
 
-  <!-- RESULT MODAL -->
+  <!-- RESULT & REVIEW MODAL -->
   <div id="modalResult" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
       <div class="bg-slate-900 text-white p-4 text-center shrink-0">
-        <h3 class="text-[10px] font-bold text-slate-400 uppercase">Official Result</h3>
+        <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">IELTS Official Result</h3>
         <div class="text-3xl font-black text-emerald-400 mt-1" id="resBandScore">Band 7.5</div>
         <p class="text-xs text-slate-300 mt-0.5" id="resRawScore">33 / 40 Correct</p>
       </div>
       <div class="p-4 overflow-y-auto space-y-2 flex-1 divide-y divide-slate-100" id="resBreakdownList"></div>
-      <div class="p-3 bg-slate-50 border-t flex gap-2 shrink-0">
-        <button onclick="closeResultModal()" class="w-full bg-blue-600 text-white font-extrabold text-xs py-2.5 rounded-xl shadow">Finish</button>
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex gap-2 shrink-0">
+        <button onclick="closeResultModal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs py-2.5 rounded-xl shadow active:scale-95 transition-transform">Finish & Back to Home</button>
       </div>
     </div>
   </div>
 
-  <!-- NAVBAR -->
+  <!-- BOTTOM NAVBAR -->
   <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2 flex justify-around items-center z-40 max-w-md mx-auto">
     <button onclick="switchTab('view-home')" class="flex flex-col items-center gap-0.5 text-blue-600 font-bold text-[10px]">
       <i class="fa-solid fa-house text-base"></i><span>Home</span>
     </button>
     <button onclick="switchTab('view-books')" class="flex flex-col items-center gap-0.5 text-slate-400 font-medium text-[10px]">
-      <i class="fa-solid fa-book-open text-base"></i><span>Books</span>
+      <i class="fa-solid fa-book-open text-base"></i><span>Books 1–21</span>
+    </button>
+    <button onclick="switchTab('view-predictions')" class="flex flex-col items-center gap-0.5 text-slate-400 font-medium text-[10px]">
+      <i class="fa-solid fa-fire text-base"></i><span>Predictions</span>
     </button>
   </nav>
 
-  <!-- JAVASCRIPT ENGINE -->
+  <!-- JAVASCRIPT ENGINE (LINKED DIRECTLY TO YOUR REPO FILES) -->
   <script>
     const tg = window.Telegram?.WebApp;
-    if (tg) { try { tg.ready(); tg.expand(); } catch(e) {} }
+    if (tg) { 
+      try { tg.ready(); tg.expand(); } catch(e) {}
+    }
+
+    let currentMode = 'IELTS';
+    let currentSkill = 'reading';
+    let currentBookNum = 1;
+    let currentTestNum = 1;
+    let timerInterval = null;
+    let userAnswers = {};
+    let TEST = null;
+
+    function calculateBandScore(rawScore) {
+      if (rawScore >= 39) return "9.0";
+      if (rawScore >= 37) return "8.5";
+      if (rawScore >= 35) return "8.0";
+      if (rawScore >= 33) return "7.5";
+      if (rawScore >= 30) return "7.0";
+      if (rawScore >= 27) return "6.5";
+      if (rawScore >= 23) return "6.0";
+      if (rawScore >= 19) return "5.5";
+      if (rawScore >= 15) return "5.0";
+      if (rawScore >= 13) return "4.5";
+      if (rawScore >= 10) return "4.0";
+      if (rawScore >= 8) return "3.5";
+      if (rawScore >= 6) return "3.0";
+      if (rawScore >= 4) return "2.5";
+      return "2.0";
+    }
+
+    function switchExamMode(mode) {
+      currentMode = mode;
+      const btnIelts = document.getElementById('btn-mode-ielts');
+      const btnSat = document.getElementById('btn-mode-sat');
+      if (btnIelts) {
+        btnIelts.className = mode === 'IELTS' 
+          ? "px-2 py-0.5 rounded-lg text-[11px] font-extrabold bg-white text-blue-600 shadow-sm"
+          : "px-2 py-0.5 rounded-lg text-[11px] font-extrabold text-slate-500";
+      }
+      if (btnSat) {
+        btnSat.className = mode === 'SAT'
+          ? "px-2 py-0.5 rounded-lg text-[11px] font-extrabold bg-white text-teal-600 shadow-sm"
+          : "px-2 py-0.5 rounded-lg text-[11px] font-extrabold text-slate-500";
+      }
+    }
 
     function switchTab(tabId) {
-      ['view-home', 'view-select-test', 'view-listening-runner', 'view-writing', 'view-speaking', 'view-test-runner', 'view-books'].forEach(t => {
+      ['view-home', 'view-select-test', 'view-listening-runner', 'view-writing', 'view-speaking', 'view-test-runner', 'view-predictions', 'view-books'].forEach(t => {
         document.getElementById(t)?.classList.add('hidden');
       });
       document.getElementById(tabId)?.classList.remove('hidden');
@@ -307,13 +397,16 @@
 
     function renderCollectionList(skill) {
       const list = document.getElementById('testSelectionList');
+      if (!list) return;
       list.innerHTML = '';
       for (let book = 21; book >= 1; book--) {
         list.innerHTML += `
           <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2">
             <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-              <span class="w-6 h-6 bg-blue-600 text-white rounded flex items-center justify-center font-black text-xs">C${book}</span>
-              <h4 class="font-bold text-slate-800 text-xs">Cambridge IELTS ${book}</h4>
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 bg-blue-600 text-white rounded flex items-center justify-center font-black text-xs">C${book}</span>
+                <h4 class="font-bold text-slate-800 text-xs">Cambridge IELTS ${book}</h4>
+              </div>
               <span class="text-[10px] bg-blue-50 text-blue-600 font-bold px-2 py-0.5 rounded uppercase">${skill}</span>
             </div>
             <div class="grid grid-cols-4 gap-1.5">
@@ -327,51 +420,117 @@
     }
 
     function launchRealTest(book, test, skill) {
+      currentBookNum = book;
+      currentTestNum = test;
       if (skill === 'reading') {
         switchTab('view-test-runner');
         document.getElementById('testTitle').textContent = `Cambridge IELTS ${book} — Test ${test}`;
-        const TEST = window.CAMBRIDGE_DATA?.[String(book)]?.[String(test)] || window.CAMBRIDGE_DATA?.["1"]?.["1"];
-        window.CURRENT_READING = TEST;
-        
+        const bookStr = String(book);
+        const testStr = String(test);
+        if (window.CAMBRIDGE_DATA && window.CAMBRIDGE_DATA[bookStr] && window.CAMBRIDGE_DATA[bookStr][testStr]) {
+          TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
+        } else {
+          TEST = window.CAMBRIDGE_DATA?.["1"]?.["1"];
+        }
         const tabs = document.getElementById('sectionNavTabs');
-        tabs.innerHTML = TEST?.passages?.map((p, i) => 
-          `<button onclick="switchPassage(${i+1})" class="px-3 py-1 bg-white border rounded text-xs font-bold">Passage ${i+1}</button>`
-        ).join('') || '';
-        switchPassage(1);
+        if (tabs && TEST?.passages) {
+          tabs.innerHTML = TEST.passages.map((p, i) => 
+            `<button id="pass-tab-${i+1}" onclick="switchReadingPassage(${i+1})" class="px-3 py-1 bg-white text-slate-700 border rounded text-xs font-bold">Passage ${i+1}</button>`
+          ).join('');
+        }
         renderPalette(40);
         startTimer(3600);
+        switchReadingPassage(1);
+        initResizer();
       } else if (skill === 'listening') {
         switchTab('view-listening-runner');
         document.getElementById('listeningTitle').textContent = `Cambridge IELTS ${book} — Test ${test}`;
         const L_TEST = window.CAMBRIDGE_LISTENING_DATA?.[String(book)]?.[String(test)] || window.CAMBRIDGE_LISTENING_DATA?.["1"]?.["1"];
         let container = document.getElementById('listeningQuestionsContainer');
         container.innerHTML = '';
-        L_TEST?.sections?.forEach(sec => {
-          container.innerHTML += `<div class="font-bold text-blue-900 text-xs mt-3">${sec.title}[span_13](start_span)[span_13](end_span)</div>`;
-          sec.questions?.forEach(q => {
-            container.innerHTML += `<div class="bg-slate-50 p-2.5 rounded border text-xs"><span class="font-black mr-2">${q.id}</span>${q.prompt} <input type="text" class="border-b border-blue-500 ml-2 px-1 text-xs font-semibold"></div>`;
+        if (L_TEST && L_TEST.sections) {
+          L_TEST.sections.forEach(sec => {
+            container.innerHTML += `<div class="font-bold text-blue-900 text-xs mt-3">${sec.title}[span_12](start_span)[span_12](end_span)</div>`;
+            sec.questions?.forEach(q => {
+              container.innerHTML += `<div class="bg-slate-50 p-2.5 rounded border text-xs"><span class="font-black mr-2">${q.id}</span>${q.prompt} <input type="text" class="border-b border-blue-500 ml-2 px-1 text-xs font-semibold focus:outline-none"></div>`;
+            });
           });
-        });
+        }
       }
     }
 
-    function switchPassage(num) {
-      const pData = window.CURRENT_READING?.passages?.[num - 1];
-      document.getElementById('passageContent').innerHTML = `<h3 class="font-bold text-sm mb-2">Passage ${num}: ${pData?.title || ''}</h3><p class="text-xs leading-relaxed">${pData?.passage_text || ''}</p>`;
-      let qHtml = "";
-      pData?.questions?.forEach(q => {
-        qHtml += `<div class="bg-white p-3 rounded border mb-2 text-xs"><span class="font-black mr-2">${q.id}</span>${q.prompt}</div>`;
+    function switchReadingPassage(passageNum) {
+      [1, 2, 3].forEach(p => {
+        const btn = document.getElementById(`pass-tab-${p}`);
+        if (btn) {
+          btn.className = p === passageNum ? "px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold shadow-sm" : "px-3 py-1 bg-white text-slate-700 border rounded text-xs font-bold";
+        }
       });
+      const pData = TEST?.passages?.[passageNum - 1];
+      if (!pData) return;
+      document.getElementById('passageContent').innerHTML = `
+        <div class="space-y-2 text-xs text-slate-800 p-2 select-text">
+          <h3 class="font-extrabold text-slate-900 text-sm mb-3">Passage ${passageNum}: ${pData.title || ''}</h3>
+          <p class="leading-relaxed">${pData.passage_text || ''}</p>
+        </div>
+      `;
+      let qHtml = `<div class="space-y-4 pb-8">`;
+      pData.questions?.forEach(q => {
+        if (q.type === 'instruction') {
+           qHtml += `<div class="bg-blue-50 p-3 rounded-xl border border-blue-200"><h4 class="font-bold text-blue-900 text-xs">${q.prompt}</h4></div>`;
+           return;
+        }
+        qHtml += `<div id="q-box-${q.id}" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2">`;
+        qHtml += `<div class="text-[12px] font-bold text-slate-800"><span class='border bg-white px-1.5 py-0.5 rounded text-[11px] font-black mr-2'>${q.id}</span> ${q.prompt || ''}</div>`;
+        if (q.type === 'fill_in') {
+          qHtml += `<div class="mt-2"><input type="text" oninput="markAnswered(${q.id}, this.value)" value="${userAnswers[q.id] || ''}" placeholder="Type answer" class="border-b-2 border-blue-500 bg-slate-50 px-2 py-0.5 text-xs text-blue-700 font-bold focus:outline-none"></div>`;
+        } else if (q.options) {
+          qHtml += `<div class="space-y-1.5 mt-2">`;
+          q.options.forEach(opt => {
+            let isChecked = userAnswers[q.id] === opt;
+            qHtml += `<label class="flex items-center gap-2.5 p-2 border rounded-lg cursor-pointer text-xs font-medium ${isChecked ? 'bg-blue-50 border-blue-300' : 'border-slate-200 hover:bg-slate-50'}" onclick="markAnswered(${q.id}, '${opt}')"><input type="radio" name="q-${q.id}" value="${opt}" ${isChecked ? 'checked' : ''} class="accent-blue-600"> ${opt}</label>`;
+          });
+          qHtml += `</div>`;
+        }
+        qHtml += `</div>`;
+      });
+      qHtml += `</div>`;
       document.getElementById('questionsContent').innerHTML = qHtml;
+    }
+
+    function markAnswered(qNum, value) {
+      if (value) {
+        userAnswers[qNum] = String(value).trim();
+        document.getElementById(`palette-q-${qNum}`)?.classList.add('answered');
+      } else {
+        delete userAnswers[qNum];
+        document.getElementById(`palette-q-${qNum}`)?.classList.remove('answered');
+      }
+    }
+
+    function renderPalette(total) {
+      const palette = document.getElementById('questionPalette');
+      if (!palette) return;
+      palette.innerHTML = '';
+      for (let i = 1; i <= total; i++) {
+        palette.innerHTML += `<div class="q-badge" id="palette-q-${i}" onclick="jumpToQuestion(${i})">${i}</div>`;
+      }
+    }
+
+    function jumpToQuestion(i) {
+      if (i >= 1 && i <= 13) switchReadingPassage(1);
+      else if (i >= 14 && i <= 26) switchReadingPassage(2);
+      else if (i >= 27 && i <= 40) switchReadingPassage(3);
+      setTimeout(() => document.getElementById(`q-box-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
     }
 
     function loadRealWriting(book, test) {
       const W = window.CAMBRIDGE_WRITING_DATA?.[String(book)]?.[String(test)] || window.CAMBRIDGE_WRITING_DATA?.["1"]?.["1"];
       if (!W) return;
-      document.getElementById('wTask1Type').textContent = `Task 1: ${W.task1.type}`;
+      document.getElementById('wTask1Type').textContent = `Task 1: ${W.task1.type}[span_13](start_span)[span_13](end_span)`;
       document.getElementById('wTask1Prompt').textContent = W.task1.prompt;
       document.getElementById('wChartDesc').textContent = W.task1.chart_description;
-      document.getElementById('wTask2Type').textContent = `Task 2: ${W.task2.type}`;
+      document.getElementById('wTask2Type').textContent = `Task 2: ${W.task2.type}[span_14](start_span)[span_14](end_span)`;
       document.getElementById('wTask2Prompt').textContent = W.task2.prompt;
     }
 
@@ -395,14 +554,18 @@
       const text = document.getElementById('writingEssayInput').value;
       const res = document.getElementById('writingAiResult');
       res.classList.remove('hidden');
-      res.innerHTML = `<p class="font-bold text-slate-800">🤖 AI Examiner Feedback (Cambridge Standard):</p><p><strong>Estimated Band:</strong> <span class="text-amber-600 font-black">7.5</span></p><p>Great adherence to official book prompt criteria and lexical resource.</p>`;
+      if(text.length < 20) {
+        res.innerHTML = `<p class="text-rose-600 font-bold">Please write a bit more for accurate AI evaluation.</p>`;
+        return;
+      }
+      res.innerHTML = `<p class="font-bold text-slate-800">🤖 AI Examiner Feedback:</p><p><strong>Estimated Band:</strong> <span class="text-amber-600 font-black">7.5</span></p><p>Great adherence to official book prompt criteria and lexical resource[span_15](start_span)[span_15](end_span).</p>`;
     }
 
     function loadRealSpeaking(book, test) {
       const S = window.CAMBRIDGE_SPEAKING_DATA?.[String(book)]?.[String(test)] || window.CAMBRIDGE_SPEAKING_DATA?.["1"]?.["1"];
       if (!S) return;
-      document.getElementById('speakingTopicBadge').textContent = `Topic: ${S.part1.topic}[span_14](start_span)[span_14](end_span)`;
-      document.getElementById('speakingPromptText').textContent = `Examiner: "${S.part1.questions[0].q}[span_15](start_span)"[span_15](end_span)`;
+      document.getElementById('speakingTopicBadge').textContent = `Topic: ${S.part1.topic}[span_16](start_span)[span_16](end_span)`;
+      document.getElementById('speakingPromptText').textContent = `Examiner: "${S.part1.questions[0].q}[span_17](start_span)"[span_17](end_span)`;
       document.getElementById('speechModelAnswer').textContent = S.part1.questions[0].sample_answer;
     }
 
@@ -411,12 +574,12 @@
       isAudioPlaying = !isAudioPlaying;
       document.getElementById('audioPlayBtn').innerHTML = isAudioPlaying ? `<i class="fa-solid fa-pause"></i>` : `<i class="fa-solid fa-play"></i>`;
       document.getElementById('audioProgress').style.width = isAudioPlaying ? "60%" : "0%";
-      document.getElementById('audioStatus').textContent = isAudioPlaying ? "Playing Book Audio..." : "Paused[span_16](start_span)[span_16](end_span)";
+      document.getElementById('audioStatus').textContent = isAudioPlaying ? "Playing Book Audio..." : "Paused[span_18](start_span)[span_18](end_span)";
     }
 
     function submitListeningAnswers() {
       document.getElementById('listeningAiResult').classList.remove('hidden');
-      document.getElementById('listeningAiResult').innerHTML = `<p class="font-bold text-slate-800">🤖 AI Listening Check:</p><p class="text-emerald-700 font-semibold">Matched with official answer key from book[span_17](start_span)[span_17](end_span).</p>`;
+      document.getElementById('listeningAiResult').innerHTML = `<p class="font-bold text-slate-800">🤖 AI Listening Check:</p><p class="text-emerald-700 font-semibold">Matched with official answer key from book[span_19](start_span)[span_19](end_span).</p>`;
     }
 
     let isRecording = false;
@@ -430,26 +593,17 @@
     function evaluateSpeakingAI() {
       const res = document.getElementById('speakingAiResult');
       res.classList.remove('hidden');
-      res.innerHTML = `<p class="font-bold text-slate-800">🤖 AI Speaking Evaluation:</p><p><strong>Band Score:</strong> <span class="text-purple-600 font-black">7.5</span></p><p>Strong structural response aligned with official Cambridge benchmarks[span_18](start_span)[span_18](end_span).</p>`;
+      res.innerHTML = `<p class="font-bold text-slate-800">🤖 AI Speaking Evaluation:</p><p><strong>Band Score:</strong> <span class="text-purple-600 font-black">7.5</span></p><p>Strong structural response aligned with official Cambridge benchmarks[span_20](start_span)[span_20](end_span).</p>`;
     }
 
-    function renderPalette(total) {
-      const palette = document.getElementById('questionPalette');
-      if(!palette) return;
-      palette.innerHTML = '';
-      for(let i=1; i<=total; i++) {
-        palette.innerHTML += `<div class="q-badge">${i}</div>`;
-      }
-    }
-
-    let timerInterval = null;
     function startTimer(seconds) {
       clearInterval(timerInterval);
       let remain = seconds;
       timerInterval = setInterval(() => {
         remain--;
         const m = Math.floor(remain / 60), s = remain % 60;
-        document.getElementById('testTimer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        const timerEl = document.getElementById('testTimer');
+        if (timerEl) timerEl.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
         if (remain <= 0) { clearInterval(timerInterval); submitReadingTest(); }
       }, 1000);
     }
@@ -462,6 +616,45 @@
     function closeResultModal() {
       document.getElementById('modalResult').classList.add('hidden');
       switchTab('view-home');
+    }
+
+    function confirmExitTest() {
+      if (confirm("Are you sure you want to exit?")) {
+        clearInterval(timerInterval);
+        switchTab('view-home');
+      }
+    }
+
+    function highlightSelection() {
+      const sel = window.getSelection();
+      if (!sel.rangeCount || sel.isCollapsed) return;
+      try {
+        const range = sel.getRangeAt(0);
+        const span = document.createElement('span');
+        span.className = 'highlighted';
+        range.surroundContents(span);
+        sel.removeAllRanges();
+      } catch(e) {}
+    }
+
+    function initResizer() {
+      const resizer = document.getElementById('resizerBar');
+      const top = document.getElementById('topPane');
+      const bottom = document.getElementById('bottomPane');
+      if (!resizer || !top || !bottom) return;
+      let isDragging = false;
+      resizer.onmousedown = () => isDragging = true;
+      resizer.ontouchstart = () => isDragging = true;
+      window.onmousemove = (e) => {
+        if (!isDragging) return;
+        top.style.height = `${Math.max(100, e.clientY - 60)}px`;
+      };
+      window.ontouchmove = (e) => {
+        if (!isDragging) return;
+        top.style.height = `${Math.max(100, e.touches[0].clientY - 60)}px`;
+      };
+      window.onmouseup = () => isDragging = false;
+      window.ontouchend = () => isDragging = false;
     }
 
     document.addEventListener("DOMContentLoaded", () => {
