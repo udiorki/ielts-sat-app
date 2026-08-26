@@ -1,14 +1,14 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>IELTS & SAT Genius Simulator</title>
+  
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <script src="reading_data.js"></script>
+  
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 0; user-select: none; }
@@ -21,19 +21,23 @@
       transition: all 0.2s;
     }
     .q-badge.answered { background-color: #2563eb; color: #ffffff; border-color: #2563eb; }
-    
+    .q-badge.flagged { background-color: #fef3c7; color: #b45309; border-color: #f59e0b; }
+    .q-badge.active-q { outline: 2px solid #3b82f6; outline-offset: 1px; }
+
     .split-container { display: flex; flex-direction: column; height: calc(100vh - 125px); }
-    .split-pane { overflow-y: auto; padding: 14px; }
+    .split-pane { overflow-y: auto; padding: 14px; -webkit-overflow-scrolling: touch; }
     .resizer-bar {
-      height: 12px; background: #e2e8f0; cursor: row-resize;
+      height: 12px; background: #e2e8f0; cursor: row-resize; touch-action: none;
       display: flex; align-items: center; justify-content: center;
       border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1;
     }
     .resizer-bar::after { content: "•••"; color: #64748b; font-size: 10px; font-weight: bold; letter-spacing: 2px; }
+    .highlighted { background-color: #fef08a; border-radius: 2px; padding: 1px 2px; }
   </style>
 </head>
 <body class="pb-16">
 
+  <!-- HEADER -->
   <header class="bg-white border-b border-slate-200 px-4 py-2.5 sticky top-0 z-30 shadow-sm flex items-center justify-between">
     <div class="flex items-center gap-2.5">
       <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black flex items-center justify-center text-sm shadow">S</div>
@@ -44,10 +48,10 @@
     </div>
     <div class="flex items-center gap-2">
       <div class="flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-700 px-2 py-0.5 rounded-full text-xs font-black">
-        <i class="fa-solid fa-fire text-amber-500"></i> <span>0</span>
+        <i class="fa-solid fa-fire text-amber-500"></i> <span id="streakDisplay">0</span>
       </div>
       <div class="flex items-center gap-1 bg-purple-50 border border-purple-200 text-purple-700 px-2 py-0.5 rounded-full text-xs font-black">
-        <i class="fa-solid fa-bolt text-purple-500"></i> <span>150 XP</span>
+        <i class="fa-solid fa-bolt text-purple-500"></i> <span id="xpDisplay">150 XP</span>
       </div>
       <div class="bg-slate-100 p-0.5 rounded-xl flex gap-0.5 border border-slate-200 ml-1">
         <button id="btn-mode-ielts" onclick="switchExamMode('IELTS')" class="px-2 py-0.5 rounded-lg text-[11px] font-extrabold bg-white text-blue-600 shadow-sm">IELTS</button>
@@ -56,6 +60,7 @@
     </div>
   </header>
 
+  <!-- MAIN VIEW -->
   <main id="view-home" class="p-4 space-y-4 max-w-md mx-auto">
     <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 text-white shadow-md space-y-2 cursor-pointer hover:opacity-95">
       <div class="flex items-center justify-between">
@@ -91,21 +96,20 @@
     <div class="grid grid-cols-3 gap-2">
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Estimated Band</p>
-        <p class="text-base font-black text-slate-400">--</p>
+        <p class="text-base font-black text-slate-400" id="statBand">--</p>
       </div>
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Tests Done</p>
-        <p class="text-base font-black text-slate-800">0</p>
+        <p class="text-base font-black text-slate-800" id="statDone">0</p>
       </div>
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Accuracy</p>
-        <p class="text-base font-black text-slate-400">0%</p>
+        <p class="text-base font-black text-slate-400" id="statAccuracy">0%</p>
       </div>
     </div>
     
     <h2 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Practice Modules</h2>
     
-    <!-- ЖЕСТКО ВШИТЫЕ МОДУЛИ ДЛЯ ПРЕЗЕНТАЦИИ (Они появятся всегда!) -->
     <div class="grid grid-cols-2 gap-3" id="mainModulesGrid">
       <div onclick="openBookSelection('reading')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
         <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-book-reader"></i></div>
@@ -130,6 +134,7 @@
     </div>
   </main>
 
+  <!-- TEST SELECTION VIEW -->
   <section id="view-select-test" class="p-4 space-y-3 hidden max-w-md mx-auto">
     <div class="flex items-center justify-between">
       <div>
@@ -141,6 +146,7 @@
     <div class="space-y-3" id="testSelectionList"></div>
   </section>
 
+  <!-- TEST RUNNER VIEW -->
   <section id="view-test-runner" class="hidden flex flex-col h-screen overflow-hidden">
     <div class="bg-slate-900 text-white px-4 py-2 flex items-center justify-between shadow-md">
       <div>
@@ -148,53 +154,52 @@
         <p class="text-[10px] text-emerald-400 font-semibold" id="testSubtitle">Academic Reading Test</p>
       </div>
       <div class="flex items-center gap-2">
-        <div class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-mono font-bold px-2 py-0.5 rounded">
-          <i class="fa-regular fa-clock mr-1"></i><span id="testTimer">59:59</span>
+        <button onclick="highlightSelection()" class="bg-slate-800 text-amber-300 px-2 py-0.5 rounded text-xs font-bold border border-slate-700 flex items-center gap-1">
+          <i class="fa-solid fa-highlighter"></i>
+        </button>
+        <div class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-mono font-bold px-2 py-0.5 rounded flex items-center gap-1">
+          <i class="fa-regular fa-clock"></i><span id="testTimer">60:00</span>
         </div>
         <button onclick="confirmExitTest()" class="bg-rose-600 text-white font-bold text-xs px-2.5 py-1 rounded">Exit</button>
       </div>
     </div>
+    
     <div class="bg-slate-100 border-b border-slate-200 px-4 py-1.5 flex gap-2 overflow-x-auto" id="sectionNavTabs"></div>
+    
     <div class="split-container" id="splitMainLayout">
-      <div class="split-pane bg-white" id="topPane" style="height: 50%;">
+      <div class="split-pane bg-white" id="topPane" style="flex: 1;">
         <div id="passageContent"></div>
       </div>
       <div class="resizer-bar" id="resizerBar"></div>
-      <div class="split-pane bg-slate-50" id="bottomPane" style="height: 50%;">
+      <div class="split-pane bg-slate-50" id="bottomPane" style="flex: 1;">
         <div id="questionsContent"></div>
       </div>
     </div>
+    
     <div class="bg-white border-t border-slate-200 px-4 py-2 sticky bottom-0 z-20 flex items-center justify-between gap-2 shadow-lg">
       <div class="flex items-center gap-1 overflow-x-auto py-1 max-w-[65%]" id="questionPalette"></div>
-      <button onclick="submitTest()" class="bg-emerald-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-lg shadow whitespace-nowrap">
+      <button onclick="submitTest()" class="bg-emerald-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-lg shadow whitespace-nowrap active:scale-95 transition-transform">
         Submit Test
       </button>
     </div>
   </section>
 
-  <section id="view-predictions" class="p-4 space-y-3 hidden max-w-md mx-auto">
-    <div class="flex justify-between items-center">
-      <div>
-        <h2 class="text-sm font-extrabold text-slate-800">Real Exam Predictions</h2>
-        <p class="text-[11px] text-slate-500">Upcoming exam prompts pool</p>
+  <!-- RESULT MODAL -->
+  <div id="modalResult" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
+      <div class="bg-slate-900 text-white p-4 text-center shrink-0">
+        <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">IELTS Official Result</h3>
+        <div class="text-3xl font-black text-emerald-400 mt-1" id="resBandScore">Band 7.5</div>
+        <p class="text-xs text-slate-300 mt-0.5" id="resRawScore">33 / 40 Correct</p>
       </div>
-      <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg">Back</button>
+      <div class="p-4 overflow-y-auto space-y-2 flex-1 divide-y divide-slate-100" id="resBreakdownList"></div>
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex gap-2 shrink-0">
+        <button onclick="closeResultModal()" class="w-full bg-blue-600 text-white font-extrabold text-xs py-2.5 rounded-xl shadow">Finish & Back to Home</button>
+      </div>
     </div>
-    <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2">
-      <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">Writing Task 1 & 2</span>
-      <h4 class="font-bold text-slate-800 text-xs">Leaked Cambridge Recalls</h4>
-      <p class="text-[11px] text-slate-600">Charts, process diagrams, and essay questions collected from current test centers.</p>
-    </div>
-  </section>
+  </div>
 
-  <section id="view-books" class="p-4 space-y-3 hidden max-w-md mx-auto">
-    <div>
-      <h2 class="text-sm font-extrabold text-slate-800">Cambridge IELTS Complete Collection</h2>
-      <p class="text-[11px] text-slate-500">Books 1 to 21</p>
-    </div>
-    <div class="grid grid-cols-2 gap-2.5" id="booksGrid"></div>
-  </section>
-
+  <!-- BOTTOM NAVBAR -->
   <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2 flex justify-around items-center z-40 max-w-md mx-auto">
     <button onclick="switchTab('view-home')" class="flex flex-col items-center gap-0.5 text-blue-600 font-bold text-[10px]">
       <i class="fa-solid fa-house text-base"></i><span>Home</span>
@@ -207,14 +212,38 @@
     </button>
   </nav>
 
+  <!-- SCRIPT ENGINE -->
   <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) { tg.ready(); tg.expand(); }
+
     let currentMode = 'IELTS';
     let currentSkill = 'reading';
     let currentBookNum = 21;
     let currentTestNum = 1;
     let timerInterval = null;
     let userAnswers = {};
+    let flaggedQuestions = {};
     let TEST = null;
+
+    // IELTS Academic Reading Band Calculation
+    function calculateBandScore(rawScore) {
+      if (rawScore >= 39) return "9.0";
+      if (rawScore >= 37) return "8.5";
+      if (rawScore >= 35) return "8.0";
+      if (rawScore >= 33) return "7.5";
+      if (rawScore >= 30) return "7.0";
+      if (rawScore >= 27) return "6.5";
+      if (rawScore >= 23) return "6.0";
+      if (rawScore >= 19) return "5.5";
+      if (rawScore >= 15) return "5.0";
+      if (rawScore >= 13) return "4.5";
+      if (rawScore >= 10) return "4.0";
+      if (rawScore >= 8) return "3.5";
+      if (rawScore >= 6) return "3.0";
+      if (rawScore >= 4) return "2.5";
+      return "2.0";
+    }
 
     function switchExamMode(mode) {
       currentMode = mode;
@@ -250,21 +279,22 @@
             </div>
             <span class="text-[10px] bg-blue-50 text-blue-600 font-bold px-2 py-0.5 rounded uppercase">${currentSkill}</span>
           </div>
-          <div class="grid grid-cols-2 gap-2">
-            <button onclick="launchCDTest(${book}, 1, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">Test 1</button>
-            <button onclick="launchCDTest(${book}, 2, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">Test 2</button>
-            <button onclick="launchCDTest(${book}, 3, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">Test 3</button>
-            <button onclick="launchCDTest(${book}, 4, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">Test 4</button>
+          <div class="grid grid-cols-4 gap-1.5">
+            <button onclick="launchCDTest(${book}, 1, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">T1</button>
+            <button onclick="launchCDTest(${book}, 2, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">T2</button>
+            <button onclick="launchCDTest(${book}, 3, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">T3</button>
+            <button onclick="launchCDTest(${book}, 4, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">T4</button>
           </div>
         `;
         list.appendChild(item);
       }
     }
 
-    function launchCDTest(book, testNumber, skill='reading') {
+    function launchCDTest(book, testNumber, skill = 'reading') {
       currentBookNum = book; 
       currentTestNum = testNumber; 
       userAnswers = {};
+      flaggedQuestions = {};
       
       switchTab('view-test-runner');
       
@@ -277,8 +307,11 @@
           const bookStr = String(book);
           const testStr = String(testNumber);
 
-          // Твой оригинальный код, где Тест 1 и Тест 2 работали 100%
-          TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
+          if (window.CAMBRIDGE_DATA && window.CAMBRIDGE_DATA[bookStr] && window.CAMBRIDGE_DATA[bookStr][testStr]) {
+            TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
+          } else {
+            TEST = window.CAMBRIDGE_DATA["21"]["1"];
+          }
 
           const tabs = document.getElementById('sectionNavTabs');
           if (tabs && TEST && TEST.passages) {
@@ -289,39 +322,12 @@
           renderPalette(40); 
           startTimer(3600); 
           switchReadingPassage(1);
-      } else if (skill === 'listening') {
-          const tabs = document.getElementById('sectionNavTabs');
-          if (tabs) {
-            tabs.innerHTML = [1, 2, 3, 4].map(i => 
-                `<button id="pass-tab-${i}" onclick="loadListeningPart(${i})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors">Part ${i}</button>`
-            ).join('');
-          }
-          renderPalette(40);
-          startTimer(1800);
-          loadListeningPart(1);
-      } else if (skill === 'writing') {
-          const tabs = document.getElementById('sectionNavTabs');
-          if (tabs) {
-            tabs.innerHTML = [1, 2].map(i => 
-                `<button id="pass-tab-${i}" onclick="loadWritingTaskSection(${i})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors">Task ${i}</button>`
-            ).join('');
-          }
-          const pal = document.getElementById('questionPalette');
-          if (pal) pal.innerHTML = '';
-          startTimer(3600);
-          loadWritingTaskSection(1);
-      } else if (skill === 'speaking') {
-          const tabs = document.getElementById('sectionNavTabs');
-          if (tabs) tabs.innerHTML = '';
-          const pal = document.getElementById('questionPalette');
-          if (pal) pal.innerHTML = '';
-          startTimer(900);
-          loadSpeakingSection();
+          initResizer();
       }
     }
 
     function switchReadingPassage(passageNum) {
-      [1, 2, 3].forEach(p => {
+     .forEach(p => {
         const btn = document.getElementById(`pass-tab-${p}`);
         if (btn) btn.className = p === passageNum 
           ? "px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold"
@@ -343,33 +349,33 @@
 
       const textHtml = (pData.passage_text || "").split(/\n+/).map(para => {
         if (para.match(/^[A-G]\s/)) {
-            return `<p class="mb-4 leading-relaxed"><strong class="text-base mr-2 text-slate-900">${para[0]}</strong> ${para.substring(2)}</p>`;
+            return `<p class="mb-3 leading-relaxed"><strong class="text-sm mr-2 text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">${para[0]}</strong> ${para.substring(2)}</p>`;
         }
-        return `<p class="mb-4 leading-relaxed">${para}</p>`;
+        return `<p class="mb-3 leading-relaxed">${para}</p>`;
       }).join('');
 
       passagePane.innerHTML = `
-        <div class="space-y-2 text-xs text-slate-800 p-3">
-          <h3 class="font-extrabold text-slate-900 text-sm mb-4">Passage ${passageNum}: ${pData.title || ''}</h3>
+        <div class="space-y-2 text-xs text-slate-800 p-2">
+          <h3 class="font-extrabold text-slate-900 text-sm mb-3">Passage ${passageNum}: ${pData.title || ''}</h3>
           ${textHtml}
         </div>
       `;
 
-      let qHtml = `<div class="space-y-5 pb-8">`;
+      let qHtml = `<div class="space-y-4 pb-8">`;
       if (pData.questions) {
           pData.questions.forEach(q => {
             if (q.type === 'instruction') {
-               qHtml += `<div class="bg-blue-50/90 p-3.5 rounded-xl border border-blue-200 sticky top-0 z-10 backdrop-blur-md shadow-sm">
+               qHtml += `<div class="bg-blue-50/95 p-3 rounded-xl border border-blue-200 sticky top-0 z-10 backdrop-blur-md shadow-sm">
                  <h4 class="font-bold text-blue-900 text-xs leading-relaxed">${q.prompt}</h4>
                </div>`;
                return;
             }
 
-            qHtml += `<div id="q-box-${q.id}" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">`;
+            qHtml += `<div id="q-box-${q.id}" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2.5">`;
             let promptText = q.prompt || '';
 
             if (q.type === 'grid') {
-              qHtml += `<div class="text-[12px] font-medium text-slate-800 leading-relaxed mb-3">${promptText}</div>`;
+              qHtml += `<div class="text-[12px] font-medium text-slate-800 leading-relaxed">${promptText}</div>`;
               qHtml += `<div class="overflow-x-auto"><table class="w-full text-left border-collapse bg-slate-50/50 rounded-lg"><thead><tr><th class="p-2 border-b border-slate-200"></th>`;
               if(q.options) {
                   q.options.forEach(opt => {
@@ -379,7 +385,7 @@
               qHtml += `</tr></thead><tbody>`;
               if(q.sub_questions) {
                   q.sub_questions.forEach(subQ => {
-                    qHtml += `<tr><td class="p-3 border-b border-slate-200 text-[12px] font-medium text-slate-700 leading-snug"><span class='border border-slate-400 bg-white px-1.5 py-0.5 rounded text-[11px] font-black mr-2 shadow-sm'>${subQ.id}</span>${subQ.text}</td>`;
+                    qHtml += `<tr><td class="p-2.5 border-b border-slate-200 text-[12px] font-medium text-slate-700 leading-snug"><span class='border border-slate-400 bg-white px-1.5 py-0.5 rounded text-[11px] font-black mr-2 shadow-sm'>${subQ.id}</span>${subQ.text}</td>`;
                     if(q.options) {
                         q.options.forEach(opt => {
                           let isChecked = userAnswers[subQ.id] === opt ? 'checked' : '';
@@ -391,23 +397,25 @@
               }
               qHtml += `</tbody></table></div>`;
             } else if (q.type === 'fill_in') {
-              let inputHtml = `<input type="text" oninput="markAnswered(${q.id}, this.value)" value="${userAnswers[q.id] || ''}" class="border-b-2 border-blue-500 bg-slate-50 px-2 py-0.5 text-blue-700 font-bold focus:outline-none focus:bg-blue-100 w-32 text-center mx-1 rounded-t transition-colors">`;
-              let formattedPrompt = promptText.replace(/_+/g, inputHtml);
-              qHtml += `<div class="text-[13px] font-medium text-slate-800 leading-relaxed">${formattedPrompt}</div>`;
+              let inputHtml = `<input type="text" oninput="markAnswered(${q.id}, this.value)" value="${userAnswers[q.id] || ''}" placeholder="answer" class="border-b-2 border-blue-500 bg-slate-50 px-2 py-0.5 text-blue-700 font-bold focus:outline-none focus:bg-blue-100 min-w-24 text-center mx-1 rounded-t transition-colors text-xs">`;
+              let formattedPrompt = promptText.includes('_____') 
+                ? promptText.replace(/_+/g, inputHtml) 
+                : `<span class='border border-slate-400 bg-white px-1.5 py-0.5 rounded text-[11px] font-black mr-2 shadow-sm'>${q.id}</span> ${promptText} <div class="mt-2">${inputHtml}</div>`;
+              qHtml += `<div class="text-[12px] font-medium text-slate-800 leading-relaxed">${formattedPrompt}</div>`;
             } else if (q.type === 'tfng' || q.type === 'mcq') {
-              qHtml += `<div class="text-[13px] font-bold text-slate-800 leading-relaxed mb-2">${promptText}</div>`;
-              qHtml += `<div class="space-y-2 mt-2">`;
+              qHtml += `<div class="text-[12px] font-bold text-slate-800 leading-relaxed">${promptText.startsWith('<span') ? promptText : `<span class='border border-slate-400 bg-white px-1.5 py-0.5 rounded text-[11px] font-black mr-2 shadow-sm'>${q.id}</span> ` + promptText}</div>`;
+              qHtml += `<div class="space-y-1.5 mt-2">`;
               if (q.options) {
                   q.options.forEach(opt => {
                      let isChecked = userAnswers[q.id] === opt ? 'checked' : '';
                      let activeClass = isChecked ? 'bg-blue-50 border-blue-300' : 'border-slate-200 hover:bg-slate-50';
                      qHtml += `
-                       <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${activeClass}" onclick="updateRadioUI(this, ${q.id}, '${opt}')">
+                       <label class="flex items-center gap-2.5 p-2 border rounded-lg cursor-pointer transition-colors ${activeClass}" onclick="updateRadioUI(this, ${q.id}, '${opt}')">
                          <input type="radio" name="q-${q.id}" value="${opt}" ${isChecked} class="hidden">
-                         <div class="w-4 h-4 rounded-full border border-slate-400 flex items-center justify-center ${isChecked ? 'border-blue-600' : ''}">
-                            <div class="w-2 h-2 rounded-full ${isChecked ? 'bg-blue-600' : 'bg-transparent'}"></div>
+                         <div class="w-3.5 h-3.5 rounded-full border border-slate-400 flex items-center justify-center ${isChecked ? 'border-blue-600' : ''}">
+                            <div class="w-1.5 h-1.5 rounded-full ${isChecked ? 'bg-blue-600' : 'bg-transparent'}"></div>
                          </div>
-                         <span class="text-[13px] text-slate-700 font-medium">${opt}</span>
+                         <span class="text-[12px] text-slate-700 font-medium">${opt}</span>
                        </label>
                      `;
                   });
@@ -425,57 +433,25 @@
         markAnswered(qId, value);
         const container = labelElement.parentElement;
         container.querySelectorAll('label').forEach(lbl => {
-            lbl.className = 'flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors border-slate-200 hover:bg-slate-50';
-            lbl.querySelector('.w-4').className = 'w-4 h-4 rounded-full border border-slate-400 flex items-center justify-center';
-            lbl.querySelector('.w-2').className = 'w-2 h-2 rounded-full bg-transparent';
+            lbl.className = 'flex items-center gap-2.5 p-2 border rounded-lg cursor-pointer transition-colors border-slate-200 hover:bg-slate-50';
+            lbl.querySelector('.w-3\\.5')?.classList.remove('border-blue-600');
+            const inner = lbl.querySelector('.w-1\\.5');
+            if(inner) inner.className = 'w-1.5 h-1.5 rounded-full bg-transparent';
         });
-        labelElement.className = 'flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors bg-blue-50 border-blue-300';
-        labelElement.querySelector('.w-4').className = 'w-4 h-4 rounded-full border border-blue-600 flex items-center justify-center';
-        labelElement.querySelector('.w-2').className = 'w-2 h-2 rounded-full bg-blue-600';
+        labelElement.className = 'flex items-center gap-2.5 p-2 border rounded-lg cursor-pointer transition-colors bg-blue-50 border-blue-300';
+        labelElement.querySelector('.w-3\\.5')?.classList.add('border-blue-600');
+        const activeInner = labelElement.querySelector('.w-1\\.5');
+        if(activeInner) activeInner.className = 'w-1.5 h-1.5 rounded-full bg-blue-600';
     }
 
-    function loadListeningPart(partNum) {
-      [1, 2, 3, 4].forEach(p => {
-        const btn = document.getElementById(`pass-tab-${p}`);
-        if (btn) btn.className = p === partNum ? "px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold" : "px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold";
-      });
-      const passagePane = document.getElementById('passageContent');
-      const questionsPane = document.getElementById('questionsContent');
-      if(passagePane) passagePane.innerHTML = `<div class="space-y-2 p-2"><h3 class="font-bold text-slate-800 text-xs">Part ${partNum} Audio Track</h3><div class="bg-slate-100 p-4 rounded-xl flex items-center justify-center shadow-inner text-slate-400 text-xs">[Audio Player Placeholder]</div></div>`;
-      
-      let startQ = (partNum - 1) * 10 + 1;
-      let endQ = partNum * 10;
-      let qHtml = `<div class="space-y-3 pb-6"><div class="bg-blue-50/80 p-3 rounded-xl border border-blue-200 sticky top-0 z-10 backdrop-blur-md"><h4 class="font-bold text-blue-900 text-xs">Questions ${startQ}–${endQ}</h4></div>`;
-      for (let i = startQ; i <= endQ; i++) {
-        qHtml += `<div id="q-box-${i}" class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5 shadow-sm"><label class="text-xs font-bold text-slate-700">Question ${i}:</label><input type="text" oninput="markAnswered(${i}, this.value)" value="${userAnswers[i] || ''}" placeholder="Type answer..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs"></div>`;
-      }
-      qHtml += `</div>`;
-      if(questionsPane) questionsPane.innerHTML = qHtml;
-    }
-
-    function loadWritingTaskSection(taskNum) {
-      [1, 2].forEach(p => {
-        const btn = document.getElementById(`pass-tab-${p}`);
-        if (btn) btn.className = p === taskNum ? "px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold" : "px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold";
-      });
-      const passagePane = document.getElementById('passageContent');
-      const questionsPane = document.getElementById('questionsContent');
-      if (!passagePane || !questionsPane) return;
-
-      if (taskNum === 1) {
-        passagePane.innerHTML = `<div class="space-y-3 p-2"><span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">WRITING TASK 1</span></div>`;
-        questionsPane.innerHTML = `<div class="space-y-3 p-2"><textarea id="essayInput" rows="10" placeholder="Type your Task 1 response here..." class="w-full text-xs p-3 bg-white border border-slate-300 rounded-xl leading-relaxed"></textarea></div>`;
+    function markAnswered(qNum, value) {
+      if (value && String(value).trim() !== '') {
+        userAnswers[qNum] = String(value).trim();
+        document.getElementById(`palette-q-${qNum}`)?.classList.add('answered');
       } else {
-        passagePane.innerHTML = `<div class="space-y-3 p-2"><span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">WRITING TASK 2</span></div>`;
-        questionsPane.innerHTML = `<div class="space-y-3 p-2"><textarea id="essayInput" rows="12" placeholder="Type your Task 2 response here..." class="w-full text-xs p-3 bg-white border border-slate-300 rounded-xl leading-relaxed"></textarea></div>`;
+        delete userAnswers[qNum];
+        document.getElementById(`palette-q-${qNum}`)?.classList.remove('answered');
       }
-    }
-
-    function loadSpeakingSection() {
-      const pPane = document.getElementById('passageContent');
-      const qPane = document.getElementById('questionsContent');
-      if(pPane) pPane.innerHTML = `<div class="p-4 space-y-3"><span class="bg-purple-100 text-purple-800 text-[10px] font-black px-2 py-0.5 rounded">SPEAKING PART 2</span></div>`;
-      if(qPane) qPane.innerHTML = `<div class="flex flex-col items-center justify-center h-full space-y-4"><button class="bg-purple-600 text-white font-extrabold text-xs px-6 py-2.5 rounded-xl shadow-md">Start Recording</button></div>`;
     }
 
     function renderPalette(total) {
@@ -494,20 +470,49 @@
                 else if (i >= 14 && i <= 26) switchReadingPassage(2);
                 else if (i >= 27 && i <= 40) switchReadingPassage(3);
             }
-          setTimeout(() => document.getElementById(`q-box-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+          setTimeout(() => document.getElementById(`q-box-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80);
         };
         palette.appendChild(btn);
       }
     }
 
-    function markAnswered(qNum, value) {
-      if (value && value.trim() !== '') {
-        userAnswers[qNum] = value;
-        document.getElementById(`palette-q-${qNum}`)?.classList.add('answered');
-      } else {
-        delete userAnswers[qNum];
-        document.getElementById(`palette-q-${qNum}`)?.classList.remove('answered');
+    function highlightSelection() {
+      const sel = window.getSelection();
+      if (!sel.rangeCount || sel.isCollapsed) return;
+      const range = sel.getRangeAt(0);
+      const span = document.createElement('span');
+      span.className = 'highlighted';
+      range.surroundContents(span);
+      sel.removeAllRanges();
+      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+    }
+
+    function initResizer() {
+      const resizer = document.getElementById('resizerBar');
+      const top = document.getElementById('topPane');
+      const bottom = document.getElementById('bottomPane');
+      if (!resizer || !top || !bottom) return;
+
+      let isDragging = false;
+
+      function onStart(e) { isDragging = true; }
+      function onMove(e) {
+        if (!isDragging) return;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const totalHeight = window.innerHeight - 125;
+        const newTopHeight = Math.max(80, Math.min(totalHeight - 80, clientY - 60));
+        top.style.flex = 'none';
+        top.style.height = `${newTopHeight}px`;
+        bottom.style.flex = '1';
       }
+      function onEnd() { isDragging = false; }
+
+      resizer.addEventListener('mousedown', onStart);
+      resizer.addEventListener('touchstart', onStart, { passive: true });
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('touchmove', onMove, { passive: true });
+      window.addEventListener('mouseup', onEnd);
+      window.addEventListener('touchend', onEnd);
     }
 
     function startTimer(seconds) {
@@ -530,10 +535,76 @@
       }
     }
 
-    function submitTest() { switchTab('view-home'); }
+    function submitTest() {
+      clearInterval(timerInterval);
+      let rawScore = 0;
+      const breakdown = [];
+
+      if (TEST && TEST.passages) {
+        TEST.passages.forEach(p => {
+          if (p.questions) {
+            p.questions.forEach(q => {
+              if (q.type === 'grid' && q.sub_questions) {
+                q.sub_questions.forEach(subQ => {
+                  const uAns = String(userAnswers[subQ.id] || '').trim().toLowerCase();
+                  const cAns = String(subQ.answer || q.answer || '').trim().toLowerCase();
+                  const isCorrect = uAns === cAns && uAns !== '';
+                  if (isCorrect) rawScore++;
+                  breakdown.push({ id: subQ.id, user: userAnswers[subQ.id] || '(Empty)', correct: subQ.answer || q.answer, isCorrect });
+                });
+              } else if (q.id && !isNaN(q.id)) {
+                const uAns = String(userAnswers[q.id] || '').trim().toLowerCase();
+                const cAns = String(q.answer || '').trim().toLowerCase();
+                const isCorrect = uAns === cAns && uAns !== '';
+                if (isCorrect) rawScore++;
+                breakdown.push({ id: q.id, user: userAnswers[q.id] || '(Empty)', correct: q.answer, isCorrect });
+              }
+            });
+          }
+        });
+      }
+
+      const band = calculateBandScore(rawScore);
+      document.getElementById('resBandScore').textContent = `Band ${band}`;
+      document.getElementById('resRawScore').textContent = `${rawScore} / 40 Correct Answers`;
+
+      const listEl = document.getElementById('resBreakdownList');
+      listEl.innerHTML = breakdown.map(item => `
+        <div class="py-2 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md ${item.isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'} flex items-center justify-center font-black">${item.id}</span>
+            <span class="text-slate-600">Your: <strong class="${item.isCorrect ? 'text-emerald-700' : 'text-rose-600'}">${item.user}</strong></span>
+          </div>
+          ${item.isCorrect ? `<span class="text-emerald-600 font-black"><i class="fa-solid fa-check"></i></span>` : `<span class="text-slate-500 font-bold">Ans: <strong class="text-emerald-700">${item.correct}</strong></span>`}
+        </div>
+      `).join('');
+
+      document.getElementById('modalResult').classList.remove('hidden');
+
+      // Update stats
+      document.getElementById('statBand').textContent = `Band ${band}`;
+      document.getElementById('statDone').textContent = '1';
+      document.getElementById('statAccuracy').textContent = `${Math.round((rawScore / 40) * 100)}%`;
+      document.getElementById('streakDisplay').textContent = '1';
+
+      if (tg?.sendData) {
+        tg.sendData(JSON.stringify({
+          exam: "IELTS Reading",
+          book: currentBookNum,
+          test: currentTestNum,
+          rawScore: rawScore,
+          band: band
+        }));
+      }
+    }
+
+    function closeResultModal() {
+      document.getElementById('modalResult').classList.add('hidden');
+      switchTab('view-home');
+    }
 
     function switchTab(tabId) {
-      ['view-home', 'view-select-test', 'view-test-runner', 'view-review', 'view-books', 'view-predictions'].forEach(t => {
+      ['view-home', 'view-select-test', 'view-test-runner', 'view-predictions', 'view-books'].forEach(t => {
         document.getElementById(t)?.classList.add('hidden');
       });
       document.getElementById(tabId)?.classList.remove('hidden');
