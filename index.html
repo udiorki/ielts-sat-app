@@ -8,7 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <!-- Подключение базы всех книг -->
+  <!-- Подключение базы тестов -->
   <script src="reading_data.js"></script>
   
   <style>
@@ -63,6 +63,7 @@
 
   <!-- HOME VIEW -->
   <main id="view-home" class="p-4 space-y-4 max-w-md mx-auto">
+    <!-- Blue Banner -->
     <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 text-white shadow-md space-y-2 cursor-pointer hover:opacity-95">
       <div class="flex items-center justify-between">
         <span class="bg-white/20 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">Band 9 Lexical Resource</span>
@@ -77,6 +78,7 @@
       <p class="text-[10px] text-blue-200 pt-1">→ Tap to open Lexical Flashcards</p>
     </div>
     
+    <!-- Emerald Banner -->
     <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-white shadow-md cursor-pointer hover:opacity-95">
       <div class="flex items-center justify-between mb-1">
         <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Interactive Mini-Game</span>
@@ -86,6 +88,7 @@
       <p class="text-[11px] text-emerald-100 mt-0.5">Test your Academic Word List (AWL) knowledge and earn XP!</p>
     </div>
     
+    <!-- Purple Banner -->
     <div onclick="switchTab('view-predictions')" class="bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl p-4 text-white shadow-md cursor-pointer hover:opacity-95">
       <div class="flex items-center justify-between mb-1">
         <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Exam Predictions</span>
@@ -95,6 +98,7 @@
       <p class="text-[11px] text-purple-100 mt-0.5">Practice prompts and study resources.</p>
     </div>
     
+    <!-- 3 Stats Cards -->
     <div class="grid grid-cols-3 gap-2">
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Estimated Band</p>
@@ -112,6 +116,7 @@
     
     <h2 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Practice Modules</h2>
     
+    <!-- 4 Practice Modules Grid -->
     <div class="grid grid-cols-2 gap-3" id="mainModulesGrid">
       <div onclick="openBookSelection('reading')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
         <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-book-reader"></i></div>
@@ -120,17 +125,17 @@
       </div>
       <div onclick="openBookSelection('listening')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
         <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-headphones"></i></div>
-        <h4 class="font-bold text-slate-800 text-xs">Listening Practice</h4>
+        <h4 class="font-bold text-slate-800 text-xs">Listening</h4>
         <p class="text-[10px] text-slate-400">Coming next</p>
       </div>
       <div onclick="openBookSelection('writing')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
         <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-pen-nib"></i></div>
-        <h4 class="font-bold text-slate-800 text-xs">Writing Simulator</h4>
+        <h4 class="font-bold text-slate-800 text-xs">Writing</h4>
         <p class="text-[10px] text-slate-400">Coming next</p>
       </div>
       <div onclick="openBookSelection('speaking')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
         <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-microphone"></i></div>
-        <h4 class="font-bold text-slate-800 text-xs">Speaking AI</h4>
+        <h4 class="font-bold text-slate-800 text-xs">Speaking</h4>
         <p class="text-[10px] text-slate-400">Coming next</p>
       </div>
     </div>
@@ -148,9 +153,9 @@
     <div class="space-y-3" id="testSelectionList"></div>
   </section>
 
-  <!-- TEST RUNNER VIEW -->
+  <!-- TEST RUNNER SIMULATOR SCREEN -->
   <section id="view-test-runner" class="hidden flex flex-col h-screen overflow-hidden">
-    <div class="bg-slate-900 text-white px-4 py-2 flex items-center justify-between shadow-md">
+    <div class="bg-slate-900 text-white px-4 py-2 flex items-center justify-between shadow-md shrink-0">
       <div>
         <h2 class="text-xs font-bold text-slate-200" id="testTitle">Cambridge IELTS 19 — Test 1</h2>
         <p class="text-[10px] text-emerald-400 font-semibold" id="testSubtitle">Academic Reading Test</p>
@@ -166,7 +171,7 @@
       </div>
     </div>
     
-    <div class="bg-slate-100 border-b border-slate-200 px-4 py-1.5 flex gap-2 overflow-x-auto" id="sectionNavTabs"></div>
+    <div class="bg-slate-100 border-b border-slate-200 px-4 py-1.5 flex gap-2 overflow-x-auto shrink-0" id="sectionNavTabs"></div>
     
     <div class="split-container" id="splitMainLayout">
       <div class="split-pane bg-white" id="topPane" style="flex: 1;">
@@ -178,7 +183,7 @@
       </div>
     </div>
     
-    <div class="bg-white border-t border-slate-200 px-4 py-2 sticky bottom-0 z-20 flex items-center justify-between gap-2 shadow-lg">
+    <div class="bg-white border-t border-slate-200 px-4 py-2 sticky bottom-0 z-20 flex items-center justify-between gap-2 shadow-lg shrink-0">
       <div class="flex items-center gap-1 overflow-x-auto py-1 max-w-[65%]" id="questionPalette"></div>
       <button onclick="submitTest()" class="bg-emerald-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-lg shadow whitespace-nowrap active:scale-95 transition-transform">
         Submit Test
@@ -239,6 +244,7 @@
     </button>
   </nav>
 
+  <!-- JAVASCRIPT ENGINE -->
   <script>
     const tg = window.Telegram?.WebApp;
     if (tg) { tg.ready(); tg.expand(); }
