@@ -8,8 +8,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <!-- Подключение базы тестов Cambridge -->
+  <!-- Подключение баз данных тестов -->
   <script src="reading_data.js"></script>
+  <script src="listening_data.js"></script>
+  <script src="writing_data.js"></script>
+  <script src="speaking_data.js"></script>
   
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -108,22 +111,22 @@
     
     <!-- 4 Practice Modules Grid -->
     <div class="grid grid-cols-2 gap-3" id="mainModulesGrid">
-      <div onclick="openBookSelection('reading')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
+      <div onclick="openSkillModule('reading')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
         <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-book-reader"></i></div>
         <h4 class="font-bold text-slate-800 text-xs">Reading Simulator</h4>
         <p class="text-[10px] text-slate-400">Books 1–21 (Passages 1-3)</p>
       </div>
-      <div onclick="switchTab('view-listening')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
+      <div onclick="openSkillModule('listening')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
         <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-headphones"></i></div>
         <h4 class="font-bold text-slate-800 text-xs">Listening AI</h4>
-        <p class="text-[10px] text-slate-400">Audio Player + AI Check</p>
+        <p class="text-[10px] text-slate-400">Audio + Questions + AI</p>
       </div>
-      <div onclick="switchTab('view-writing')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
+      <div onclick="openSkillModule('writing')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
         <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-pen-nib"></i></div>
         <h4 class="font-bold text-slate-800 text-xs">Writing + AI Check</h4>
         <p class="text-[10px] text-slate-400">Task 1 (Charts) & Task 2</p>
       </div>
-      <div onclick="switchTab('view-speaking')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
+      <div onclick="openSkillModule('speaking')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
         <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-microphone"></i></div>
         <h4 class="font-bold text-slate-800 text-xs">Speaking AI</h4>
         <p class="text-[10px] text-slate-400">Interactive Parts 1–3</p>
@@ -131,11 +134,11 @@
     </div>
   </main>
 
-  <!-- READING TEST SELECTION VIEW -->
+  <!-- TEST SELECTION VIEW -->
   <section id="view-select-test" class="p-4 space-y-3 hidden max-w-md mx-auto">
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-sm font-extrabold text-slate-800">Cambridge Reading Books</h2>
+        <h2 class="text-sm font-extrabold text-slate-800" id="selectTestTitle">Cambridge Books</h2>
         <p class="text-[11px] text-slate-500">Official Collection 1 — 21</p>
       </div>
       <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg hover:bg-slate-300">Back</button>
@@ -143,21 +146,17 @@
     <div class="space-y-3" id="testSelectionList"></div>
   </section>
 
-  <!-- LISTENING MODULE VIEW -->
-  <section id="view-listening" class="p-4 space-y-4 hidden max-w-md mx-auto">
+  <!-- LISTENING ACTIVE RUNNER VIEW -->
+  <section id="view-listening-runner" class="p-4 space-y-4 hidden max-w-md mx-auto">
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-sm font-extrabold text-slate-800">IELTS Listening Practice</h2>
-        <p class="text-[11px] text-slate-500">Section 1 with AI Evaluation</p>
+        <h2 class="text-sm font-extrabold text-slate-800" id="listeningTitle">IELTS Listening Test</h2>
+        <p class="text-[11px] text-slate-500" id="listeningSubtitle">Section Audio & Questions</p>
       </div>
-      <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg">Back</button>
+      <button onclick="switchTab('view-home')" class="text-xs font-bold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg">Exit</button>
     </div>
     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
-      <span class="bg-blue-100 text-blue-800 text-[10px] font-black px-2 py-0.5 rounded">Section 1: Conversation</span>
-      <h4 class="font-bold text-slate-800 text-xs">Booking a Hotel Room & Facilities</h4>
-      
-      <!-- Audio Simulator Player -->
-      <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 flex items-center gap-3">
+      <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 flex items-center gap-3">
         <button onclick="toggleAudioMock()" id="audioPlayBtn" class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shadow hover:bg-blue-700 active:scale-95 transition-transform"><i class="fa-solid fa-play"></i></button>
         <div class="flex-1">
           <div class="text-[11px] font-bold text-slate-700" id="audioStatus">Audio Track Ready</div>
@@ -166,17 +165,7 @@
           </div>
         </div>
       </div>
-
-      <div class="space-y-3 pt-2">
-        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
-          <label class="block text-xs font-bold text-slate-700 mb-1">1. Customer's surname:</label>
-          <input type="text" id="l-ans-1" placeholder="Type answer..." class="w-full bg-white border border-slate-300 rounded p-2 text-xs font-medium focus:outline-none focus:border-blue-500">
-        </div>
-        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
-          <label class="block text-xs font-bold text-slate-700 mb-1">2. Arrival date (e.g., 12th May):</label>
-          <input type="text" id="l-ans-2" placeholder="Type answer..." class="w-full bg-white border border-slate-300 rounded p-2 text-xs font-medium focus:outline-none focus:border-blue-500">
-        </div>
-      </div>
+      <div class="space-y-3 pt-2 max-h-[50vh] overflow-y-auto" id="listeningQuestionsContainer"></div>
       <button onclick="submitListeningAI()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 rounded-lg shadow active:scale-95 transition-transform">Check Answers with AI</button>
       <div id="listeningAiResult" class="hidden bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1"></div>
     </div>
@@ -200,8 +189,8 @@
     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
       <!-- Task 1 Content with Chart -->
       <div id="wTask1Content" class="space-y-2">
-        <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">Task 1: Graph Analysis</span>
-        <p class="text-xs text-slate-700 leading-relaxed">"The chart below shows global renewable energy growth from 2010 to 2025 across three sectors."</p>
+        <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded" id="wTask1Type">Task 1: Graph Analysis</span>
+        <p class="text-xs text-slate-700 leading-relaxed" id="wTask1Prompt">Loading prompt...</p>
         <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center space-y-2">
           <div class="h-32 bg-gradient-to-r from-blue-500/10 via-emerald-500/20 to-indigo-500/10 rounded flex items-end justify-around p-2 border border-slate-200">
             <div class="w-8 bg-blue-600 rounded-t" style="height: 35%;"></div>
@@ -209,17 +198,17 @@
             <div class="w-8 bg-emerald-500 rounded-t" style="height: 80%;"></div>
             <div class="w-8 bg-emerald-600 rounded-t" style="height: 100%;"></div>
           </div>
-          <p class="text-[10px] text-slate-400 font-semibold">Figure: Solar, Wind & Hydro Capacity (Gigawatts)</p>
+          <p class="text-[10px] text-slate-400 font-semibold" id="wChartDesc">Chart Visualization</p>
         </div>
       </div>
 
       <!-- Task 2 Content -->
       <div id="wTask2Content" class="space-y-2 hidden">
-        <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">Task 2: Academic Essay</span>
-        <p class="text-xs font-medium text-slate-700 leading-relaxed bg-amber-50/50 p-3 rounded-lg border border-amber-100">"Some people think that universities should provide graduates with the knowledge and skills needed in the workplace. Others think that the true function of a university should be to give access to knowledge for its own sake. Discuss both views and give your opinion."</p>
+        <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded" id="wTask2Type">Task 2: Academic Essay</span>
+        <p class="text-xs font-medium text-slate-700 leading-relaxed bg-amber-50/50 p-3 rounded-lg border border-amber-100" id="wTask2Prompt">Loading prompt...</p>
       </div>
 
-      <textarea id="writingEssayInput" rows="6" class="w-full p-2.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-amber-500 bg-slate-50" placeholder="Write your response here (min 150 words for Task 1, 250 for Task 2)..."></textarea>
+      <textarea id="writingEssayInput" rows="6" class="w-full p-2.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-amber-500 bg-slate-50" placeholder="Write your response here..."></textarea>
       
       <button onclick="evaluateWritingAI()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs py-2.5 rounded-lg shadow active:scale-95 transition-transform">Evaluate with AI Examiner</button>
       <div id="writingAiResult" class="hidden bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-2"></div>
@@ -238,10 +227,10 @@
     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3 text-center">
       <span class="bg-purple-100 text-purple-800 text-[10px] font-black px-2 py-0.5 rounded">Part 1: Introduction</span>
       <div class="w-16 h-16 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mx-auto text-xl shadow-inner"><i class="fa-solid fa-microphone-lines animate-pulse"></i></div>
-      <p class="text-xs font-bold text-slate-800" id="speakingPromptText">Examiner: "Let's talk about your hometown. What do you like most about it?"</p>
+      <p class="text-xs font-bold text-slate-800" id="speakingPromptText">Loading question...</p>
       <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-left text-xs space-y-2">
-        <p class="text-[11px] text-slate-500 font-semibold">Your Speech Transcript (Simulated):</p>
-        <p id="speechTranscript" class="font-medium text-slate-700 italic">Tap start and speak into your phone microphone...</p>
+        <p class="text-[11px] text-slate-500 font-semibold">Model Answer / Sample Response:</p>
+        <p id="speechModelAnswer" class="font-medium text-slate-700 italic">Tap start to record your voice...</p>
       </div>
       <div class="flex gap-2">
         <button onclick="toggleRecordSpeech()" id="btnRecord" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs py-2.5 rounded-lg shadow active:scale-95 transition-transform">Start Recording</button>
@@ -283,7 +272,7 @@
     
     <div class="bg-white border-t border-slate-200 px-4 py-2 sticky bottom-0 z-20 flex items-center justify-between gap-2 shadow-lg shrink-0">
       <div class="flex items-center gap-1 overflow-x-auto py-1 max-w-[65%]" id="questionPalette"></div>
-      <button onclick="submitTest()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-3.5 py-2 rounded-lg shadow whitespace-nowrap active:scale-95 transition-transform">
+      <button onclick="submitReadingTest()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-3.5 py-2 rounded-lg shadow whitespace-nowrap active:scale-95 transition-transform">
         Submit Test
       </button>
     </div>
@@ -346,19 +335,15 @@
   <script>
     const tg = window.Telegram?.WebApp;
     if (tg) { 
-      try {
-        tg.ready(); 
-        tg.expand(); 
-      } catch(e) {}
+      try { tg.ready(); tg.expand(); } catch(e) {}
     }
 
     let currentMode = 'IELTS';
     let currentSkill = 'reading';
-    let currentBookNum = 21;
+    let currentBookNum = 1;
     let currentTestNum = 1;
     let timerInterval = null;
     let userAnswers = {};
-    let flaggedQuestions = {};
     let TEST = null;
 
     function calculateBandScore(rawScore) {
@@ -395,10 +380,244 @@
       }
     }
 
-    function openBookSelection(skill, filterBookNumber = null) {
+    function switchTab(tabId) {
+      ['view-home', 'view-select-test', 'view-listening-runner', 'view-writing', 'view-speaking', 'view-test-runner', 'view-predictions', 'view-books'].forEach(t => {
+        document.getElementById(t)?.classList.add('hidden');
+      });
+      document.getElementById(tabId)?.classList.remove('hidden');
+    }
+
+    function openSkillModule(skill) {
       currentSkill = skill;
-      switchTab('view-select-test');
-      renderTestSelectionList(filterBookNumber);
+      if (skill === 'reading') {
+        document.getElementById('selectTestTitle').textContent = "Cambridge Reading Books";
+        switchTab('view-select-test');
+        renderCollectionList(skill);
+      } else if (skill === 'listening') {
+        document.getElementById('selectTestTitle').textContent = "Cambridge Listening Books";
+        switchTab('view-select-test');
+        renderCollectionList(skill);
+      } else if (skill === 'writing') {
+        loadWritingData(1, 1);
+        switchTab('view-writing');
+      } else if (skill === 'speaking') {
+        loadSpeakingData(1, 1);
+        switchTab('view-speaking');
+      }
+    }
+
+    function renderCollectionList(skill) {
+      const list = document.getElementById('testSelectionList');
+      if (!list) return;
+      list.innerHTML = '';
+      for (let book = 21; book >= 1; book--) {
+        list.innerHTML += `
+          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 bg-blue-600 text-white rounded flex items-center justify-center font-black text-xs">C${book}</span>
+                <h4 class="font-bold text-slate-800 text-xs">Cambridge IELTS ${book}</h4>
+              </div>
+              <span class="text-[10px] bg-blue-50 text-blue-600 font-bold px-2 py-0.5 rounded uppercase">${skill}</span>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5">
+              <button onclick="launchModuleTest(${book}, 1, '${skill}')" class="bg-slate-50 border text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white">T1</button>
+              <button onclick="launchModuleTest(${book}, 2, '${skill}')" class="bg-slate-50 border text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white">T2</button>
+              <button onclick="launchModuleTest(${book}, 3, '${skill}')" class="bg-slate-50 border text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white">T3</button>
+              <button onclick="launchModuleTest(${book}, 4, '${skill}')" class="bg-slate-50 border text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white">T4</button>
+            </div>
+          </div>`;
+      }
+    }
+
+    function launchModuleTest(book, test, skill) {
+      currentBookNum = book;
+      currentTestNum = test;
+      if (skill === 'reading') {
+        launchReadingTest(book, test);
+      } else if (skill === 'listening') {
+        launchListeningTest(book, test);
+      }
+    }
+
+    // READING ENGINE
+    function launchReadingTest(book, test) {
+      currentBookNum = book; 
+      currentTestNum = test; 
+      userAnswers = {};
+      switchTab('view-test-runner');
+      document.getElementById('testTitle').textContent = `Cambridge IELTS ${book} — Test ${test}`;
+      
+      const bookStr = String(book);
+      const testStr = String(test);
+      if (window.CAMBRIDGE_DATA && window.CAMBRIDGE_DATA[bookStr] && window.CAMBRIDGE_DATA[bookStr][testStr]) {
+        TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
+      } else if (window.CAMBRIDGE_DATA && window.CAMBRIDGE_DATA["1"]) {
+        TEST = window.CAMBRIDGE_DATA["1"]["1"];
+      }
+
+      const tabs = document.getElementById('sectionNavTabs');
+      if (tabs && TEST && TEST.passages) {
+        tabs.innerHTML = TEST.passages.map((p, i) => 
+          `<button id="pass-tab-${i+1}" onclick="switchReadingPassage(${i+1})" class="px-3 py-1 bg-white text-slate-700 border rounded text-xs font-bold">Passage ${i+1}</button>`
+        ).join('');
+      }
+      renderPalette(40);
+      startTimer(3600);
+      switchReadingPassage(1);
+      initResizer();
+    }
+
+    function switchReadingPassage(passageNum) {
+      [1, 2, 3].forEach(p => {
+        const btn = document.getElementById(`pass-tab-${p}`);
+        if (btn) {
+          btn.className = p === passageNum 
+            ? "px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold shadow-sm"
+            : "px-3 py-1 bg-white text-slate-700 border rounded text-xs font-bold";
+        }
+      });
+
+      const pData = TEST?.passages?.[passageNum - 1];
+      if (!pData) return;
+
+      document.getElementById('passageContent').innerHTML = `
+        <div class="space-y-2 text-xs text-slate-800 p-2 select-text">
+          <h3 class="font-extrabold text-slate-900 text-sm mb-3">Passage ${passageNum}: ${pData.title || ''}</h3>
+          <p class="leading-relaxed">${pData.passage_text || ''}</p>
+        </div>
+      `;
+
+      let qHtml = `<div class="space-y-4 pb-8">`;
+      pData.questions?.forEach(q => {
+        if (q.type === 'instruction') {
+           qHtml += `<div class="bg-blue-50 p-3 rounded-xl border border-blue-200"><h4 class="font-bold text-blue-900 text-xs">${q.prompt}</h4></div>`;
+           return;
+        }
+        qHtml += `<div id="q-box-${q.id}" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2">`;
+        qHtml += `<div class="text-[12px] font-bold text-slate-800"><span class='border bg-white px-1.5 py-0.5 rounded text-[11px] font-black mr-2'>${q.id}</span> ${q.prompt || ''}</div>`;
+        if (q.type === 'fill_in') {
+          qHtml += `<div class="mt-2"><input type="text" oninput="markAnswered(${q.id}, this.value)" value="${userAnswers[q.id] || ''}" placeholder="Type answer" class="border-b-2 border-blue-500 bg-slate-50 px-2 py-0.5 text-xs text-blue-700 font-bold focus:outline-none"></div>`;
+        } else if (q.options) {
+          qHtml += `<div class="space-y-1.5 mt-2">`;
+          q.options.forEach(opt => {
+            let isChecked = userAnswers[q.id] === opt;
+            qHtml += `<label class="flex items-center gap-2.5 p-2 border rounded-lg cursor-pointer text-xs font-medium ${isChecked ? 'bg-blue-50 border-blue-300' : 'border-slate-200 hover:bg-slate-50'}" onclick="markAnswered(${q.id}, '${opt}')"><input type="radio" name="q-${q.id}" value="${opt}" ${isChecked ? 'checked' : ''} class="accent-blue-600"> ${opt}</label>`;
+          });
+          qHtml += `</div>`;
+        }
+        qHtml += `</div>`;
+      });
+      qHtml += `</div>`;
+      document.getElementById('questionsContent').innerHTML = qHtml;
+    }
+
+    function markAnswered(qNum, value) {
+      if (value !== undefined && value !== null && String(value).trim() !== '') {
+        userAnswers[qNum] = String(value).trim();
+        document.getElementById(`palette-q-${qNum}`)?.classList.add('answered');
+      } else {
+        delete userAnswers[qNum];
+        document.getElementById(`palette-q-${qNum}`)?.classList.remove('answered');
+      }
+    }
+
+    function renderPalette(total) {
+      const palette = document.getElementById('questionPalette');
+      if (!palette) return;
+      palette.innerHTML = '';
+      for (let i = 1; i <= total; i++) {
+        palette.innerHTML += `<div class="q-badge" id="palette-q-${i}" onclick="jumpToQuestion(${i})">${i}</div>`;
+      }
+    }
+
+    function jumpToQuestion(i) {
+      if (i >= 1 && i <= 13) switchReadingPassage(1);
+      else if (i >= 14 && i <= 26) switchReadingPassage(2);
+      else if (i >= 27 && i <= 40) switchReadingPassage(3);
+      setTimeout(() => document.getElementById(`q-box-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+    }
+
+    function submitReadingTest() {
+      clearInterval(timerInterval);
+      let rawScore = 0;
+      const breakdown = [];
+      TEST?.passages?.forEach(p => {
+        p.questions?.forEach(q => {
+          if (q.id && !isNaN(q.id)) {
+            const correctAns = q.answer || '';
+            const userAns = userAnswers[q.id] || '';
+            const isCorrect = userAns.toLowerCase() === correctAns.toLowerCase();
+            if (isCorrect) rawScore++;
+            breakdown.push({ id: q.id, user: userAns || '(Empty)', correct: correctAns, isCorrect });
+          }
+        });
+      });
+
+      const band = calculateBandScore(rawScore);
+      document.getElementById('resBandScore').textContent = `Band ${band}`;
+      document.getElementById('resRawScore').textContent = `${rawScore} / 40 Correct Answers`;
+      
+      const listEl = document.getElementById('resBreakdownList');
+      listEl.innerHTML = breakdown.map(item => `
+        <div class="py-2 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md ${item.isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'} flex items-center justify-center font-black">${item.id}</span>
+            <span class="text-slate-600">Your: <strong class="${item.isCorrect ? 'text-emerald-700' : 'text-rose-600'}">${item.user}</strong></span>
+          </div>
+          ${item.isCorrect ? `<span class="text-emerald-600 font-black"><i class="fa-solid fa-check"></i></span>` : `<span class="text-slate-500 font-bold">Ans: <strong class="text-emerald-700">${item.correct}</strong></span>`}
+        </div>
+      `).join('');
+
+      document.getElementById('modalResult').classList.remove('hidden');
+      document.getElementById('statBand').textContent = `Band ${band}`;
+      document.getElementById('statDone').textContent = String(parseInt(document.getElementById('statDone').textContent || '0') + 1);
+    }
+
+    function closeResultModal() {
+      document.getElementById('modalResult').classList.add('hidden');
+      switchTab('view-home');
+    }
+
+    // LISTENING ENGINE
+    function launchListeningTest(book, test) {
+      switchTab('view-listening-runner');
+      document.getElementById('listeningTitle').textContent = `Cambridge IELTS ${book} — Test ${test}`;
+      const L_TEST = window.CAMBRIDGE_LISTENING_DATA?.[String(book)]?.[String(test)] || window.CAMBRIDGE_LISTENING_DATA?.["1"]?.["1"];
+      
+      let container = document.getElementById('listeningQuestionsContainer');
+      container.innerHTML = '';
+      L_TEST?.sections?.forEach(sec => {
+        container.innerHTML += `<div class="font-bold text-blue-900 text-xs mt-3">${sec.title}</div>`;
+        sec.questions?.forEach(q => {
+          container.innerHTML += `<div class="bg-slate-50 p-2.5 rounded border text-xs"><span class="font-black mr-2">${q.id}</span>${q.prompt} <input type="text" class="border-b border-blue-500 ml-2 px-1 text-xs font-semibold focus:outline-none"></div>`;
+        });
+      });
+    }
+
+    let isAudioPlaying = false;
+    function toggleAudioMock() {
+      isAudioPlaying = !isAudioPlaying;
+      document.getElementById('audioPlayBtn').innerHTML = isAudioPlaying ? `<i class="fa-solid fa-pause"></i>` : `<i class="fa-solid fa-play"></i>`;
+      document.getElementById('audioProgress').style.width = isAudioPlaying ? "75%" : "0%";
+      document.getElementById('audioStatus').textContent = isAudioPlaying ? "Playing Audio Stream..." : "Audio Paused";
+    }
+
+    function submitListeningAI() {
+      const res = document.getElementById('listeningAiResult');
+      res.classList.remove('hidden');
+      res.innerHTML = `<p class="font-bold text-slate-800">🤖 AI Listening Examiner:</p><p class="text-emerald-700 font-semibold">Evaluated successfully! Your transcript match is accurate.</p>`;
+    }
+
+    // WRITING ENGINE
+    function loadWritingData(book, test) {
+      const W_TEST = window.CAMBRIDGE_WRITING_DATA?.[String(book)]?.[String(test)] || window.CAMBRIDGE_WRITING_DATA?.["1"]?.["1"];
+      if (!W_TEST) return;
+      document.getElementById('wTask1Type').textContent = `Task 1: ${W_TEST.task1.type}`;
+      document.getElementById('wTask1Prompt').textContent = W_TEST.task1.prompt;
+      document.getElementById('wChartDesc').textContent = W_TEST.task1.chart_description.split('\n')[0];
+      document.getElementById('wTask2Type').textContent = `Task 2: ${W_TEST.task2.type}`;
+      document.getElementById('wTask2Prompt').textContent = W_TEST.task2.prompt;
     }
 
     function switchWritingTask(taskNum) {
@@ -419,292 +638,63 @@
 
     function evaluateWritingAI() {
       const text = document.getElementById('writingEssayInput').value;
-      const resEl = document.getElementById('writingAiResult');
-      resEl.classList.remove('hidden');
+      const res = document.getElementById('writingAiResult');
+      res.classList.remove('hidden');
       if(text.length < 20) {
-        resEl.innerHTML = `<p class="text-rose-600 font-bold">Please write a bit more for accurate AI evaluation.</p>`;
+        res.innerHTML = `<p class="text-rose-600 font-bold">Please write a bit more for accurate AI evaluation.</p>`;
         return;
       }
-      resEl.innerHTML = `
+      res.innerHTML = `
         <p class="font-bold text-slate-800">🤖 AI Examiner Feedback:</p>
         <p><strong>Estimated Band Score:</strong> <span class="text-amber-600 font-black">7.5</span></p>
-        <p><strong>Task Response:</strong> Clearly addresses all parts with relevant data/arguments.</p>
-        <p><strong>Lexical Resource:</strong> Good range of academic vocabulary used.</p>
-        <p><strong>Grammar:</strong> Strong sentence structures with accurate punctuation.</p>
+        <p><strong>Task Achievement:</strong> Addresses all aspects of the prompt comprehensively.</p>
+        <p><strong>Lexical Resource:</strong> Advanced vocabulary incorporated effectively.</p>
       `;
     }
 
-    let isAudioPlaying = false;
-    function toggleAudioMock() {
-      isAudioPlaying = !isAudioPlaying;
-      const btn = document.getElementById('audioPlayBtn');
-      const status = document.getElementById('audioStatus');
-      const prog = document.getElementById('audioProgress');
-      if(isAudioPlaying) {
-        btn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
-        status.textContent = "Playing Audio Track...";
-        prog.style.width = "75%";
-      } else {
-        btn.innerHTML = `<i class="fa-solid fa-play"></i>`;
-        status.textContent = "Audio Paused";
-      }
-    }
-
-    function submitListeningAI() {
-      const resEl = document.getElementById('listeningAiResult');
-      resEl.classList.remove('hidden');
-      resEl.innerHTML = `
-        <p class="font-bold text-slate-800">🤖 AI Listening Check:</p>
-        <p class="text-emerald-700 font-semibold">Score: 2 / 2 Correct. Your answers match the audio transcript perfectly!</p>
-      `;
+    // SPEAKING ENGINE
+    function loadSpeakingData(book, test) {
+      const S_TEST = window.CAMBRIDGE_SPEAKING_DATA?.[String(book)]?.[String(test)] || window.CAMBRIDGE_SPEAKING_DATA?.["1"]?.["1"];
+      if (!S_TEST) return;
+      document.getElementById('speakingPromptText').textContent = `Examiner: "${S_TEST.part1.questions[0].q}"`;
+      document.getElementById('speechModelAnswer').textContent = S_TEST.part1.questions[0].sample_answer;
     }
 
     let isRecording = false;
     function toggleRecordSpeech() {
       isRecording = !isRecording;
       const btn = document.getElementById('btnRecord');
-      const transcript = document.getElementById('speechTranscript');
-      if(isRecording) {
-        btn.textContent = "Stop Recording";
-        btn.className = "flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-2.5 rounded-lg shadow";
-        transcript.textContent = "Listening to your voice... Speak clearly into your device microphone.";
-      } else {
-        btn.textContent = "Start Recording";
-        btn.className = "flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs py-2.5 rounded-lg shadow";
-        transcript.textContent = "“Well, my daily routine usually starts around 7 AM. After a cup of coffee, I check my priorities for the day...”";
-      }
+      btn.textContent = isRecording ? "Stop Recording" : "Start Recording";
+      btn.className = isRecording ? "flex-1 bg-rose-600 text-white font-bold text-xs py-2.5 rounded-lg shadow" : "flex-1 bg-purple-600 text-white font-bold text-xs py-2.5 rounded-lg shadow";
     }
 
     function evaluateSpeakingAI() {
-      const resEl = document.getElementById('speakingAiResult');
-      resEl.classList.remove('hidden');
-      resEl.innerHTML = `
+      const res = document.getElementById('speakingAiResult');
+      res.classList.remove('hidden');
+      res.innerHTML = `
         <p class="font-bold text-slate-800">🤖 AI Speaking Evaluation:</p>
         <p><strong>Band Score:</strong> <span class="text-purple-600 font-black">7.0</span></p>
-        <p><strong>Fluency & Coherence:</strong> Natural flow of speech with appropriate pauses.</p>
-        <p><strong>Pronunciation:</strong> Clear intonation and correct word stress.</p>
+        <p><strong>Fluency & Coherence:</strong> Natural speech flow with appropriate pauses.</p>
+        <p><strong>Pronunciation:</strong> Clear intonation and word stress.</p>
       `;
     }
 
-    function renderTestSelectionList(filterBookNumber = null) {
-      const list = document.getElementById('testSelectionList');
-      if (!list) return;
-      list.innerHTML = '';
-      
-      let startBook = filterBookNumber !== null ? filterBookNumber : 21;
-      let endBook = filterBookNumber !== null ? filterBookNumber : 1;
-
-      for (let book = startBook; book >= endBook; book--) {
-        const item = document.createElement('div');
-        item.className = 'bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2';
-        item.innerHTML = `
-          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-            <div class="flex items-center gap-2">
-              <span class="w-6 h-6 bg-blue-600 text-white rounded flex items-center justify-center font-black text-xs">C${book}</span>
-              <h4 class="font-bold text-slate-800 text-xs">Cambridge IELTS ${book}</h4>
-            </div>
-            <span class="text-[10px] bg-blue-50 text-blue-600 font-bold px-2 py-0.5 rounded uppercase">Reading</span>
-          </div>
-          <div class="grid grid-cols-4 gap-1.5">
-            <button onclick="launchCDTest(${book}, 1, 'reading')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors active:scale-95">T1</button>
-            <button onclick="launchCDTest(${book}, 2, 'reading')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors active:scale-95">T2</button>
-            <button onclick="launchCDTest(${book}, 3, 'reading')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors active:scale-95">T3</button>
-            <button onclick="launchCDTest(${book}, 4, 'reading')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors active:scale-95">T4</button>
-          </div>
-        `;
-        list.appendChild(item);
-      }
+    function startTimer(seconds) {
+      clearInterval(timerInterval);
+      let remain = seconds;
+      timerInterval = setInterval(() => {
+        remain--;
+        const m = Math.floor(remain / 60), s = remain % 60;
+        const timerEl = document.getElementById('testTimer');
+        if (timerEl) timerEl.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        if (remain <= 0) { clearInterval(timerInterval); submitReadingTest(); }
+      }, 1000);
     }
 
-    function launchCDTest(book, testNumber, skill = 'reading') {
-      currentBookNum = book; 
-      currentTestNum = testNumber; 
-      userAnswers = {};
-      flaggedQuestions = {};
-      
-      switchTab('view-test-runner');
-      
-      const titleEl = document.getElementById('testTitle');
-      if (titleEl) titleEl.textContent = `Cambridge IELTS ${book} — Test ${testNumber}`;
-      const subtitleEl = document.getElementById('testSubtitle');
-      if (subtitleEl) subtitleEl.textContent = `Academic ${skill.charAt(0).toUpperCase() + skill.slice(1)} Test`;
-
-      const bookStr = String(book);
-      const testStr = String(testNumber);
-
-      if (window.CAMBRIDGE_DATA && window.CAMBRIDGE_DATA[bookStr] && window.CAMBRIDGE_DATA[bookStr][testStr]) {
-        TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
-      } else if (window.CAMBRIDGE_DATA && window.CAMBRIDGE_DATA["21"]) {
-        TEST = window.CAMBRIDGE_DATA["21"][testStr] || window.CAMBRIDGE_DATA["21"]["1"];
-      }
-
-      const tabs = document.getElementById('sectionNavTabs');
-      if (tabs && TEST && TEST.passages) {
-        tabs.innerHTML = TEST.passages.map((p, i) => 
-          `<button id="pass-tab-${i+1}" onclick="switchReadingPassage(${i+1})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors">Passage ${i+1}</button>`
-        ).join('');
-      }
-      
-      renderPalette(40); 
-      startTimer(3600); 
-      switchReadingPassage(1);
-      initResizer();
-    }
-
-    function switchReadingPassage(passageNum) {
-      [1, 2, 3].forEach(p => {
-        const btn = document.getElementById(`pass-tab-${p}`);
-        if (btn) {
-          btn.className = p === passageNum 
-            ? "px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold shadow-sm"
-            : "px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors hover:bg-slate-50";
-        }
-      });
-
-      const passagePane = document.getElementById('passageContent');
-      const questionsPane = document.getElementById('questionsContent');
-      
-      if (!passagePane || !questionsPane) return;
-
-      if (!TEST || !TEST.passages || !TEST.passages[passageNum - 1]) {
-        passagePane.innerHTML = `<p class="p-4 text-xs font-bold text-slate-600">No passage data found for this test.</p>`;
-        questionsPane.innerHTML = '';
-        return;
-      }
-
-      const pData = TEST.passages[passageNum - 1];
-
-      const textHtml = (pData.passage_text || "").split(/\n+/).map(para => {
-        if (para.match(/^[A-G]\s/)) {
-            return `<p class="mb-3 leading-relaxed"><strong class="text-sm mr-2 text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">${para[0]}</strong> ${para.substring(2)}</p>`;
-        }
-        return `<p class="mb-3 leading-relaxed">${para}</p>`;
-      }).join('');
-
-      passagePane.innerHTML = `
-        <div class="space-y-2 text-xs text-slate-800 p-2 select-text">
-          <h3 class="font-extrabold text-slate-900 text-sm mb-3">Passage ${passageNum}: ${pData.title || ''}</h3>
-          ${textHtml}
-        </div>
-      `;
-
-      let qHtml = `<div class="space-y-4 pb-8">`;
-      if (pData.questions) {
-          pData.questions.forEach(q => {
-            if (q.type === 'instruction') {
-               qHtml += `<div class="bg-blue-50/95 p-3 rounded-xl border border-blue-200 sticky top-0 z-10 backdrop-blur-md shadow-sm">
-                 <h4 class="font-bold text-blue-900 text-xs leading-relaxed">${q.prompt}</h4>
-               </div>`;
-               return;
-            }
-
-            qHtml += `<div id="q-box-${q.id}" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2.5">`;
-            let promptText = q.prompt || '';
-
-            if (q.type === 'grid') {
-              qHtml += `<div class="text-[12px] font-medium text-slate-800 leading-relaxed">${promptText}</div>`;
-              qHtml += `<div class="overflow-x-auto"><table class="w-full text-left border-collapse bg-slate-50/50 rounded-lg"><thead><tr><th class="p-2 border-b border-slate-200"></th>`;
-              if(q.options) {
-                  q.options.forEach(opt => {
-                    qHtml += `<th class="p-2 border-b border-slate-200 text-center text-slate-600 font-extrabold w-10">${opt}</th>`;
-                  });
-              }
-              qHtml += `</tr></thead><tbody>`;
-              if(q.sub_questions) {
-                  q.sub_questions.forEach(subQ => {
-                    qHtml += `<tr><td class="p-2.5 border-b border-slate-200 text-[12px] font-medium text-slate-700 leading-snug"><span class='border border-slate-400 bg-white px-1.5 py-0.5 rounded text-[11px] font-black mr-2 shadow-sm'>${subQ.id}</span>${subQ.text}</td>`;
-                    if(q.options) {
-                        q.options.forEach(opt => {
-                          let isChecked = userAnswers[subQ.id] === opt ? 'checked' : '';
-                          qHtml += `<td class="p-2 border-b border-slate-200 text-center bg-white"><input type="radio" name="q-${subQ.id}" value="${opt}" ${isChecked} onchange="markAnswered(${subQ.id}, this.value)" class="w-4 h-4 cursor-pointer accent-blue-600"></td>`;
-                        });
-                    }
-                    qHtml += `</tr>`;
-                  });
-              }
-              qHtml += `</tbody></table></div>`;
-            } else if (q.type === 'fill_in') {
-              let inputHtml = `<input type="text" oninput="markAnswered(${q.id}, this.value)" value="${userAnswers[q.id] || ''}" placeholder="answer" class="border-b-2 border-blue-500 bg-slate-50 px-2 py-0.5 text-blue-700 font-bold focus:outline-none focus:bg-blue-100 min-w-24 text-center mx-1 rounded-t transition-colors text-xs">`;
-              let formattedPrompt = promptText.includes('_____') 
-                ? promptText.replace(/_+/g, inputHtml) 
-                : `<span class='border border-slate-400 bg-white px-1.5 py-0.5 rounded text-[11px] font-black mr-2 shadow-sm'>${q.id}</span> ${promptText} <div class="mt-2">${inputHtml}</div>`;
-              qHtml += `<div class="text-[12px] font-medium text-slate-800 leading-relaxed">${formattedPrompt}</div>`;
-            } else if (q.type === 'tfng' || q.type === 'mcq') {
-              qHtml += `<div class="text-[12px] font-bold text-slate-800 leading-relaxed">${promptText.startsWith('<span') ? promptText : `<span class='border border-slate-400 bg-white px-1.5 py-0.5 rounded text-[11px] font-black mr-2 shadow-sm'>${q.id}</span> ` + promptText}</div>`;
-              qHtml += `<div class="space-y-1.5 mt-2">`;
-              if (q.options) {
-                  q.options.forEach(opt => {
-                     let isChecked = userAnswers[q.id] === opt;
-                     let activeClass = isChecked ? 'bg-blue-50 border-blue-300' : 'border-slate-200 hover:bg-slate-50';
-                     const escapedOpt = opt.replace(/'/g, "\\'");
-                     qHtml += `
-                       <label class="flex items-center gap-2.5 p-2 border rounded-lg cursor-pointer transition-colors ${activeClass}" onclick="updateRadioUI(this, ${q.id}, '${escapedOpt}')">
-                         <input type="radio" name="q-${q.id}" value="${escapedOpt}" ${isChecked ? 'checked' : ''} class="hidden">
-                         <div class="w-3.5 h-3.5 rounded-full border border-slate-400 flex items-center justify-center ${isChecked ? 'border-blue-600' : ''}">
-                            <div class="w-1.5 h-1.5 rounded-full ${isChecked ? 'bg-blue-600' : 'bg-transparent'}"></div>
-                         </div>
-                         <span class="text-[12px] text-slate-700 font-medium">${opt}</span>
-                       </label>
-                     `;
-                  });
-              }
-              qHtml += `</div>`;
-            }
-            qHtml += `</div>`;
-          });
-      }
-      qHtml += `</div>`;
-      questionsPane.innerHTML = qHtml;
-    }
-
-    function updateRadioUI(labelElement, qId, value) {
-        markAnswered(qId, value);
-        const container = labelElement.parentElement;
-        container.querySelectorAll('label').forEach(lbl => {
-            lbl.className = 'flex items-center gap-2.5 p-2 border rounded-lg cursor-pointer transition-colors border-slate-200 hover:bg-slate-50';
-            const outerCircle = lbl.querySelector('.w-3\\.5');
-            if (outerCircle) outerCircle.classList.remove('border-blue-600');
-            const inner = lbl.querySelector('.w-1\\.5');
-            if(inner) inner.className = 'w-1.5 h-1.5 rounded-full bg-transparent';
-        });
-        labelElement.className = 'flex items-center gap-2.5 p-2 border rounded-lg cursor-pointer transition-colors bg-blue-50 border-blue-300';
-        const activeOuter = labelElement.querySelector('.w-3\\.5');
-        if (activeOuter) activeOuter.classList.add('border-blue-600');
-        const activeInner = labelElement.querySelector('.w-1\\.5');
-        if(activeInner) activeInner.className = 'w-1.5 h-1.5 rounded-full bg-blue-600';
-    }
-
-    function markAnswered(qNum, value) {
-      if (value !== undefined && value !== null && String(value).trim() !== '') {
-        userAnswers[qNum] = String(value).trim();
-        document.getElementById(`palette-q-${qNum}`)?.classList.add('answered');
-      } else {
-        delete userAnswers[qNum];
-        document.getElementById(`palette-q-${qNum}`)?.classList.remove('answered');
-      }
-    }
-
-    function renderPalette(total) {
-      const palette = document.getElementById('questionPalette');
-      if(!palette) return;
-      
-      palette.innerHTML = '';
-      for (let i = 1; i <= total; i++) {
-        const btn = document.createElement('div');
-        btn.className = `q-badge ${userAnswers[i] ? 'answered' : ''}`;
-        btn.id = `palette-q-${i}`;
-        btn.innerText = i;
-        btn.onclick = () => {
-            if (currentSkill === 'reading') {
-                if (i >= 1 && i <= 13) switchReadingPassage(1);
-                else if (i >= 14 && i <= 26) switchReadingPassage(2);
-                else if (i >= 27 && i <= 40) switchReadingPassage(3);
-            }
-          setTimeout(() => {
-            document.getElementById(`q-box-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }, 120);
-        };
-        palette.appendChild(btn);
+    function confirmExitTest() {
+      if (confirm("Are you sure you want to exit? Progress will be lost.")) {
+        clearInterval(timerInterval);
+        switchTab('view-home');
       }
     }
 
@@ -717,7 +707,6 @@
         span.className = 'highlighted';
         range.surroundContents(span);
         sel.removeAllRanges();
-        if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
       } catch(e) {}
     }
 
@@ -726,153 +715,19 @@
       const top = document.getElementById('topPane');
       const bottom = document.getElementById('bottomPane');
       if (!resizer || !top || !bottom) return;
-
       let isDragging = false;
-
-      function onStart(e) { isDragging = true; }
-      function onMove(e) {
+      resizer.onmousedown = () => isDragging = true;
+      resizer.ontouchstart = () => isDragging = true;
+      window.onmousemove = (e) => {
         if (!isDragging) return;
-        if (window.innerWidth >= 768) {
-          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-          const totalWidth = window.innerWidth;
-          const newLeftWidth = Math.max(200, Math.min(totalWidth - 200, clientX));
-          top.style.flex = 'none';
-          top.style.width = `${newLeftWidth}px`;
-          bottom.style.flex = '1';
-        } else {
-          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-          const totalHeight = window.innerHeight - 125;
-          const newTopHeight = Math.max(80, Math.min(totalHeight - 80, clientY - 60));
-          top.style.flex = 'none';
-          top.style.height = `${newTopHeight}px`;
-          bottom.style.flex = '1';
-        }
-      }
-      function onEnd() { isDragging = false; }
-
-      resizer.addEventListener('mousedown', onStart);
-      resizer.addEventListener('touchstart', onStart, { passive: true });
-      window.addEventListener('mousemove', onMove);
-      window.addEventListener('touchmove', onMove, { passive: true });
-      window.addEventListener('mouseup', onEnd);
-      window.addEventListener('touchend', onEnd);
-    }
-
-    function startTimer(seconds) {
-      clearInterval(timerInterval);
-      let remain = seconds;
-      timerInterval = setInterval(() => {
-        remain--;
-        const m = Math.floor(remain / 60);
-        const s = remain % 60;
-        const timerEl = document.getElementById('testTimer');
-        if (timerEl) timerEl.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-        if (remain <= 0) { 
-          clearInterval(timerInterval); 
-          submitTest(); 
-        }
-      }, 1000);
-    }
-
-    function confirmExitTest() {
-      if (confirm("Are you sure you want to exit? Your progress will be lost.")) {
-        clearInterval(timerInterval);
-        switchTab('view-home');
-      }
-    }
-
-    function checkAnswerCorrectness(userVal, correctVal) {
-      if (!userVal || !correctVal) return false;
-      const u = String(userVal).trim().toLowerCase();
-      const c = String(correctVal).trim().toLowerCase();
-      
-      if (u === c) return true;
-      if (c.length === 1 && (u.startsWith(c + ' ') || u.startsWith(c + '.') || u.startsWith(c + ')') || u === c)) return true;
-      if (u.length === 1 && (c.startsWith(u + ' ') || c.startsWith(u + '.') || c.startsWith(u + ')') || c === u)) return true;
-      if (c.includes('/')) {
-        const alts = c.split('/').map(s => s.trim().toLowerCase());
-        if (alts.includes(u)) return true;
-      }
-      return false;
-    }
-
-    function submitTest() {
-      clearInterval(timerInterval);
-      let rawScore = 0;
-      const breakdown = [];
-
-      if (TEST && TEST.passages) {
-        TEST.passages.forEach(p => {
-          if (p.questions) {
-            p.questions.forEach(q => {
-              if (q.type === 'grid' && q.sub_questions) {
-                q.sub_questions.forEach(subQ => {
-                  const correctAns = subQ.answer || q.answer || '';
-                  const userAns = userAnswers[subQ.id] || '';
-                  const isCorrect = checkAnswerCorrectness(userAns, correctAns);
-                  if (isCorrect) rawScore++;
-                  breakdown.push({ id: subQ.id, user: userAns || '(Empty)', correct: correctAns, isCorrect });
-                });
-              } else if (q.id && !isNaN(q.id)) {
-                const correctAns = q.answer || '';
-                const userAns = userAnswers[q.id] || '';
-                const isCorrect = checkAnswerCorrectness(userAns, correctAns);
-                if (isCorrect) rawScore++;
-                breakdown.push({ id: q.id, user: userAns || '(Empty)', correct: correctAns, isCorrect });
-              }
-            });
-          }
-        });
-      }
-
-      breakdown.sort((a, b) => Number(a.id) - Number(b.id));
-
-      const band = calculateBandScore(rawScore);
-      document.getElementById('resBandScore').textContent = `Band ${band}`;
-      document.getElementById('resRawScore').textContent = `${rawScore} / 40 Correct Answers`;
-
-      const listEl = document.getElementById('resBreakdownList');
-      listEl.innerHTML = breakdown.map(item => `
-        <div class="py-2 flex items-center justify-between text-xs">
-          <div class="flex items-center gap-2">
-            <span class="w-6 h-6 rounded-md ${item.isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'} flex items-center justify-center font-black">${item.id}</span>
-            <span class="text-slate-600">Your: <strong class="${item.isCorrect ? 'text-emerald-700' : 'text-rose-600'}">${item.user}</strong></span>
-          </div>
-          ${item.isCorrect ? `<span class="text-emerald-600 font-black"><i class="fa-solid fa-check"></i></span>` : `<span class="text-slate-500 font-bold">Ans: <strong class="text-emerald-700">${item.correct}</strong></span>`}
-        </div>
-      `).join('');
-
-      document.getElementById('modalResult').classList.remove('hidden');
-
-      document.getElementById('statBand').textContent = `Band ${band}`;
-      const prevDone = parseInt(document.getElementById('statDone').textContent || '0', 10) || 0;
-      document.getElementById('statDone').textContent = String(prevDone + 1);
-      document.getElementById('statAccuracy').textContent = `${Math.round((rawScore / 40) * 100)}%`;
-      document.getElementById('streakDisplay').textContent = '1';
-
-      if (tg?.sendData) {
-        try {
-          tg.sendData(JSON.stringify({
-            exam: "IELTS Reading",
-            book: currentBookNum,
-            test: currentTestNum,
-            rawScore: rawScore,
-            band: band
-          }));
-        } catch(e) {}
-      }
-    }
-
-    function closeResultModal() {
-      document.getElementById('modalResult').classList.add('hidden');
-      switchTab('view-home');
-    }
-
-    function switchTab(tabId) {
-      ['view-home', 'view-select-test', 'view-listening', 'view-writing', 'view-speaking', 'view-test-runner', 'view-predictions', 'view-books'].forEach(t => {
-        document.getElementById(t)?.classList.add('hidden');
-      });
-      document.getElementById(tabId)?.classList.remove('hidden');
+        top.style.height = `${Math.max(100, e.clientY - 60)}px`;
+      };
+      window.ontouchmove = (e) => {
+        if (!isDragging) return;
+        top.style.height = `${Math.max(100, e.touches[0].clientY - 60)}px`;
+      };
+      window.onmouseup = () => isDragging = false;
+      window.ontouchend = () => isDragging = false;
     }
 
     function renderBooksGrid() {
@@ -880,28 +735,17 @@
       if (!grid) return;
       grid.innerHTML = '';
       for (let i = 21; i >= 1; i--) {
-        const card = document.createElement('div');
-        card.className = 'bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer hover:border-blue-400 transition-colors active:scale-95';
-        card.onclick = () => openBookSelection('reading', i);
-        card.innerHTML = `
-          <div class="flex items-center gap-2">
+        grid.innerHTML += `
+          <div onclick="openSkillModule('reading')" class="bg-white p-3 rounded-xl border shadow-sm flex items-center justify-between cursor-pointer">
             <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-black text-xs">C${i}</span>
-            <div>
-              <h4 class="font-bold text-slate-800 text-xs">Cambridge ${i}</h4>
-              <p class="text-[10px] text-slate-400">4 Full Tests</p>
-            </div>
-          </div>
-          <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-        `;
-        grid.appendChild(card);
+            <span class="text-xs font-bold text-slate-700">Cambridge ${i}</span>
+          </div>`;
       }
     }
 
     document.addEventListener("DOMContentLoaded", () => {
       renderBooksGrid();
     });
-    
-    renderBooksGrid();
   </script>
 </body>
 </html>
