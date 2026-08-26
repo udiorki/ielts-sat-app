@@ -1,17 +1,15 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>IELTS & SAT Genius Simulator</title>
-  
-  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  
-  <!-- Tailwind CSS & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
+  <script src="reading_data.js"></script>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 0; user-select: none; }
@@ -24,22 +22,19 @@
       transition: all 0.2s;
     }
     .q-badge.answered { background-color: #2563eb; color: #ffffff; border-color: #2563eb; }
-    .q-badge.flagged { background-color: #fef3c7; color: #b45309; border-color: #f59e0b; }
     
     .split-container { display: flex; flex-direction: column; height: calc(100vh - 125px); }
-    .split-pane { overflow-y: auto; padding: 14px; -webkit-overflow-scrolling: touch; }
+    .split-pane { overflow-y: auto; padding: 14px; }
     .resizer-bar {
-      height: 12px; background: #e2e8f0; cursor: row-resize; touch-action: none;
+      height: 12px; background: #e2e8f0; cursor: row-resize;
       display: flex; align-items: center; justify-content: center;
       border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1;
     }
     .resizer-bar::after { content: "•••"; color: #64748b; font-size: 10px; font-weight: bold; letter-spacing: 2px; }
-    .highlighted { background-color: #fef08a; border-radius: 2px; padding: 1px 2px; }
   </style>
 </head>
 <body class="pb-16">
 
-  <!-- HEADER -->
   <header class="bg-white border-b border-slate-200 px-4 py-2.5 sticky top-0 z-30 shadow-sm flex items-center justify-between">
     <div class="flex items-center gap-2.5">
       <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black flex items-center justify-center text-sm shadow">S</div>
@@ -50,10 +45,10 @@
     </div>
     <div class="flex items-center gap-2">
       <div class="flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-700 px-2 py-0.5 rounded-full text-xs font-black">
-        <i class="fa-solid fa-fire text-amber-500"></i> <span id="streakDisplay">0</span>
+        <i class="fa-solid fa-fire text-amber-500"></i> <span>0</span>
       </div>
       <div class="flex items-center gap-1 bg-purple-50 border border-purple-200 text-purple-700 px-2 py-0.5 rounded-full text-xs font-black">
-        <i class="fa-solid fa-bolt text-purple-500"></i> <span id="xpDisplay">150 XP</span>
+        <i class="fa-solid fa-bolt text-purple-500"></i> <span>150 XP</span>
       </div>
       <div class="bg-slate-100 p-0.5 rounded-xl flex gap-0.5 border border-slate-200 ml-1">
         <button id="btn-mode-ielts" onclick="switchExamMode('IELTS')" class="px-2 py-0.5 rounded-lg text-[11px] font-extrabold bg-white text-blue-600 shadow-sm">IELTS</button>
@@ -62,7 +57,6 @@
     </div>
   </header>
 
-  <!-- HOME VIEW -->
   <main id="view-home" class="p-4 space-y-4 max-w-md mx-auto">
     <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 text-white shadow-md space-y-2 cursor-pointer hover:opacity-95">
       <div class="flex items-center justify-between">
@@ -98,20 +92,21 @@
     <div class="grid grid-cols-3 gap-2">
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Estimated Band</p>
-        <p class="text-base font-black text-slate-400" id="statBand">--</p>
+        <p class="text-base font-black text-slate-400">--</p>
       </div>
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Tests Done</p>
-        <p class="text-base font-black text-slate-800" id="statDone">0</p>
+        <p class="text-base font-black text-slate-800">0</p>
       </div>
       <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-center shadow-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase">Accuracy</p>
-        <p class="text-base font-black text-slate-400" id="statAccuracy">0%</p>
+        <p class="text-base font-black text-slate-400">0%</p>
       </div>
     </div>
     
     <h2 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Practice Modules</h2>
     
+    <!-- ЖЕСТКО ВШИТЫЕ МОДУЛИ ДЛЯ ПРЕЗЕНТАЦИИ (Они появятся всегда!) -->
     <div class="grid grid-cols-2 gap-3" id="mainModulesGrid">
       <div onclick="openBookSelection('reading')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors">
         <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm mb-2"><i class="fa-solid fa-book-reader"></i></div>
@@ -136,7 +131,6 @@
     </div>
   </main>
 
-  <!-- TEST SELECTION VIEW -->
   <section id="view-select-test" class="p-4 space-y-3 hidden max-w-md mx-auto">
     <div class="flex items-center justify-between">
       <div>
@@ -148,7 +142,6 @@
     <div class="space-y-3" id="testSelectionList"></div>
   </section>
 
-  <!-- TEST RUNNER VIEW -->
   <section id="view-test-runner" class="hidden flex flex-col h-screen overflow-hidden">
     <div class="bg-slate-900 text-white px-4 py-2 flex items-center justify-between shadow-md">
       <div>
@@ -156,37 +149,30 @@
         <p class="text-[10px] text-emerald-400 font-semibold" id="testSubtitle">Academic Reading Test</p>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="highlightSelection()" class="bg-slate-800 text-amber-300 px-2 py-0.5 rounded text-xs font-bold border border-slate-700 flex items-center gap-1">
-          <i class="fa-solid fa-highlighter"></i>
-        </button>
-        <div class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-mono font-bold px-2 py-0.5 rounded flex items-center gap-1">
-          <i class="fa-regular fa-clock"></i><span id="testTimer">60:00</span>
+        <div class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-mono font-bold px-2 py-0.5 rounded">
+          <i class="fa-regular fa-clock mr-1"></i><span id="testTimer">59:59</span>
         </div>
         <button onclick="confirmExitTest()" class="bg-rose-600 text-white font-bold text-xs px-2.5 py-1 rounded">Exit</button>
       </div>
     </div>
-    
     <div class="bg-slate-100 border-b border-slate-200 px-4 py-1.5 flex gap-2 overflow-x-auto" id="sectionNavTabs"></div>
-    
     <div class="split-container" id="splitMainLayout">
-      <div class="split-pane bg-white" id="topPane" style="flex: 1;">
+      <div class="split-pane bg-white" id="topPane" style="height: 50%;">
         <div id="passageContent"></div>
       </div>
       <div class="resizer-bar" id="resizerBar"></div>
-      <div class="split-pane bg-slate-50" id="bottomPane" style="flex: 1;">
+      <div class="split-pane bg-slate-50" id="bottomPane" style="height: 50%;">
         <div id="questionsContent"></div>
       </div>
     </div>
-    
     <div class="bg-white border-t border-slate-200 px-4 py-2 sticky bottom-0 z-20 flex items-center justify-between gap-2 shadow-lg">
       <div class="flex items-center gap-1 overflow-x-auto py-1 max-w-[65%]" id="questionPalette"></div>
-      <button onclick="submitTest()" class="bg-emerald-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-lg shadow whitespace-nowrap active:scale-95 transition-transform">
+      <button onclick="submitTest()" class="bg-emerald-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-lg shadow whitespace-nowrap">
         Submit Test
       </button>
     </div>
   </section>
 
-  <!-- PREDICTIONS VIEW -->
   <section id="view-predictions" class="p-4 space-y-3 hidden max-w-md mx-auto">
     <div class="flex justify-between items-center">
       <div>
@@ -202,7 +188,6 @@
     </div>
   </section>
 
-  <!-- BOOKS COMPLETE COLLECTION VIEW -->
   <section id="view-books" class="p-4 space-y-3 hidden max-w-md mx-auto">
     <div>
       <h2 class="text-sm font-extrabold text-slate-800">Cambridge IELTS Complete Collection</h2>
@@ -211,22 +196,6 @@
     <div class="grid grid-cols-2 gap-2.5" id="booksGrid"></div>
   </section>
 
-  <!-- RESULT & REVIEW MODAL -->
-  <div id="modalResult" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
-      <div class="bg-slate-900 text-white p-4 text-center shrink-0">
-        <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">IELTS Official Result</h3>
-        <div class="text-3xl font-black text-emerald-400 mt-1" id="resBandScore">Band 7.5</div>
-        <p class="text-xs text-slate-300 mt-0.5" id="resRawScore">33 / 40 Correct</p>
-      </div>
-      <div class="p-4 overflow-y-auto space-y-2 flex-1 divide-y divide-slate-100" id="resBreakdownList"></div>
-      <div class="p-3 bg-slate-50 border-t border-slate-200 flex gap-2 shrink-0">
-        <button onclick="closeResultModal()" class="w-full bg-blue-600 text-white font-extrabold text-xs py-2.5 rounded-xl shadow">Finish & Back to Home</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- BOTTOM NAVBAR -->
   <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2 flex justify-around items-center z-40 max-w-md mx-auto">
     <button onclick="switchTab('view-home')" class="flex flex-col items-center gap-0.5 text-blue-600 font-bold text-[10px]">
       <i class="fa-solid fa-house text-base"></i><span>Home</span>
@@ -239,118 +208,14 @@
     </button>
   </nav>
 
-  <!-- EMBEDDED CAMBRIDGE DATA & ENGINE SCRIPT -->
   <script>
-    window.CAMBRIDGE_DATA = window.CAMBRIDGE_DATA || {};
-
-    window.CAMBRIDGE_DATA["21"] = {
-      "1": {
-        bookId: "21",
-        testId: "1",
-        passages: [
-          {
-            id: 1,
-            title: "The Davies Sisters",
-            passage_text: "Between 1908 and 1924, Gwendoline and Margaret Davies amassed one of the largest collections of late-nineteenth and early-twentieth-century French paintings in Britain.\n\nGwendoline (1882-1951) and Margaret (1884-1963) Davies were the granddaughters of David Davies, a Welshman who amassed a fortune in the shipping and mining industries. In 1907, when Gwendoline came into her inheritance (Margaret would follow in 1909), the sisters were said to be the wealthiest unmarried women in Britain. Their religious upbringing in rural Wales gave them a deep sense of social responsibility and they chose to use their inheritance for cultural and philanthropic purposes.\n\nWhile there was no real family history of art collecting, the sisters' education was rigorously geared toward such pursuits. Their London school focused on cultural rather than academic study, and they travelled extensively with their governess, Jane Blaker, visiting art galleries and making extensive notes on the collections there.\n\nThe sisters began to make regular art purchases from 1908, which roughly coincided with the dates of their inheritance. They took advice from various people, including the art dealer Hugh Blaker (the brother of Jane Blaker) and David Croal Thompson, who was also an art dealer. While it was long assumed that these men were largely responsible for the nature of the sisters' collection, it has recently been accepted that Gwendoline and Margaret retained a far more active role in the process.\n\nThe sisters' journals reveal their preference for Old Master paintings. Yet they initially made very few attempts to secure any such works. While the sisters were wealthy in relative terms, their income was nothing compared to the fortunes of American art collectors of this period, such as J. Pierpont Morgan. Quite simply, high quality Old Master works were, if not beyond their means, then beyond what they were willing to pay for them. Instead, their early purchases were of the fashionable, safe variety, and included, for example, paintings by the French artist Jean-Baptiste-Camille Corot.\n\nHowever, it was only a few years before their collecting took a new direction and they turned to the work of the French Impressionists. We know that Hugh Blaker, as a champion of contemporary French art had a hand in the decision, and we know also that they would have seen examples on their various trips to Paris. Whatever the precise reason for this change, their first purchases of Impressionist art, made in October 1912, were scenes of Venice by the French artist Claude Monet. Over the next 12 years, the sisters amassed the bulk of their Impressionist collection, including six further works by Monet, two more by Manet, and three by Renoir, including his well-known painting La Parisienne.\n\nThe First World War (1914-1918) played a part in the development of the sisters' collection. Their initial response to the war effort was to finance the safe passage of artists from occupied Belgium to Wales, as a humanitarian act, but also with the hope of establishing a vibrant artists' community in the area. Later in the conflict, both sisters decided to volunteer at a canteen for troops at Troyes, in northern France; Gwendoline in 1916, followed by Margaret in 1917.\n\nIt was tedious and distressing work, which would have a permanent effect on Gwendoline's health. Yet on one of numerous trips to nearby Paris, she visited the Bernheim-Jeune Gallery. Here she acquired two works by Cezanne - Provençal Landscape and The François Zola Dam. The paintings were shipped directly to Bath, England, where they became the first works by Cezanne to go on display in a public gallery in Britain.\n\nCommentators have often described the sisters as unlikely pioneer collectors. Much is made of their isolation in rural Wales and the fact that they didn't make friends with artists or gallery owners. Yet they didn't feel obliged to follow fashionable tastes and were free to pursue their own preferences. Although they relied on a trusted circle of advisers, they made frequent trips to London and Paris, and also regularly had paintings sent to their home for consideration.\n\nBy the early 1920s, Gwendoline felt increasingly uncomfortable buying art works when faced with the poverty and social upheaval created by the First World War. Her philanthropic pursuits then became focused almost exclusively on social causes and the development of the sisters' home at Gregynog Hall into a conference center and venue for the Gregynog Festival of Music and Poetry. Gwendoline made her final art purchase in March 1926. Margaret also stopped collecting around this time, but started again in the 1930s acquiring, on a relatively small scale, work by contemporary British artists.\n\nThe sisters collected French Impressionist paintings at a time when such art was routinely ignored by individuals and institutions alike. The Gwendoline and Margaret Davies collection, donated in 1951 and 1963 respectively to the National Museum Wales, contains major examples of work by leading French Impressionists. In collecting paintings that they loved, the sisters created a lasting and meaningful cultural legacy for the people of Wales and beyond.",
-            questions: [
-              { id: "inst-1", type: "instruction", prompt: "Questions 1-7<br>Complete the notes below.<br>Choose <b>ONE WORD ONLY</b> from the passage for each answer." },
-              { id: 1, type: "fill_in", prompt: "Their grandfather's wealth came from _____ and transportation businesses.", answer: "mining" },
-              { id: 2, type: "fill_in", prompt: "Their _____ was designed to give them an interest in activities such as collecting art.", answer: "education" },
-              { id: 3, type: "fill_in", prompt: "They took lengthy _____ about the things they saw in art galleries.", answer: "notes" },
-              { id: 4, type: "fill_in", prompt: "Their _____ showed they liked Old Master paintings, but they were expensive to buy.", answer: "journals" },
-              { id: 5, type: "fill_in", prompt: "The first Impressionist paintings they bought showed places in _____.", answer: "Venice" },
-              { id: 6, type: "fill_in", prompt: "During the war, they worked in a _____ for soldiers in France.", answer: "canteen" },
-              { id: 7, type: "fill_in", prompt: "They lived in isolation in the countryside and did not have any _____ who were artists.", answer: "friends" },
-              { id: "inst-2", type: "instruction", prompt: "Questions 8-13<br>Do the following statements agree with the information given in Reading Passage 1?<br><b>TRUE</b> / <b>FALSE</b> / <b>NOT GIVEN</b>" },
-              { id: 8, type: "tfng", prompt: "The Davies sisters' childhood influenced the way they decided to use their wealth.", options: ["TRUE", "FALSE", "NOT GIVEN"], answer: "TRUE" },
-              { id: 9, type: "tfng", prompt: "The Jean-Baptiste-Camille Corot paintings in the Davies sisters' collection were purchased from a gallery in France.", options: ["TRUE", "FALSE", "NOT GIVEN"], answer: "NOT GIVEN" },
-              { id: 10, type: "tfng", prompt: "Hugh Blaker opposed the Davies sisters' decision to buy art by French Impressionists.", options: ["TRUE", "FALSE", "NOT GIVEN"], answer: "FALSE" },
-              { id: 11, type: "tfng", prompt: "The exhibition of Cezanne paintings at the Bath gallery was very popular with the public.", options: ["TRUE", "FALSE", "NOT GIVEN"], answer: "NOT GIVEN" },
-              { id: 12, type: "tfng", prompt: "The impact of the First World War encouraged Gwendoline to reconsider her interest in collecting art.", options: ["TRUE", "FALSE", "NOT GIVEN"], answer: "TRUE" },
-              { id: 13, type: "tfng", prompt: "The Davies sisters bought French Impressionist art during a period when very few people were doing so.", options: ["TRUE", "FALSE", "NOT GIVEN"], answer: "TRUE" }
-            ]
-          },
-          {
-            id: 2,
-            title: "Why we need silence",
-            passage_text: "A Humans are finely attuned to noise, and for good reason. From an evolutionary perspective, sounds give us vital information, helping us navigate the world and avoid danger. To help ensure loud or unexpected noises get the attention they deserve, our internal chemistry alters in response to them. Our blood pressure goes up, muscles tense and glands release hormones that prepare us for fight or flight. In the short term, this is a good thing. When we are exposed to too much noise over the long term, however, those responses can lead to a multitude of health issues, from sleep disturbance to even cardiovascular disease.\n\nB The World Health Organization has recently designated excessive noise as an 'underestimated threat' to public health, and has said that people living in cities such as Mumbai, Tokyo and Buenos Aires are being exposed to far more than the recommended 40 decibels of noise at night. A report from the European Environment Agency concluded that noise was an ongoing and widespread issue in Europe, with at least 1 in 5 people consistently exposed to levels considered harmful to health. 'There are no \"earlids\" that can protect your brain from noise,' says Nick Antonio, an acoustic consultant who has contributed to the British and international standards for noise.\n\nC The good news is that several cities have been working to turn the volume down. One of the first to do so was London. 'By providing recommendations for quieter buses, reducing noise from roads and also controlling noise from aircraft, they were able to make the city quieter,' says Antonio. Other cities have introduced noise-reducing road coatings, for instance, alongside greenery that muffles sound. Some solutions are more specific: Washington DC's ban on petrol-powered leaf blowers came into effect recently, while in New York City, legislation has been approved to fine people who modify their vehicles to make them noisier. 'People are seeing the benefits of these more quiet environments in their cities,' Antonio says. 'I expect we will see much more of this in the future.'\n\nD Researchers are also seeking to understand what aspects of silent experiences are most beneficial to our health. One of the best-researched is the flotation tank: a lightproof, soundproof tank of salt water in which a person floats as a form of deep relaxation. While some people experience altered perception in the tanks, involving subtle humming sounds and visual effects, these effects are benign and do not detract from the benefits of the experience, says Justin Feinstein, a clinical neuropsychologist. 'When you don't have external sensory stimuli coming in, the brain tries to fill the void to make sense of this dark and silent world,' he explains. 'In these tanks, some people can even hear the sound of their eyes blinking,' says Feinstein. 'But it is the ability to focus on the breath that helps people reach a relaxed or meditative state.'\n\nE To further explore flotation tanks as a therapeutic tool, Feinstein and his colleagues recruited 50 people with a variety of conditions related to stress and had them answer a questionnaire prior to and following a flotation session. Participants reported decreases in muscle tension, pain and symptoms of their conditions after a single, 1-hour float, alongside an increase in feelings of relaxation and overall wellbeing.\n\nLess is known about what effects sensory deprivation can have on the brain. To investigate, Feinstein's team had 48 people participate in either three 90-minute float sessions or three 90-minute periods of relaxing on a chair which reclined. Participants had their brains scanned using functional magnetic resonance imaging at the beginning and end of the trial. Float sessions uniquely decreased activity in the default mode network (DMN), a collection of brain regions commonly linked with depression. Feinstein says it is an exciting finding, because flotation tanks seem to offer a way of 'resetting' our nervous system to prevent it from getting out of balance.\n\nF Neurobiologist Tal Dotan Ben-Soussan is also an advocate of silence as a therapy. 'When we find ways to be quiet, we are not only quiet in our environment, but quiet in our inner selves,' she explains. 'This allows us to be more aware of what is happening around us and what the situation may require from us so we can provide [a more] adequate response.'\n\nNot everyone will benefit from silence to the same extent, but Ben-Soussan says one characteristic is key: the person must need to want to engage in the experience. 'We see from animal models and human studies that volition and intentionality is important,' she says. 'When people do not want silence, it can be very distressing.'\n\nG Eric Pfeifer, a psychotherapy researcher, also concedes that some people may not benefit from silence, particularly those who are in a heightened state of stress. 'People in these states may not be able to relax or calm down in a silent condition,' he says. Professional guidance can be useful, he adds, allowing people to approach silence slowly so that they can gradually enjoy the benefits. And Pfeifer is convinced that silence is more attainable in everyday life than people think. First, complete silence isn't necessary. In a recent study, he found that participants reported more relaxation and less boredom when they sat quietly in an outdoor garden compared with a completely silent room. Second, Pfeifer believes we don't need a lot of silence to gain benefits. 'You don't need to spend hours in silence,' he says. 'It is likely better to have more frequency of silence for a few minutes at a time than a longer period of silence only once a week. Just finding those places in your daily life where you can find some silence ... can make a big difference.'",
-            questions: [
-              { id: "inst-3", type: "instruction", prompt: "Questions 14-17<br>Which section (A-G) contains the following information?" },
-              { id: 14, type: "fill_in", prompt: "examples of strategies to decrease the noise that the public are exposed to (Enter letter A-G):", answer: "C" },
-              { id: 15, type: "fill_in", prompt: "data indicating the extent of the problem of excessive noise (Enter letter A-G):", answer: "B" },
-              { id: 16, type: "fill_in", prompt: "a description of physiological changes in our bodies when we hear sudden noises (Enter letter A-G):", answer: "A" },
-              { id: 17, type: "fill_in", prompt: "evidence that a relatively quiet environment can be more beneficial than a totally silent one (Enter letter A-G):", answer: "G" },
-              { id: "inst-4", type: "instruction", prompt: "Questions 18-21<br>Complete the summary below. Choose <b>ONE WORD ONLY</b>." },
-              { id: 18, type: "fill_in", prompt: "According to Justin Feinstein, flotation tanks allow people to concentrate on their own _____, which helps them relax.", answer: "breath" },
-              { id: 19, type: "fill_in", prompt: "Participants who were all suffering from stress completed a _____ before and after using a flotation tank.", answer: "questionnaire" },
-              { id: 20, type: "fill_in", prompt: "Participants reported a reduction in symptoms alongside signs of relaxation and improved general _____.", answer: "wellbeing" },
-              { id: 21, type: "fill_in", prompt: "Brain scans revealed that those people in a tank had decreased activity in brain parts associated with _____.", answer: "depression" },
-              { id: "inst-5", type: "instruction", prompt: "Questions 22-26<br>Match each statement with the correct person:<br><b>A</b> - Nick Antonio | <b>B</b> - Justin Feinstein | <b>C</b> - Tal Dotan Ben-Soussan | <b>D</b> - Eric Pfeifer" },
-              { id: 22, type: "fill_in", prompt: "It is unpleasant and upsetting for people to be placed in a silent environment against their will. (A/B/C/D):", answer: "C" },
-              { id: 23, type: "fill_in", prompt: "The trend towards creating quieter urban locations is likely to increase in the coming years. (A/B/C/D):", answer: "A" },
-              { id: 24, type: "fill_in", prompt: "When body senses are deprived of input, our minds compensate by creating the illusion of images and sounds. (A/B/C/D):", answer: "B" },
-              { id: 25, type: "fill_in", prompt: "Even a short amount of silent time can have a positive impact. (A/B/C/D):", answer: "D" },
-              { id: 26, type: "fill_in", prompt: "Quietness makes us more conscious of events occurring in surroundings and helps us react appropriately. (A/B/C/D):", answer: "C" }
-            ]
-          },
-          {
-            id: 3,
-            title: "Book review: The World of Sugar by Ulbe Bosma",
-            passage_text: "Ulbe Bosma's The World of Sugar is a genuinely global history. Bosma discusses all the sugar-growing places of the world, beginning with Cuba and Java, the largest exporters of the early 20th century. But this is a history not just of cane sugar but also of beet sugar, an equally important form of traded sugar over the last hundred years. Beet sugar is grown mainly in Europe and the United States. It has also been massively subsidised and sold at artificially low prices on world markets, threatening the livelihood of producers of cane sugar.\n\nBosma's discussion of the sugar market in Britain gives a sense of the book's range. The sweet-toothed British first bought cane sugar from their own slavery-dependent colonial plantations. Following the abolition of slavery in the British Empire, cane sugar was imported to Britain from places which retained the practice, such as Cuba and Brazil. Towards the end of the 19th century, the British started to import beet sugar from continental Europe. Only in the 20th century was there a move to develop a national beet sugar industry.\n\nThe book provides a global labour history, investigating the wide range of labour regimes associated with growing sugar. Contrary to popular belief, cane sugar production was never just restricted to large, dedicated plantations owned by rich men. For example, in Java, a huge exporter of sugar in the early 20th century, sugar cane was grown together with rice in an extraordinarily labour-intensive way by small farmers.\n\nThe World of Sugar is also a story of similarity and continuity in sugar cultivation. For example, imported labour has been used for much large-scale production. German beet fields employed Polish workers; Mexicans and many others, including Sicilians, were vital to US sugar production. Cane cutting, Bosma shows, remains a poorly paid and brutal business to this day in many places in the world. But as well as this, the book is about the continuity of the use of traditional methods on small farms. In the mid 20th-century, this type of sugar production dominated in South Asia and Latin America.\n\nThis is also a history of capitalists and sugar dynasties, as well as corporations that in some cases have remained influential over very long periods. Great firms and great interests have had profound influence on the policies of states. In many places - not just the British Caribbean but Cuba and the Philippines too - a powerful sugar bourgeoisie played a major role in politics and their interests were consequently protected by trade barriers and subsidies. In the battle for control of the industry, it was inevitably the poor countries which came off worse. All this is explored by Bosma with wonderful subtlety and control.\n\nBut sugar production was never just a matter of agriculture. It also involved the extraction, close to the place of harvest, of sucrose from the sugar plant, a process which required machinery powered by humans, animals, wind or steam. Further processes involved boiling (from the 19th century, this often involved vacuum systems) and the separation of sugar from other materials in a process known as refinement. From very early on, sugar production was an energy-intensive industrial process, mostly taking place in the countryside and in refineries in centres of consumption, both small and large. The growth of the industry entailed a very rapid diffusion of ideas and techniques from one country to another. Cuba, for example, developed an extraordinarily dense system of railways to transport workers and cane, as well as steam-powered sugar factories. Particular varieties of cane sugar and beet sugar spread very rapidly across the world, in accordance with local needs and demands.\n\nWhere once only tiny quantities of sugar could be produced, now new techniques, varieties, fertilisers, irrigation systems and much more have turned gleaming white sugar into a ubiquitous chemical. Over the same time, there has been a massive increase in consumption. Once regarded as a luxury, sugar came to be promoted as a valuable source of energy. But as the consumption of sugar has increased, so has the harm it does, whether to people's teeth or weight. In the face of appalling obstruction from the sugar industry to attempts to reduce consumption, some countries have been forced to tax sugar in order to bring that about. The sugar industry has a history of attacking its critics and, when it comes to obesity, of trying to blame fats, and lack of exercise and self-control. And the recent past has seen worrying new developments in mass sweetening. High-fructose corn syrup made from maize using an enzymatic process invented in Japan in the 1960s has a similar number of calories to table sugar but is far cheaper to produce. It is now widely consumed, having been adopted in the making of soft drinks and a large number of processed foods, and is regarded as a leading cause of obesity.\n\nThis is a wonderfully rich book, a model of global history, the history of production and the history of capitalism. Bosma avoids outbursts of emotion, celebratory or critical, even if they might have made his analysis of the multiple tragedies involving sugar all the more powerful. He shows that we could always have done without sugar and that today we have many alternative sources of sweetness. Yet many of the poorest people in the world still depend on it to make a living.",
-            questions: [
-              { id: "inst-6", type: "instruction", prompt: "Questions 27-30<br>Choose the correct letter, A, B, C or D." },
-              { id: 27, type: "mcq", prompt: "What does the reviewer suggest about the cultivation and trading of sugar in the first paragraph?", options: ["A Sugar has played a major role in international relations.", "B Beet sugar has been made more internationally competitive.", "C Cane sugar is thought to be of superior quality to beet sugar.", "D New locations for cultivating sugar have increased production."], answer: "B" },
-              { id: 28, type: "mcq", prompt: "In the second paragraph, when discussing the sugar market in Britain, the reviewer stresses", options: ["A how the sources used changed over time.", "B how developments in agriculture affected trade.", "C the increased demand for sugar over the years.", "D the growing support for ethical methods of cultivation."], answer: "A" },
-              { id: 29, type: "mcq", prompt: "What is the reviewer doing in the third paragraph?", options: ["A describing an efficient approach to sugar cultivation", "B explaining why the use of sugar plantations declined", "C addressing a misconception about the growing of sugar cane", "D evaluating different approaches to the cultivation of sugar cane"], answer: "C" },
-              { id: 30, type: "mcq", prompt: "In the final paragraph, what does the reviewer suggest is the overall message of Bosma's book?", options: ["A Sugar is a harmful and unnecessary product.", "B Economic pressure is needed to control sugar production.", "C Conditions for workers in sugar production should be improved.", "D Intensive marketing of sugar has had disastrous consequences."], answer: "A" },
-              { id: "inst-7", type: "instruction", prompt: "Questions 31-36<br>Complete the summary using the list of words, A-I:<br><b>A</b> - national governments | <b>B</b> - agricultural developments | <b>C</b> - less wealthy nations<br><b>D</b> - untrained workers | <b>E</b> - small-scale cultivation | <b>F</b> - outdated methods<br><b>G</b> - financial controls | <b>H</b> - migrant workers | <b>I</b> - powerful individuals and businesses" },
-              { id: 31, type: "fill_in", prompt: "In big industries in Germany and the US, sugar farming depended on _____ (A-I).", answer: "H" },
-              { id: 32, type: "fill_in", prompt: "However, in South Asia and Latin America, _____ (A-I) continued.", answer: "E" },
-              { id: 33, type: "fill_in", prompt: "Sugar production has also involved _____ (A-I) who were eager to protect their markets.", answer: "I" },
-              { id: 34, type: "fill_in", prompt: "In countries such as Cuba the sugar industry had a major influence on _____ (A-I).", answer: "A" },
-              { id: 35, type: "fill_in", prompt: "To support the interests of sugar producers, _____ (A-I) were established.", answer: "G" },
-              { id: 36, type: "fill_in", prompt: "As a result of this, _____ (A-I) were penalised.", answer: "C" },
-              { id: "inst-8", type: "instruction", prompt: "Questions 37-40<br>Do the following statements agree with the views of the writer?<br><b>YES</b> / <b>NO</b> / <b>NOT GIVEN</b>" },
-              { id: 37, type: "tfng", prompt: "Sugar has now become available in large quantities due to a range of agricultural developments.", options: ["YES", "NO", "NOT GIVEN"], answer: "YES" },
-              { id: 38, type: "tfng", prompt: "Advertisers initially marketed sugar as a luxury product.", options: ["YES", "NO", "NOT GIVEN"], answer: "YES" },
-              { id: 39, type: "tfng", prompt: "The invention of high-fructose corn syrup was a positive development.", options: ["YES", "NO", "NOT GIVEN"], answer: "NO" },
-              { id: 40, type: "tfng", prompt: "High-fructose corn syrup is an ingredient in many processed foods.", options: ["YES", "NO", "NOT GIVEN"], answer: "YES" }
-            ]
-          }
-        ]
-      }
-    };
-
-    // Global App Engine
-    const tg = window.Telegram?.WebApp;
-    if (tg) { tg.ready(); tg.expand(); }
-
     let currentMode = 'IELTS';
     let currentSkill = 'reading';
     let currentBookNum = 21;
     let currentTestNum = 1;
     let timerInterval = null;
     let userAnswers = {};
-    let flaggedQuestions = {};
     let TEST = null;
-
-    function calculateBandScore(rawScore) {
-      if (rawScore >= 39) return "9.0";
-      if (rawScore >= 37) return "8.5";
-      if (rawScore >= 35) return "8.0";
-      if (rawScore >= 33) return "7.5";
-      if (rawScore >= 30) return "7.0";
-      if (rawScore >= 27) return "6.5";
-      if (rawScore >= 23) return "6.0";
-      if (rawScore >= 19) return "5.5";
-      if (rawScore >= 15) return "5.0";
-      if (rawScore >= 13) return "4.5";
-      if (rawScore >= 10) return "4.0";
-      if (rawScore >= 8) return "3.5";
-      if (rawScore >= 6) return "3.0";
-      if (rawScore >= 4) return "2.5";
-      return "2.0";
-    }
 
     function switchExamMode(mode) {
       currentMode = mode;
@@ -386,22 +251,21 @@
             </div>
             <span class="text-[10px] bg-blue-50 text-blue-600 font-bold px-2 py-0.5 rounded uppercase">${currentSkill}</span>
           </div>
-          <div class="grid grid-cols-4 gap-1.5">
-            <button onclick="launchCDTest(${book}, 1, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">T1</button>
-            <button onclick="launchCDTest(${book}, 2, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">T2</button>
-            <button onclick="launchCDTest(${book}, 3, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">T3</button>
-            <button onclick="launchCDTest(${book}, 4, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">T4</button>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="launchCDTest(${book}, 1, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">Test 1</button>
+            <button onclick="launchCDTest(${book}, 2, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">Test 2</button>
+            <button onclick="launchCDTest(${book}, 3, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">Test 3</button>
+            <button onclick="launchCDTest(${book}, 4, '${currentSkill}')" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs py-1.5 rounded font-bold hover:bg-blue-600 hover:text-white transition-colors">Test 4</button>
           </div>
         `;
         list.appendChild(item);
       }
     }
 
-    function launchCDTest(book, testNumber, skill = 'reading') {
+    function launchCDTest(book, testNumber, skill='reading') {
       currentBookNum = book; 
       currentTestNum = testNumber; 
       userAnswers = {};
-      flaggedQuestions = {};
       
       switchTab('view-test-runner');
       
@@ -410,29 +274,55 @@
       const subtitleEl = document.getElementById('testSubtitle');
       if (subtitleEl) subtitleEl.textContent = `Academic ${skill.charAt(0).toUpperCase() + skill.slice(1)} Test`;
 
-      const bookStr = String(book);
-      const testStr = String(testNumber);
+      if (skill === 'reading') {
+          const bookStr = String(book);
+          const testStr = String(testNumber);
 
-      if (window.CAMBRIDGE_DATA && window.CAMBRIDGE_DATA[bookStr] && window.CAMBRIDGE_DATA[bookStr][testStr]) {
-        TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
-      } else if (window.CAMBRIDGE_DATA && window.CAMBRIDGE_DATA["21"]) {
-        TEST = window.CAMBRIDGE_DATA["21"][testStr] || window.CAMBRIDGE_DATA["21"]["1"];
-      }
+          // Твой оригинальный код, где Тест 1 и Тест 2 работали 100%
+          TEST = window.CAMBRIDGE_DATA[bookStr][testStr];
 
-      const tabs = document.getElementById('sectionNavTabs');
-      if (tabs && TEST && TEST.passages) {
-        tabs.innerHTML = TEST.passages.map((p, i) => 
-          `<button id="pass-tab-${i+1}" onclick="switchReadingPassage(${i+1})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors">Passage ${i+1}</button>`
-        ).join('');
+          const tabs = document.getElementById('sectionNavTabs');
+          if (tabs && TEST && TEST.passages) {
+            tabs.innerHTML = TEST.passages.map((p, i) => 
+              `<button id="pass-tab-${i+1}" onclick="switchReadingPassage(${i+1})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors">Passage ${i+1}</button>`
+            ).join('');
+          }
+          renderPalette(40); 
+          startTimer(3600); 
+          switchReadingPassage(1);
+      } else if (skill === 'listening') {
+          const tabs = document.getElementById('sectionNavTabs');
+          if (tabs) {
+            tabs.innerHTML = [1, 2, 3, 4].map(i => 
+                `<button id="pass-tab-${i}" onclick="loadListeningPart(${i})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors">Part ${i}</button>`
+            ).join('');
+          }
+          renderPalette(40);
+          startTimer(1800);
+          loadListeningPart(1);
+      } else if (skill === 'writing') {
+          const tabs = document.getElementById('sectionNavTabs');
+          if (tabs) {
+            tabs.innerHTML = [1, 2].map(i => 
+                `<button id="pass-tab-${i}" onclick="loadWritingTaskSection(${i})" class="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold transition-colors">Task ${i}</button>`
+            ).join('');
+          }
+          const pal = document.getElementById('questionPalette');
+          if (pal) pal.innerHTML = '';
+          startTimer(3600);
+          loadWritingTaskSection(1);
+      } else if (skill === 'speaking') {
+          const tabs = document.getElementById('sectionNavTabs');
+          if (tabs) tabs.innerHTML = '';
+          const pal = document.getElementById('questionPalette');
+          if (pal) pal.innerHTML = '';
+          startTimer(900);
+          loadSpeakingSection();
       }
-      renderPalette(40); 
-      startTimer(3600); 
-      switchReadingPassage(1);
-      initResizer();
     }
 
     function switchReadingPassage(passageNum) {
-     .forEach(p => {
+      [1, 2, 3].forEach(p => {
         const btn = document.getElementById(`pass-tab-${p}`);
         if (btn) btn.className = p === passageNum 
           ? "px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold"
@@ -454,33 +344,33 @@
 
       const textHtml = (pData.passage_text || "").split(/\n+/).map(para => {
         if (para.match(/^[A-G]\s/)) {
-            return `<p class="mb-3 leading-relaxed"><strong class="text-sm mr-2 text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">${para[0]}</strong> ${para.substring(2)}</p>`;
+            return `<p class="mb-4 leading-relaxed"><strong class="text-base mr-2 text-slate-900">${para[0]}</strong> ${para.substring(2)}</p>`;
         }
-        return `<p class="mb-3 leading-relaxed">${para}</p>`;
+        return `<p class="mb-4 leading-relaxed">${para}</p>`;
       }).join('');
 
       passagePane.innerHTML = `
-        <div class="space-y-2 text-xs text-slate-800 p-2">
-          <h3 class="font-extrabold text-slate-900 text-sm mb-3">Passage ${passageNum}: ${pData.title || ''}</h3>
+        <div class="space-y-2 text-xs text-slate-800 p-3">
+          <h3 class="font-extrabold text-slate-900 text-sm mb-4">Passage ${passageNum}: ${pData.title || ''}</h3>
           ${textHtml}
         </div>
       `;
 
-      let qHtml = `<div class="space-y-4 pb-8">`;
+      let qHtml = `<div class="space-y-5 pb-8">`;
       if (pData.questions) {
           pData.questions.forEach(q => {
             if (q.type === 'instruction') {
-               qHtml += `<div class="bg-blue-50/95 p-3 rounded-xl border border-blue-200 sticky top-0 z-10 backdrop-blur-md shadow-sm">
+               qHtml += `<div class="bg-blue-50/90 p-3.5 rounded-xl border border-blue-200 sticky top-0 z-10 backdrop-blur-md shadow-sm">
                  <h4 class="font-bold text-blue-900 text-xs leading-relaxed">${q.prompt}</h4>
                </div>`;
                return;
             }
 
-            qHtml += `<div id="q-box-${q.id}" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2.5">`;
+            qHtml += `<div id="q-box-${q.id}" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">`;
             let promptText = q.prompt || '';
 
             if (q.type === 'grid') {
-              qHtml += `<div class="text-[12px] font-medium text-slate-800 leading-relaxed">${promptText}</div>`;
+              qHtml += `<div class="text-[12px] font-medium text-slate-800 leading-relaxed mb-3">${promptText}</div>`;
               qHtml += `<div class="overflow-x-auto"><table class="w-full text-left border-collapse bg-slate-50/50 rounded-lg"><thead><tr><th class="p-2 border-b border-slate-200"></th>`;
               if(q.options) {
                   q.options.forEach(opt => {
@@ -490,7 +380,7 @@
               qHtml += `</tr></thead><tbody>`;
               if(q.sub_questions) {
                   q.sub_questions.forEach(subQ => {
-                    qHtml += `<tr><td class="p-2.5 border-b border-slate-200 text-[12px] font-medium text-slate-700 leading-snug"><span class='border border-slate-400 bg-white px-1.5 py-0.5 rounded text-[11px] font-black mr-2 shadow-sm'>${subQ.id}</span>${subQ.text}</td>`;
+                    qHtml += `<tr><td class="p-3 border-b border-slate-200 text-[12px] font-medium text-slate-700 leading-snug"><span class='border border-slate-400 bg-white px-1.5 py-0.5 rounded text-[11px] font-black mr-2 shadow-sm'>${subQ.id}</span>${subQ.text}</td>`;
                     if(q.options) {
                         q.options.forEach(opt => {
                           let isChecked = userAnswers[subQ.id] === opt ? 'checked' : '';
@@ -502,25 +392,23 @@
               }
               qHtml += `</tbody></table></div>`;
             } else if (q.type === 'fill_in') {
-              let inputHtml = `<input type="text" oninput="markAnswered(${q.id}, this.value)" value="${userAnswers[q.id] || ''}" placeholder="answer" class="border-b-2 border-blue-500 bg-slate-50 px-2 py-0.5 text-blue-700 font-bold focus:outline-none focus:bg-blue-100 min-w-24 text-center mx-1 rounded-t transition-colors text-xs">`;
-              let formattedPrompt = promptText.includes('_____') 
-                ? promptText.replace(/_+/g, inputHtml) 
-                : `<span class='border border-slate-400 bg-white px-1.5 py-0.5 rounded text-[11px] font-black mr-2 shadow-sm'>${q.id}</span> ${promptText} <div class="mt-2">${inputHtml}</div>`;
-              qHtml += `<div class="text-[12px] font-medium text-slate-800 leading-relaxed">${formattedPrompt}</div>`;
+              let inputHtml = `<input type="text" oninput="markAnswered(${q.id}, this.value)" value="${userAnswers[q.id] || ''}" class="border-b-2 border-blue-500 bg-slate-50 px-2 py-0.5 text-blue-700 font-bold focus:outline-none focus:bg-blue-100 w-32 text-center mx-1 rounded-t transition-colors">`;
+              let formattedPrompt = promptText.replace(/_+/g, inputHtml);
+              qHtml += `<div class="text-[13px] font-medium text-slate-800 leading-relaxed">${formattedPrompt}</div>`;
             } else if (q.type === 'tfng' || q.type === 'mcq') {
-              qHtml += `<div class="text-[12px] font-bold text-slate-800 leading-relaxed">${promptText.startsWith('<span') ? promptText : `<span class='border border-slate-400 bg-white px-1.5 py-0.5 rounded text-[11px] font-black mr-2 shadow-sm'>${q.id}</span> ` + promptText}</div>`;
-              qHtml += `<div class="space-y-1.5 mt-2">`;
+              qHtml += `<div class="text-[13px] font-bold text-slate-800 leading-relaxed mb-2">${promptText}</div>`;
+              qHtml += `<div class="space-y-2 mt-2">`;
               if (q.options) {
                   q.options.forEach(opt => {
                      let isChecked = userAnswers[q.id] === opt ? 'checked' : '';
                      let activeClass = isChecked ? 'bg-blue-50 border-blue-300' : 'border-slate-200 hover:bg-slate-50';
                      qHtml += `
-                       <label class="flex items-center gap-2.5 p-2 border rounded-lg cursor-pointer transition-colors ${activeClass}" onclick="updateRadioUI(this, ${q.id}, '${opt}')">
+                       <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${activeClass}" onclick="updateRadioUI(this, ${q.id}, '${opt}')">
                          <input type="radio" name="q-${q.id}" value="${opt}" ${isChecked} class="hidden">
-                         <div class="w-3.5 h-3.5 rounded-full border border-slate-400 flex items-center justify-center ${isChecked ? 'border-blue-600' : ''}">
-                            <div class="w-1.5 h-1.5 rounded-full ${isChecked ? 'bg-blue-600' : 'bg-transparent'}"></div>
+                         <div class="w-4 h-4 rounded-full border border-slate-400 flex items-center justify-center ${isChecked ? 'border-blue-600' : ''}">
+                            <div class="w-2 h-2 rounded-full ${isChecked ? 'bg-blue-600' : 'bg-transparent'}"></div>
                          </div>
-                         <span class="text-[12px] text-slate-700 font-medium">${opt}</span>
+                         <span class="text-[13px] text-slate-700 font-medium">${opt}</span>
                        </label>
                      `;
                   });
@@ -538,25 +426,57 @@
         markAnswered(qId, value);
         const container = labelElement.parentElement;
         container.querySelectorAll('label').forEach(lbl => {
-            lbl.className = 'flex items-center gap-2.5 p-2 border rounded-lg cursor-pointer transition-colors border-slate-200 hover:bg-slate-50';
-            lbl.querySelector('.w-3\\.5')?.classList.remove('border-blue-600');
-            const inner = lbl.querySelector('.w-1\\.5');
-            if(inner) inner.className = 'w-1.5 h-1.5 rounded-full bg-transparent';
+            lbl.className = 'flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors border-slate-200 hover:bg-slate-50';
+            lbl.querySelector('.w-4').className = 'w-4 h-4 rounded-full border border-slate-400 flex items-center justify-center';
+            lbl.querySelector('.w-2').className = 'w-2 h-2 rounded-full bg-transparent';
         });
-        labelElement.className = 'flex items-center gap-2.5 p-2 border rounded-lg cursor-pointer transition-colors bg-blue-50 border-blue-300';
-        labelElement.querySelector('.w-3\\.5')?.classList.add('border-blue-600');
-        const activeInner = labelElement.querySelector('.w-1\\.5');
-        if(activeInner) activeInner.className = 'w-1.5 h-1.5 rounded-full bg-blue-600';
+        labelElement.className = 'flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors bg-blue-50 border-blue-300';
+        labelElement.querySelector('.w-4').className = 'w-4 h-4 rounded-full border border-blue-600 flex items-center justify-center';
+        labelElement.querySelector('.w-2').className = 'w-2 h-2 rounded-full bg-blue-600';
     }
 
-    function markAnswered(qNum, value) {
-      if (value && String(value).trim() !== '') {
-        userAnswers[qNum] = String(value).trim();
-        document.getElementById(`palette-q-${qNum}`)?.classList.add('answered');
-      } else {
-        delete userAnswers[qNum];
-        document.getElementById(`palette-q-${qNum}`)?.classList.remove('answered');
+    function loadListeningPart(partNum) {
+      [1, 2, 3, 4].forEach(p => {
+        const btn = document.getElementById(`pass-tab-${p}`);
+        if (btn) btn.className = p === partNum ? "px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold" : "px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold";
+      });
+      const passagePane = document.getElementById('passageContent');
+      const questionsPane = document.getElementById('questionsContent');
+      if(passagePane) passagePane.innerHTML = `<div class="space-y-2 p-2"><h3 class="font-bold text-slate-800 text-xs">Part ${partNum} Audio Track</h3><div class="bg-slate-100 p-4 rounded-xl flex items-center justify-center shadow-inner text-slate-400 text-xs">[Audio Player Placeholder]</div></div>`;
+      
+      let startQ = (partNum - 1) * 10 + 1;
+      let endQ = partNum * 10;
+      let qHtml = `<div class="space-y-3 pb-6"><div class="bg-blue-50/80 p-3 rounded-xl border border-blue-200 sticky top-0 z-10 backdrop-blur-md"><h4 class="font-bold text-blue-900 text-xs">Questions ${startQ}–${endQ}</h4></div>`;
+      for (let i = startQ; i <= endQ; i++) {
+        qHtml += `<div id="q-box-${i}" class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5 shadow-sm"><label class="text-xs font-bold text-slate-700">Question ${i}:</label><input type="text" oninput="markAnswered(${i}, this.value)" value="${userAnswers[i] || ''}" placeholder="Type answer..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs"></div>`;
       }
+      qHtml += `</div>`;
+      if(questionsPane) questionsPane.innerHTML = qHtml;
+    }
+
+    function loadWritingTaskSection(taskNum) {
+      [1, 2].forEach(p => {
+        const btn = document.getElementById(`pass-tab-${p}`);
+        if (btn) btn.className = p === taskNum ? "px-3 py-1 bg-blue-600 text-white rounded text-xs font-bold" : "px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded text-xs font-bold";
+      });
+      const passagePane = document.getElementById('passageContent');
+      const questionsPane = document.getElementById('questionsContent');
+      if (!passagePane || !questionsPane) return;
+
+      if (taskNum === 1) {
+        passagePane.innerHTML = `<div class="space-y-3 p-2"><span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">WRITING TASK 1</span></div>`;
+        questionsPane.innerHTML = `<div class="space-y-3 p-2"><textarea id="essayInput" rows="10" placeholder="Type your Task 1 response here..." class="w-full text-xs p-3 bg-white border border-slate-300 rounded-xl leading-relaxed"></textarea></div>`;
+      } else {
+        passagePane.innerHTML = `<div class="space-y-3 p-2"><span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">WRITING TASK 2</span></div>`;
+        questionsPane.innerHTML = `<div class="space-y-3 p-2"><textarea id="essayInput" rows="12" placeholder="Type your Task 2 response here..." class="w-full text-xs p-3 bg-white border border-slate-300 rounded-xl leading-relaxed"></textarea></div>`;
+      }
+    }
+
+    function loadSpeakingSection() {
+      const pPane = document.getElementById('passageContent');
+      const qPane = document.getElementById('questionsContent');
+      if(pPane) pPane.innerHTML = `<div class="p-4 space-y-3"><span class="bg-purple-100 text-purple-800 text-[10px] font-black px-2 py-0.5 rounded">SPEAKING PART 2</span></div>`;
+      if(qPane) qPane.innerHTML = `<div class="flex flex-col items-center justify-center h-full space-y-4"><button class="bg-purple-600 text-white font-extrabold text-xs px-6 py-2.5 rounded-xl shadow-md">Start Recording</button></div>`;
     }
 
     function renderPalette(total) {
@@ -575,58 +495,20 @@
                 else if (i >= 14 && i <= 26) switchReadingPassage(2);
                 else if (i >= 27 && i <= 40) switchReadingPassage(3);
             }
-          setTimeout(() => document.getElementById(`q-box-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80);
+          setTimeout(() => document.getElementById(`q-box-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
         };
         palette.appendChild(btn);
       }
     }
 
-    function highlightSelection() {
-      const sel = window.getSelection();
-      if (!sel.rangeCount || sel.isCollapsed) return;
-      const range = sel.getRangeAt(0);
-      const span = document.createElement('span');
-      span.className = 'highlighted';
-      range.surroundContents(span);
-      sel.removeAllRanges();
-      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-    }
-
-    function initResizer() {
-      const resizer = document.getElementById('resizerBar');
-      const top = document.getElementById('topPane');
-      const bottom = document.getElementById('bottomPane');
-      if (!resizer || !top || !bottom) return;
-
-      let isDragging = false;
-
-      function onStart(e) { isDragging = true; }
-      function onMove(e) {
-        if (!isDragging) return;
-        if (window.innerWidth >= 768) {
-          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-          const totalWidth = window.innerWidth;
-          const newLeftWidth = Math.max(200, Math.min(totalWidth - 200, clientX));
-          top.style.flex = 'none';
-          top.style.width = `${newLeftWidth}px`;
-          bottom.style.flex = '1';
-        } else {
-          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-          const totalHeight = window.innerHeight - 125;
-          const newTopHeight = Math.max(80, Math.min(totalHeight - 80, clientY - 60));
-          top.style.flex = 'none';
-          top.style.height = `${newTopHeight}px`;
-          bottom.style.flex = '1';
-        }
+    function markAnswered(qNum, value) {
+      if (value && value.trim() !== '') {
+        userAnswers[qNum] = value;
+        document.getElementById(`palette-q-${qNum}`)?.classList.add('answered');
+      } else {
+        delete userAnswers[qNum];
+        document.getElementById(`palette-q-${qNum}`)?.classList.remove('answered');
       }
-      function onEnd() { isDragging = false; }
-
-      resizer.addEventListener('mousedown', onStart);
-      resizer.addEventListener('touchstart', onStart, { passive: true });
-      window.addEventListener('mousemove', onMove);
-      window.addEventListener('touchmove', onMove, { passive: true });
-      window.addEventListener('mouseup', onEnd);
-      window.addEventListener('touchend', onEnd);
     }
 
     function startTimer(seconds) {
@@ -649,76 +531,10 @@
       }
     }
 
-    function submitTest() {
-      clearInterval(timerInterval);
-      let rawScore = 0;
-      const breakdown = [];
-
-      if (TEST && TEST.passages) {
-        TEST.passages.forEach(p => {
-          if (p.questions) {
-            p.questions.forEach(q => {
-              if (q.type === 'grid' && q.sub_questions) {
-                q.sub_questions.forEach(subQ => {
-                  const uAns = String(userAnswers[subQ.id] || '').trim().toLowerCase();
-                  const cAns = String(subQ.answer || q.answer || '').trim().toLowerCase();
-                  const isCorrect = uAns === cAns && uAns !== '';
-                  if (isCorrect) rawScore++;
-                  breakdown.push({ id: subQ.id, user: userAnswers[subQ.id] || '(Empty)', correct: subQ.answer || q.answer, isCorrect });
-                });
-              } else if (q.id && !isNaN(q.id)) {
-                const uAns = String(userAnswers[q.id] || '').trim().toLowerCase();
-                const cAns = String(q.answer || '').trim().toLowerCase();
-                const isCorrect = uAns === cAns && uAns !== '';
-                if (isCorrect) rawScore++;
-                breakdown.push({ id: q.id, user: userAnswers[q.id] || '(Empty)', correct: q.answer, isCorrect });
-              }
-            });
-          }
-        });
-      }
-
-      const band = calculateBandScore(rawScore);
-      document.getElementById('resBandScore').textContent = `Band ${band}`;
-      document.getElementById('resRawScore').textContent = `${rawScore} / 40 Correct Answers`;
-
-      const listEl = document.getElementById('resBreakdownList');
-      listEl.innerHTML = breakdown.map(item => `
-        <div class="py-2 flex items-center justify-between text-xs">
-          <div class="flex items-center gap-2">
-            <span class="w-6 h-6 rounded-md ${item.isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'} flex items-center justify-center font-black">${item.id}</span>
-            <span class="text-slate-600">Your: <strong class="${item.isCorrect ? 'text-emerald-700' : 'text-rose-600'}">${item.user}</strong></span>
-          </div>
-          ${item.isCorrect ? `<span class="text-emerald-600 font-black"><i class="fa-solid fa-check"></i></span>` : `<span class="text-slate-500 font-bold">Ans: <strong class="text-emerald-700">${item.correct}</strong></span>`}
-        </div>
-      `).join('');
-
-      document.getElementById('modalResult').classList.remove('hidden');
-
-      // Update stats
-      document.getElementById('statBand').textContent = `Band ${band}`;
-      document.getElementById('statDone').textContent = '1';
-      document.getElementById('statAccuracy').textContent = `${Math.round((rawScore / 40) * 100)}%`;
-      document.getElementById('streakDisplay').textContent = '1';
-
-      if (tg?.sendData) {
-        tg.sendData(JSON.stringify({
-          exam: "IELTS Reading",
-          book: currentBookNum,
-          test: currentTestNum,
-          rawScore: rawScore,
-          band: band
-        }));
-      }
-    }
-
-    function closeResultModal() {
-      document.getElementById('modalResult').classList.add('hidden');
-      switchTab('view-home');
-    }
+    function submitTest() { switchTab('view-home'); }
 
     function switchTab(tabId) {
-      ['view-home', 'view-select-test', 'view-test-runner', 'view-predictions', 'view-books'].forEach(t => {
+      ['view-home', 'view-select-test', 'view-test-runner', 'view-review', 'view-books', 'view-predictions'].forEach(t => {
         document.getElementById(t)?.classList.add('hidden');
       });
       document.getElementById(tabId)?.classList.remove('hidden');
